@@ -26,7 +26,7 @@ export default function OurHistory() {
             className="mx-auto block h-auto w-[266px] max-w-full"
           />
           <div className="-my-px overflow-hidden rounded-[36px] border-[20px] border-solid border-accent-3">
-            <VideoFrame videoId="67ouh2PgUfk" title="Introductory video" poster="/images/history-poster.jpg" />
+            <VideoFrame videoId="67ouh2PgUfk" title="Introductory video" poster="/images/school/campus-courtyard.jpg" />
           </div>
           <Image
             src="/images/tv-bottom.svg"
