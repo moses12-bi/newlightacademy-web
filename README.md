@@ -76,3 +76,4 @@ Still assumed and awaiting confirmation:
 - Route slugs still read `/infants`, `/toddlers`, `/preschool`, `/kindergarten` while the pages are labelled
   Baby Class … Primary School, so the address bar contradicts the page.
 - Every photograph and both YouTube videos are still the theme's stock material. No copy claims otherwise.
+"# newlightacademy-web" 
