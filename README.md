@@ -75,5 +75,14 @@ Still assumed and awaiting confirmation:
   descriptions.
 - Route slugs still read `/infants`, `/toddlers`, `/preschool`, `/kindergarten` while the pages are labelled
   Baby Class … Primary School, so the address bar contradicts the page.
-- Every photograph and both YouTube videos are still the theme's stock material. No copy claims otherwise.
-"# newlightacademy-web" 
+
+Still to come from the school:
+
+- **Staff names.** The six teacher portraits and the Head Teacher slot in `TeachersTeam.tsx` carry no names,
+  because the photographs arrived without any indication of who is in them. `name` and `role` already render —
+  fill them in and nothing else changes.
+- **The Founder's name.** Her photograph and title are published; her name is not.
+- **The Head Teacher.** Confirmed to be a separate person from the Founder; `HEAD_TEACHER` is `null` until a
+  name and photograph arrive, at which point the card renders first in the grid.
+- Both YouTube videos embedded on the site are still the theme's demo footage. No copy claims they show the
+  school, but the school has its own channel and should supply its own. 

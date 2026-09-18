@@ -22,6 +22,17 @@ interface TeamMember {
  * be worse than one with none. Fill them in as they are confirmed — the card
  * already renders both — and nothing else here needs to change.
  */
+/**
+ * The Head Teacher runs the school day to day and is the person NESA
+ * corresponds with — a distinct role from the Founder and Managing Director,
+ * who leads the school overall and appears in the profile band above.
+ *
+ * The school has confirmed the Head Teacher is a separate person but has not
+ * yet sent a name or a photograph. Fill this in and the card renders first in
+ * the grid, ahead of the teaching team; leave it null and the grid is unchanged.
+ */
+const HEAD_TEACHER: TeamMember | null = null;
+
 const TEAM: TeamMember[] = [
   { photo: "/images/staff/teacher-1.webp" },
   { photo: "/images/staff/teacher-2.webp", delay: "200" },
@@ -30,6 +41,9 @@ const TEAM: TeamMember[] = [
   { photo: "/images/staff/teacher-5.webp", delay: "800" },
   { photo: "/images/staff/teacher-6.webp", delay: "1000" },
 ];
+
+/** What the grid renders: the Head Teacher first, when there is one. */
+const MEMBERS: TeamMember[] = HEAD_TEACHER ? [HEAD_TEACHER, ...TEAM] : TEAM;
 
 /** Ported from post-1042: the back face is white, the name black, the role the deep teal. */
 const CARD_STYLE: CSSProperties = {
@@ -60,15 +74,15 @@ export default function TeachersTeam() {
       </section>
 
       {/* #f1b0259 is `elementor-section-full_width`, so it has no content well. */}
-      {TEAM.length > 0 ? (
+      {MEMBERS.length > 0 ? (
         <section className="teachers-team" aria-label="Our teaching team">
-          {TEAM.map((member, index) => (
+          {MEMBERS.map((member, index) => (
             <div key={member.photo} data-reveal="zoomIn" data-delay={member.delay}>
               <FlipBox
                 effect="slide"
                 direction="up"
                 heights={{ desktop: 634, tablet: 600, mobile: 600 }}
-                label={member.name ? `${member.name}${member.role ? `, ${member.role}` : ""}` : `Teaching staff, portrait ${index + 1} of ${TEAM.length}`}
+                label={member.name ? `${member.name}${member.role ? `, ${member.role}` : ""}` : `Teaching staff, portrait ${index + 1} of ${MEMBERS.length}`}
                 style={CARD_STYLE}
                 /* The front face is the portrait, as in the source theme. */
                 front={{

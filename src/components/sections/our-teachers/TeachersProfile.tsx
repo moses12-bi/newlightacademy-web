@@ -47,7 +47,7 @@ export default function TeachersProfile() {
             <div className="teachers-profile__portrait max-md:hidden">
               <Image
                 src="/images/staff/director.webp"
-                alt={`The Director of ${site.name}`}
+                alt={`The Founder and Managing Director of ${site.name}`}
                 width={700}
                 height={875}
                 sizes="(max-width: 1024px) 45vw, 480px"
@@ -57,7 +57,7 @@ export default function TeachersProfile() {
             <div className="teachers-profile__mobile-photo md:hidden">
               <Image
                 src="/images/staff/director.webp"
-                alt={`The Director of ${site.name}`}
+                alt={`The Founder and Managing Director of ${site.name}`}
                 width={700}
                 height={875}
                 sizes="100vw"
@@ -66,13 +66,14 @@ export default function TeachersProfile() {
           </div>
 
           <div className="teachers-profile__copy">
-            <h2>Our Director</h2>
+            <h2>Our Founder</h2>
             {/* The save marks the role as an h4 directly under the h2; rendered as a
                 paragraph so the page outline has no level skip. */}
-            <p className="teachers-profile__role">Director and Managing Director</p>
+            <p className="teachers-profile__role">Founder &amp; Managing Director</p>
             <p className="teachers-profile__intro">
-              Our Director leads the school day to day, across both the nursery and the primary classes,
-              and is glad to meet families who are thinking of joining us.
+              Our Founder established {site.name} and leads it as Managing Director, working alongside
+              the Head Teacher and the teaching team, and is glad to meet families who are thinking
+              of joining us.
             </p>
 
             {STATS_LEFT.length > 0 || STATS_RIGHT.length > 0 ? (
@@ -101,7 +102,7 @@ export default function TeachersProfile() {
 
             {/* #d5049bc — hidden on phones in the save. */}
             <p className="teachers-profile__since max-md:hidden">
-              <em>Director, {site.name}</em>
+              <em>Founder &amp; Managing Director, {site.name}</em>
             </p>
           </div>
         </div>
