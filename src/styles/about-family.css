@@ -743,3 +743,22 @@
     padding: 20px 0 0;
   }
 }
+
+/* Consent-withdrawal line under the gallery grid. Deliberately quiet: it is a
+   legal affordance, not a section, so it takes the muted footer-note size
+   rather than introducing a new type step. */
+.gallery-consent {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+.gallery-consent a {
+  color: var(--color-accent-1);
+  text-decoration: underline;
+}
+.gallery-consent a:hover,
+.gallery-consent a:focus-visible {
+  color: var(--color-accent-3);
+}

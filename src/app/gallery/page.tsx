@@ -4,10 +4,11 @@ import GalleryJustified from "@/components/sections/gallery/GalleryJustified";
 import { galleryPhotos } from "@/components/sections/gallery/photos";
 import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
+import { hasEmail, hasPhone, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Gallery",
-  description: "Illustrative photographs of nursery and primary school life.",
+  description: `Photographs of nursery and primary school life at ${site.name}.`,
 };
 
 export default function GalleryPage() {
@@ -32,6 +33,30 @@ export default function GalleryPage() {
             <div data-reveal="fadeIn" data-reveal-mobile="none">
               <GalleryJustified photos={galleryPhotos} />
             </div>
+
+            {/* Rwanda's Law 058/2021 requires a way to withdraw consent for a
+                child's image, not only to give it. The school confirmed it holds
+                parental consent for these photographs; this is the other half. */}
+            {hasPhone() || hasEmail() ? (
+              <p className="gallery-consent" data-reveal="fadeIn" data-delay="200">
+                If you would like a photograph of your child removed from this page, please
+                contact the school office
+                {hasPhone() ? (
+                  <>
+                    {" "}
+                    on <a href={site.phoneHref}>{site.phone}</a>
+                  </>
+                ) : null}
+                {hasPhone() && hasEmail() ? " or" : null}
+                {hasEmail() ? (
+                  <>
+                    {" "}
+                    at <a href={`mailto:${site.email}`}>{site.email}</a>
+                  </>
+                ) : null}
+                , and we will take it down.
+              </p>
+            ) : null}
           </div>
         </Container>
       </section>

@@ -1,118 +1,111 @@
 export interface GalleryPhoto {
-  /** Local file. Every gallery image in the save resolved to a local asset. */
+  /** Local file under public/images/school/. */
   src: string;
   width: number;
   height: number;
-  /**
-   * The ratio the justified layout is built from, taken from the saved
-   * `data-width` / `data-height` on each `.e-gallery-image` (1024x682 for the
-   * first photo, 1024x630 for the other eleven).
-   */
+  /** Aspect ratio the justified layout lays each row out from. */
   ratio: number;
   /**
-   * What the picture shows, for screen readers. These are still the template's
-   * stock photographs, so each line describes the scene in front of the camera
-   * and nothing more: no photograph here shows this school, its pupils, its
-   * staff or an event of its own. Rewrite each line when the photo is replaced.
+   * What the picture shows, for screen readers. Each line describes only what
+   * is visibly in the frame — no names, and no claim about the occasion beyond
+   * what the photograph itself shows.
    */
   alt?: string;
 }
 
-const WIDE = 1024 / 630;
-
 /**
- * The twelve photos of #5f571d4, in the order the saved markup lists them.
+ * New Light Academy's own photographs, curated from the school's library and
+ * written here by scripts/process-photos.cjs. Do not hand-edit: change
+ * scripts/photo-picks.cjs and re-run it, so the dimensions stay tied to the
+ * files on disk.
  *
- * Note on the two h-10 entries: the source links
- * `2020/01/h-10.jpg` and `2020/02/h-10.jpg`, two uploads of the same
- * photograph cropped differently. The asset downloader keyed files by base
- * name, so both full-size uploads collapsed onto `/images/gallery/h-10.jpg`;
- * the second entry therefore uses the 1024px variant of the February upload,
- * which is the file the saved gallery markup itself referenced.
+ * The school has confirmed it holds parental consent for these images. The
+ * gallery page carries a route for a parent to ask for a photograph of their
+ * child to be removed, which Rwanda's Law 058/2021 requires alongside consent.
  */
 export const galleryPhotos: GalleryPhoto[] = [
   {
-    src: "/images/home/blog-photo-2.jpg",
-    width: 1200,
-    height: 799,
-    ratio: 1024 / 682,
-    alt: "Children painting a small model together, with brushes and paint pots on the table",
+    src: "/images/school/nursery-pupils-outdoors.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Young pupils in gold and navy uniform standing together outdoors",
   },
   {
-    src: "/images/gallery/h-10.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A young child in a knitted hat, smiling",
+    src: "/images/school/pupil-white-coat-microphone.jpg",
+    width: 1199,
+    height: 1800,
+    ratio: 1199 / 1800,
+    alt: "A pupil in a white coat speaking into a microphone",
   },
   {
-    src: "/images/history-poster.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A child standing in front of a brightly painted mural",
+    src: "/images/school/nursery-graduation-gowns.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Nursery pupils in blue and gold graduation gowns and caps",
   },
   {
-    src: "/images/blog/h-10-1024x630.jpg",
-    width: 1024,
-    height: 630,
-    ratio: WIDE,
-    alt: "A close-up of a smiling young child in a knitted hat",
+    src: "/images/school/graduates-red-gowns.jpg",
+    width: 1800,
+    height: 1200,
+    ratio: 1800 / 1200,
+    alt: "Pupils in red graduation gowns and caps gathered together",
   },
   {
-    src: "/images/home/h-05.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A teacher showing a toy fruit to a small group of children sitting together",
+    src: "/images/school/football-team-green-kit.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Pupils in green football kit on the pitch",
   },
   {
-    src: "/images/shared/h-04.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A teacher sitting and talking with two young children",
+    src: "/images/school/karate-demonstration.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Pupils in white karate uniforms with coloured belts, mid-demonstration",
   },
   {
-    src: "/images/gallery/h-03.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "Children playing with wooden blocks while their teacher looks on",
+    src: "/images/school/brass-band.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Pupils playing brass instruments and a bass drum",
   },
   {
-    src: "/images/gallery/h-02.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "An adult smiling at a baby lying in a cot",
+    src: "/images/school/traditional-dance.jpg",
+    width: 1800,
+    height: 1200,
+    ratio: 1800 / 1200,
+    alt: "Pupils performing a traditional dance in patterned costume",
   },
   {
-    src: "/images/shared/h-07.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A child writing in a notebook beside shelves of books",
+    src: "/images/school/role-play-activity-table.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Children in white coats and chefs' hats at an activity table",
   },
   {
-    src: "/images/home/h-20.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "Children building a model out of coloured sticks at a table",
+    src: "/images/school/school-building.jpg",
+    width: 1800,
+    height: 1200,
+    ratio: 1800 / 1200,
+    alt: "The school building, painted pink and green, with an open walkway",
   },
   {
-    src: "/images/home/h-15.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "Three children crouching outdoors, looking at the ground through magnifying glasses",
+    src: "/images/school/pupils-with-certificates.jpg",
+    width: 1800,
+    height: 1199,
+    ratio: 1800 / 1199,
+    alt: "Pupils in uniform holding framed certificates",
   },
   {
-    src: "/images/home/h-18.jpg",
-    width: 1300,
-    height: 800,
-    ratio: WIDE,
-    alt: "A child reaching towards a smiling face card held up by an adult",
+    src: "/images/school/graduation-assembly.jpg",
+    width: 1800,
+    height: 1200,
+    ratio: 1800 / 1200,
+    alt: "A large group of pupils in blue graduation gowns seated together",
   },
 ];
