@@ -1,0 +1,567 @@
+/* ===========================================================================
+   /programs + the six program detail pages
+   (/infants, /toddlers, /preschool, /kindergarten, /flex-care, /art-program)
+
+   Ported from the saved Elementor page stylesheets:
+     post-46.css    -> /programs (the index: slideshow hero, flip boxes)
+     post-1050.css  -> /infants        post-1058.css -> /kindergarten
+     post-1054.css  -> /toddlers       post-1060.css -> /flex-care
+     post-1056.css  -> /preschool      post-1062.css -> /art-program
+
+   The six detail stylesheets were diffed against each other: they are one
+   template (identical colours, identical age-card palette, identical widget
+   order) and differ only in copy, photos and a handful of section paddings
+   (60 vs 65 vs 70px) and photo offsets. The values below are post-1050's.
+
+   Every class is prefixed `program-` / `programs-`, so no other conversion
+   group can collide with it. Ordinary layout lives in the components as
+   Tailwind utilities; this file carries the ported measurements.
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Shared pieces (used by both the index and the detail template)
+--------------------------------------------------------------------------- */
+
+/* The oversized handwritten word above a section heading: "About", "Ages",
+   "Our", "The". Elementor renders these as `div` headings, so they are <p>
+   here - they are decoration, not document structure. */
+.program-sensei {
+  margin: 0;
+  padding-inline-start: 130px;
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1.1;
+  color: var(--color-accent-3);
+  /* Elementor's `--e-transform-origin-x: left` on this widget, so the scroll
+     scale grows the word to the right and the section clips it. */
+  transform-origin: left center;
+}
+.program-sensei--tight { line-height: 1; }
+@media (max-width: 1024px) {
+  .program-sensei { padding-inline-start: 0; font-size: 130px; line-height: 1; }
+}
+@media (max-width: 767px) {
+  .program-sensei { font-size: 80px; }
+}
+
+/* The white rounded panel that carries the copy in every two-column band. */
+.program-card {
+  position: relative;
+  z-index: 1;
+  border-radius: 8px;
+  background: var(--color-accent-5);
+  padding: 60px;
+}
+.program-card > * + * { margin-top: 20px; }
+@media (max-width: 1024px) {
+  .program-card { padding: 20px; }
+}
+
+/* The photo beside it: full-bleed inside its column, 7px corners. */
+.program-photo { display: block; width: 100%; height: auto; border-radius: 7px; }
+
+/* Elementor's two-column band, with its default 10px column gap. The columns
+   stretch, so the white panel is as tall as the photo beside it. */
+.program-split { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+.program-split > * { display: flex; flex-direction: column; width: 50%; padding: 0 10px; }
+.program-split > * > .program-card { flex: 1 1 auto; }
+@media (max-width: 767px) {
+  .program-split { flex-direction: column; margin: 0; }
+  .program-split > * { width: 100%; padding: 0; }
+  /* Elementor's `elementor-reverse-mobile`. */
+  .program-split--reverse { flex-direction: column-reverse; }
+}
+
+/* `far fa-play-circle` on a transparent button - the hero / video band CTA.
+   Font Awesome is not part of the capture, so the glyph is hand-drawn. */
+.program-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-5);
+  line-height: 0;
+  transition: color 0.3s, transform 0.3s;
+}
+.program-play:hover,
+.program-play:focus-visible { color: var(--color-accent-1); transform: scale(1.06); }
+.program-play svg { width: 85px; height: 85px; }
+@media (max-width: 767px) {
+  .program-play svg { width: 60px; height: 60px; }
+}
+
+/* The lightbox the play button opens. Nothing is requested from YouTube until
+   the visitor presses the button, so this is a facade, not an embed. */
+.program-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px 20px;
+  background: rgba(0, 0, 0, 0.85);
+}
+.program-lightbox__frame {
+  position: relative;
+  width: min(1100px, 100%);
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.program-lightbox__frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.program-lightbox__close {
+  position: absolute;
+  top: -46px;
+  inset-inline-end: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-accent-5);
+}
+.program-lightbox__close svg { width: 28px; height: 28px; }
+
+/* ---------------------------------------------------------------------------
+   "Ages - we meet kids where they are." (post-46 #7a539ade, post-1050 #1bd9ae25)
+   The same four cards, the same palette, on all seven pages.
+--------------------------------------------------------------------------- */
+.program-ages {
+  position: relative;
+  overflow: hidden;
+  background: url("/images/home/illustration-right-cut.svg") bottom right / auto no-repeat;
+}
+/* /programs pads the band itself; the detail pages hang it off the section above. */
+.program-ages--index { padding: 130px 0; }
+.program-ages--detail { padding: 0 0 100px; }
+
+.program-ages__title {
+  padding: 0 130px 50px 0;
+  line-height: 1;
+  color: var(--color-accent-3);
+  text-align: end;
+}
+
+.program-ages__grid { display: flex; flex-wrap: wrap; }
+.program-ages__grid > * { width: 25%; padding: 0 25px; }
+/* The card's time line is an h6 in the save; it is an h4 here so the heading
+   levels stay in order, so the kit's h6 scale is restored for it. */
+.program-ages .w-imagebox__meta { font-size: 14px; font-weight: 600; line-height: 1.5; }
+@media (max-width: 1024px) {
+  .program-ages .w-imagebox__meta { font-size: 12px; }
+}
+
+@media (max-width: 1024px) {
+  .program-ages { background-position: top right; }
+  .program-ages--index { margin-top: 70px; padding: 0; }
+  .program-ages--detail { margin: 70px 0 100px; padding: 0; }
+  .program-ages__head { padding-bottom: 30px; }
+  .program-ages__title { padding: 0; text-align: start; }
+  .program-ages__grid > * { width: 50%; padding: 0; }
+  .program-ages__grid > *:nth-child(odd) { padding-inline-end: 10px; }
+  .program-ages__grid > *:nth-child(even) { padding-inline-start: 10px; }
+  .program-ages__grid > *:nth-child(n + 3) { padding-top: 20px; }
+}
+@media (max-width: 767px) {
+  .program-ages { background-size: 140px auto; }
+  .program-ages--index { margin-top: 50px; padding-bottom: 60px; }
+  .program-ages--detail { margin: 50px 0; }
+  .program-ages__head { padding-bottom: 20px; }
+  .program-ages__title { font-size: 30px; }
+  .program-ages__grid { padding: 0 10%; }
+  .program-ages__grid > *,
+  .program-ages__grid > *:nth-child(odd),
+  .program-ages__grid > *:nth-child(even),
+  .program-ages__grid > *:nth-child(n + 3) {
+    width: 100%;
+    padding: 0 0 30px;
+  }
+}
+
+/* ===========================================================================
+   The six detail pages (post-1050 and its five twins)
+   =========================================================================== */
+
+/* --- "About" band (#6ac299d): white, with a 900px-wide inner row ---------- */
+/* `overflow: hidden` is the saved section's own rule; it is what keeps the
+   oversized, scroll-scaled "About" from widening the page. */
+.program-about { overflow: hidden; margin: 100px 0; }
+.program-about__inner {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+/* Elementor's default column padding inside the 900px inner container. */
+.program-about__art { width: 39.222%; padding: 10px; text-align: center; }
+/* The saved image widget has no width rule, so the illustration keeps its
+   natural 227px and is centred in its column. */
+.program-about__art img { display: inline-block; width: auto; max-width: 100%; height: auto; }
+.program-about__copy { width: 60.778%; padding: 10px; }
+.program-about__copy > * + * { margin-top: 10px; }
+.program-about__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 15px 40px; }
+
+@media (max-width: 1024px) {
+  .program-about { margin: 70px 0; }
+  .program-about__art { margin-top: 60px; padding: 0; }
+  .program-about__copy { padding: 0; }
+}
+@media (max-width: 767px) {
+  .program-about { margin: 50px 0 0; }
+  /* `elementor-reverse-mobile`: the copy comes first, the illustration under it. */
+  .program-about__inner { flex-direction: column-reverse; }
+  .program-about__art,
+  .program-about__copy { width: 100%; }
+  .program-about__art { margin-top: 0; padding-top: 30px; }
+  .program-about__art img { width: 50%; }
+}
+
+/* --- "Individualized care" band (#7b4588f): cream, wave on top ------------ */
+.program-care {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8);
+  padding: 130px 0 70px;
+}
+.program-care__photo { margin-inline-start: -40px; text-align: end; }
+
+@media (max-width: 1024px) {
+  .program-care { padding: 100px 0 50px; }
+  .program-care__photo { margin-top: 100px; }
+  /* post-1050 switches these two columns to vertical centring at tablet. */
+  .program-care .program-split { align-items: center; }
+}
+@media (max-width: 767px) {
+  .program-care { margin-top: 20px; padding: 0; }
+  .program-care__photo { margin: 0; }
+  .program-care .program-card { margin-top: 20px; }
+}
+
+/* --- "<Program> program" band (#a7c1487): cream + the snail illustration -- */
+.program-detail {
+  overflow: hidden;
+  background: var(--color-accent-8) url("/images/snail.svg") bottom center / auto no-repeat;
+  padding: 60px 0 70px;
+}
+.program-detail__photo { margin: 85px -40px 0 0; }
+
+@media (max-width: 1024px) {
+  .program-detail { background-size: 531px auto; }
+}
+@media (max-width: 767px) {
+  .program-detail { background-size: 270px auto; padding: 70px 0 60px; }
+  .program-detail__photo { margin: 0; }
+  .program-detail .program-card { margin-top: 20px; }
+}
+
+/* --- "Signature practices" band (#edfe970): cream, wave at the bottom ----- */
+.program-signature {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8);
+  margin-bottom: 100px;
+  padding: 60px 0 130px;
+}
+.program-signature__photo { margin: 120px 0 0 -40px; }
+
+@media (max-width: 1024px) {
+  .program-signature { padding: 50px 0; }
+  .program-signature__photo { margin-top: 100px; }
+  .program-signature .program-split { align-items: center; }
+}
+@media (max-width: 767px) {
+  .program-signature { margin-bottom: 0; padding: 20px 0 70px; }
+  .program-signature__photo { margin: 0; }
+  .program-signature .program-card { margin-top: 20px; }
+}
+
+/* ===========================================================================
+   /programs (post-46)
+   =========================================================================== */
+
+/* --- hero (#bdac0fe): cross-fading photo slideshow, wave at the bottom ---- */
+.programs-hero {
+  position: relative;
+  overflow: hidden;
+  margin-top: -40px;
+  margin-bottom: 60px;
+  padding-top: 5%;
+  background: var(--color-accent-3);
+}
+.programs-hero__slides { position: absolute; inset: 0; z-index: 0; }
+.programs-hero__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: programs-hero-slides 10s linear infinite;
+}
+.programs-hero__slide img { width: 100%; height: 100%; object-fit: cover; }
+.programs-hero__slide:nth-child(2) { animation-delay: 5s; }
+.programs-hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+  opacity: 0.05;
+  transition: opacity 1.1s;
+}
+.programs-hero:hover .programs-hero__shade { opacity: 0.25; }
+.programs-hero__container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  min-height: 40vh;
+}
+.programs-hero__spacer { width: 30%; }
+.programs-hero__panel {
+  position: relative;
+  width: 70%;
+  padding: 9%;
+  text-align: center;
+  /* Elementor's `--e-transform-origin: center bottom` on this column. */
+  transform-origin: center bottom;
+}
+.programs-hero__panel > * + * { margin-top: 10px; }
+/* The saved column sits on `slider-bg.svg`, a pale backdrop shape that is not in
+   the capture (it is referenced only from CSS, so the scrape never fetched it).
+   Without it the deep-teal title and kickers sit straight on the photography and
+   drop under 3:1 over its darker areas, so this stands in for the shape and
+   restores the contrast it provided. */
+.programs-hero__panel::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 4% -4% 0;
+  border-radius: 50% / 42%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.96),
+    rgba(255, 255, 255, 0.93) 58%,
+    rgba(255, 255, 255, 0.6) 82%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+.programs-hero__dots { position: absolute; z-index: 0; top: -33px; left: -33px; }
+.programs-hero__dots img { max-width: 100%; height: auto; }
+.programs-hero__tree { position: relative; z-index: 1; transform-origin: center bottom; }
+.programs-hero__tree img { display: inline-block; width: 12%; height: auto; }
+/* The two lines around the title are `h3`s in the save; they are paragraphs
+   here (see ProgramsHero), so they carry the kit's h3 scale explicitly. */
+.programs-hero__kicker {
+  position: relative;
+  z-index: 1;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.21;
+  color: var(--color-accent-3);
+}
+.programs-hero__title {
+  position: relative;
+  z-index: 1;
+  margin: -12px 0 2px;
+  font-family: var(--font-handwritten);
+  font-size: 86px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-accent-3);
+}
+
+/* Two slides, 3s cross-fade, 5s on screen - Elementor's slideshow settings. */
+@keyframes programs-hero-slides {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  45% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* globals.css's blanket reduced-motion reset only shortens animation-duration,
+   which accelerates an infinite animation instead of stopping it: the slides
+   would sample a random phase every frame. Stop the cycle outright and show the
+   first photograph. */
+@media (prefers-reduced-motion: reduce) {
+  .programs-hero__slide { animation: none !important; opacity: 1; }
+  .programs-hero__slide:nth-child(2) { opacity: 0; }
+}
+
+@media (max-width: 1024px) {
+  .programs-hero { padding-top: 140px; }
+  .programs-hero__spacer { display: none; }
+  .programs-hero__panel { width: 100%; margin: 0 2%; padding: 7% 5% 4%; }
+  .programs-hero__title { font-size: 60px; }
+}
+@media (max-width: 767px) {
+  .programs-hero { margin: 0; padding: 0; }
+  .programs-hero__container { min-height: 60vh; }
+  .programs-hero__panel { margin: 0 0 0 10px; padding: 30% 0 4%; }
+  .programs-hero__title { font-size: 45px; }
+  .programs-hero__kicker { font-size: 24px; }
+}
+
+/* --- "Our promise to families." (#59486fb) -------------------------------- */
+.programs-promise { position: relative; z-index: 2; padding-top: 170px; }
+.programs-promise__row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+.programs-promise__word { width: 30%; padding: 0 10px; }
+.programs-promise__word .program-sensei { margin-top: -111px; }
+.programs-promise__copy { width: 70%; padding: 0 20% 0 10px; }
+.programs-promise__copy > * + * { margin-top: 20px; }
+.programs-promise__copy h2 { padding-top: 140px; }
+.programs-promise__gap { height: 50px; }
+
+@media (max-width: 1024px) {
+  .programs-promise { padding-top: 0; }
+  .programs-promise__word { width: 45%; }
+  .programs-promise__word .program-sensei { margin-top: 0; }
+  .programs-promise__copy { width: 100%; padding-inline-end: 10px; }
+  .programs-promise__copy h2 { padding-top: 0; }
+}
+@media (max-width: 767px) {
+  .programs-promise { margin-top: 50px; }
+  .programs-promise__word,
+  .programs-promise__copy { width: 100%; }
+  .programs-promise__gap { display: none; }
+}
+
+/* --- the leaves-and-tree strip (#7c9c3eb) --------------------------------- */
+/* `overflow: hidden` because the tree reveals with `rotateInDownRight`, which
+   swings its box ~150px past the content well during the 1.25s entrance and
+   would otherwise make the document scroll sideways. `.calendar-scene`, the
+   same construct on /school-calendar, is clipped for the same reason. */
+.programs-foliage { overflow: hidden; margin: -140px 0 -70px; }
+.programs-foliage__row {
+  display: flex;
+  align-items: flex-end;
+  background: url("/images/home/path-1.svg") bottom left no-repeat;
+}
+.programs-foliage__leaves { width: 50%; padding: 0 0 152px 45px; }
+.programs-foliage__leaves img { display: block; height: auto; }
+.programs-foliage__leaf-2 { padding-bottom: 40px; }
+.programs-foliage__leaf-1 { padding-inline-start: 50px; }
+.programs-foliage__tree { width: 50%; padding: 0 60px 106px 0; text-align: end; }
+.programs-foliage__tree img { display: inline-block; height: auto; }
+
+@media (max-width: 1024px) {
+  .programs-foliage { margin: -100px 0 -90px; }
+  .programs-foliage__tree { padding: 0 20px 165px 0; }
+}
+@media (max-width: 767px) {
+  .programs-foliage { margin: 0 0 -100px; }
+  .programs-foliage__row { flex-direction: column; align-items: stretch; }
+  .programs-foliage__leaves { width: 100%; padding: 0 0 0 30px; }
+  .programs-foliage__tree {
+    width: 100%;
+    margin-top: -160px;
+    margin-inline-end: -20px;
+    padding: 0;
+  }
+}
+
+/* --- the video band (#f948bec): waves top and bottom ---------------------- */
+.programs-video {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  margin-top: 80px;
+  padding: 80px 0;
+  background: var(--color-accent-3);
+  text-align: center;
+}
+.programs-video__inner { padding: 155px 0; }
+
+@media (max-width: 1024px) {
+  .programs-video { margin-top: 0; }
+  .programs-video__inner { padding: 10px 0; }
+}
+@media (max-width: 767px) {
+  .programs-video { margin-top: 20px; padding: 30px 0 20px; text-align: start; }
+  .programs-video__inner { padding: 50px 0; }
+}
+
+/* --- "The <school> difference" (#b4abadf) --------------------------------- */
+.programs-difference { overflow: hidden; }
+.programs-difference > * + * { margin-top: 20px; }
+.programs-difference .program-sensei { margin-top: 130px; }
+.programs-difference__heading { padding-inline-start: 30%; }
+.programs-difference__text { padding: 0 10% 0 30%; }
+
+@media (max-width: 1024px) {
+  .programs-difference { margin-top: 70px; }
+  .programs-difference .program-sensei { margin-top: 0; }
+  .programs-difference__heading,
+  .programs-difference__text { padding: 0; }
+}
+@media (max-width: 767px) {
+  .programs-difference { margin-top: 50px; }
+}
+
+/* --- the three flip boxes (#38d4645) -------------------------------------- */
+.programs-cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  overflow: hidden;
+  margin: 50px -10px 0;
+}
+.programs-cards > * { width: 33.3333%; padding: 0 10px; }
+/* The middle card sits on a raised, rounded plate (post-46 #3d356d8). */
+.programs-cards__raised { position: relative; z-index: 2; }
+.programs-cards__raised > * {
+  margin: 20px 0;
+  border-radius: 23px;
+  box-shadow: 0 5px 34px 0 rgba(0, 0, 0, 0.07);
+}
+
+@media (max-width: 1024px) {
+  .programs-cards { margin-top: 20px; }
+}
+@media (max-width: 767px) {
+  .programs-cards { flex-direction: column; margin: 20px 0 0; }
+  .programs-cards > * { width: 100%; padding: 0; }
+  .programs-cards__raised > * { margin: -20px 0; }
+  /* Per-instance overlay padding, through the widget layer's own property. */
+  .programs-cards__a { --w-flipbox-padding: 0 0 20px; }
+  .programs-cards__b { --w-flipbox-padding: 40px 10px; }
+  .programs-cards__c { --w-flipbox-padding: 20px 0 0; }
+}
+
+/* --- "Investing in yor child's future." (#644c312) ------------------------ */
+.programs-tuition {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8) url("/images/snail.svg") bottom center / auto no-repeat;
+  padding: 130px 0 70px;
+}
+.programs-tuition__photo { margin: 137px -40px -109px 0; }
+
+/* --- "Health and Safety" (#0da0cbc) --------------------------------------- */
+.programs-safety {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8);
+  margin-bottom: 100px;
+  padding: 60px 0 130px;
+}
+.programs-safety__photo { margin: 198px 0 -167px -40px; }
+
+/* Both bands stack one breakpoint earlier than the detail template does. */
+@media (max-width: 1024px) {
+  .programs-tuition { padding: 100px 0 0; }
+  .programs-tuition__photo { margin: 0; }
+  .programs-safety { margin-bottom: 70px; padding: 50px 0 100px; }
+  .programs-safety__photo { margin: 0; }
+  .programs-tuition .program-split,
+  .programs-safety .program-split { flex-direction: column; margin: 0; }
+  .programs-tuition .program-split > *,
+  .programs-safety .program-split > * { width: 100%; padding: 0; }
+  .programs-tuition .program-card,
+  .programs-safety .program-card { margin-top: 10px; }
+}
+@media (max-width: 767px) {
+  .programs-tuition { background-size: 270px auto; padding: 70px 0 60px; }
+  .programs-safety { margin-bottom: 60px; padding: 20px 0 70px; }
+  .programs-tuition .program-card,
+  .programs-safety .program-card { margin-top: 20px; }
+  /* Restated because the 1024 rule above also matches at phone widths. */
+  .programs-safety .program-split--reverse { flex-direction: column-reverse; }
+}

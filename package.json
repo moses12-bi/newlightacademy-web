@@ -1,0 +1,32 @@
+{
+  "name": "skole-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "verify:home": "node scripts/verify-home.cjs",
+    "verify:ui": "node scripts/verify-ui.cjs",
+    "verify:pages": "node scripts/verify-pages.cjs",
+    "verify": "npm run verify:home && npm run verify:ui && npm run verify:pages"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.5",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.8.3"
+  }
+}

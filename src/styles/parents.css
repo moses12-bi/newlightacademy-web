@@ -1,0 +1,383 @@
+/* ---------------------------------------------------------------------------
+   Parents group — /parents, /attendance-policy, /make-a-payment,
+   /student-handbook, /school-calendar.
+
+   Ported from the saved Elementor page stylesheets:
+     post-3216 (/for-our-parents)   post-1089 (/attendance-policy)
+     post-1091 (/make-a-payment)    post-1093 (/student-handbook)
+     post-1095 (/school-calendar)
+   and the kit, post-1675. Every class is prefixed with its route so the other
+   conversion groups cannot collide with it. Horizontal gutters come from
+   `Container` (20px phone / 30px otherwise), which is what the saved sections
+   set, so only the block padding is repeated here.
+
+   A handful of rules reach a shared `w-*` class, always scoped under one of
+   this group's own classes. They exist only where the saved instance differs in
+   something the widget layer does not expose as a custom property (a section
+   background illustration, a hero art width). They never change the widget's
+   defaults for anyone else.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   /parents
+   =========================================================================== */
+
+/* post-3216 #1c8cb9a0: a plain white title band — no cream, no waves, no art.
+   50/80 block padding, the h1 held to the first of two columns. */
+.parents-hero { background: var(--color-accent-5); padding: 50px 0 80px; }
+.parents-hero__copy { width: 40%; }
+
+/* post-3216 #3dafeb6 / #a674e76 / #891e7c8: three rows of flip cards. Each card
+   title is an h2 so the level after the page h1 is not skipped; the saved
+   widgets are h3s, so they keep the h3 scale. */
+.parents-cards h2 { font-size: 26px; font-weight: 900; line-height: 1.21; }
+.parents-cards { padding-bottom: 100px; }
+.parents-row { display: flex; flex-wrap: wrap; align-items: center; margin: 0 -10px; }
+.parents-row > * { width: 33.3333%; padding: 0 10px; }
+
+/* The fox sits in its own column between two cards (#3db6bd5 / #06a8c6b). */
+.parents-fox { display: flex; justify-content: center; }
+.parents-fox img { width: 59%; height: auto; }
+
+/* Front-face padding per card (Elementor's overlay padding). These set the
+   widget's documented `--w-flipbox-padding`; nothing else is restyled. */
+/* Elementor clips the flip box; the shared widget does not, so a "slide" back
+   face parked at translateX(100%) would push the document sideways. The
+   clip is applied here, on this group's own class, rather than in widgets.css.
+   An element's own outline is not clipped by its own overflow, so the card
+   keeps its focus ring. */
+.parents-flip { overflow: hidden; --w-flipbox-padding: 30px 40px 50px; }
+.parents-flip--low { --w-flipbox-padding: 50px 40px 30px; }
+.parents-flip--flat { --w-flipbox-padding: 0 40px; }
+.parents-flip--plain { --w-flipbox-padding: 10px; }
+
+/* post-3216 #cf119e6: the Parking Directions card carries the mountain
+   illustration in its front background. */
+.parents-flip--map .w-flipbox__front {
+  background-image: url("/images/home/illustration-mountain.svg");
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  background-size: 35% auto;
+}
+
+/* post-3216 #a7c3a39: the closing "Come / and visit us." band. */
+.parents-visit { position: relative; z-index: 1; margin: 130px 0 100px; }
+.parents-come {
+  padding-left: 130px;
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1.1;
+  color: var(--color-heading);
+}
+/* #e0cb0d6: a narrower 900px well, split 39.222 / 60.778. */
+.parents-visit__inner { display: flex; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+.parents-visit__art { width: 39.222%; }
+.parents-visit__form { width: 60.778%; padding-left: 40px; }
+.parents-visit__art img { width: 95%; height: auto; margin: 0 30px 20px 0; }
+/* Saved as an h4; an h3 here keeps the document outline ordered. */
+.parents-visit__art h3 { font-size: 20px; font-weight: 800; line-height: 1.27; }
+.parents-visit__address { margin-top: 10px; line-height: 1.4; }
+.parents-visit__address p + p { margin-top: 1.25em; }
+.parents-visit__address a { text-decoration: underline; }
+.parents-visit__lead { margin: 50px 0 10px; }
+
+@media (max-width: 1024px) {
+  .parents-visit__art h3 { font-size: 18px; }
+  .parents-hero__copy { width: 60%; }
+  .parents-cards { padding-bottom: 0; }
+  .parents-visit { margin: 70px 0 100px; }
+  .parents-come { padding-left: 0; font-size: 130px; }
+  .parents-visit__art img { width: 70%; margin: 60px 0 0; }
+  .parents-visit__form { padding-left: 0; }
+  .parents-visit__lead { margin: 0 0 10px; }
+}
+@media (max-width: 767px) {
+  .parents-cards h2 { font-size: 24px; }
+  .parents-visit__art h3 { font-size: 16px; }
+  .parents-hero { padding: 50px 0; }
+  .parents-hero__copy { width: 100%; }
+  .parents-row > * { width: 100%; }
+  .parents-fox { padding: 40px 0; }
+  .parents-visit { margin: 0 0 50px; }
+  .parents-come { font-size: 80px; }
+  /* #e0cb0d6 is `elementor-reverse-mobile`: the form comes first on phones. */
+  .parents-visit__inner { flex-direction: column-reverse; }
+  .parents-visit__art,
+  .parents-visit__form { width: 100%; }
+  .parents-visit__art { padding-top: 30px; }
+  .parents-visit__art img { width: 50%; margin: 0; }
+  /* per-card phone overlay padding, post-3216 */
+  .parents-flip,
+  .parents-flip--flat { --w-flipbox-padding: 40px 10px; }
+  .parents-flip--low,
+  .parents-flip--plain,
+  .parents-flip--soft { --w-flipbox-padding: 0 0 20px; }
+  .parents-flip--raise { --w-flipbox-padding: 20px 0 0; }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+  .parents-flip,
+  .parents-flip--low,
+  .parents-flip--flat,
+  .parents-flip--plain,
+  .parents-flip--soft,
+  .parents-flip--raise { --w-flipbox-padding: 10px; }
+}
+
+/* ===========================================================================
+   /attendance-policy — post-1089
+   =========================================================================== */
+
+/* #02ff223: one long column of headings and copy under the hero. */
+.attendance-body { padding: 100px 0 160px; }
+/* Each widget carries a 10px bottom gap (#3f92e56) and every text-editor adds
+   20px on top of it. */
+/* Saved as h3 widgets; h2 elements here so the level after the page h1 is not
+   skipped, kept at the saved h3 scale. */
+.attendance-body h2 { margin-bottom: 10px; font-size: 26px; font-weight: 900; line-height: 1.21; }
+.attendance-body p + ul,
+.attendance-body p + p { margin-top: 1.25em; }
+.attendance-body__block { margin-bottom: 30px; }
+.attendance-body__block:last-child { margin-bottom: 0; }
+
+@media (max-width: 1024px) {
+  .attendance-body { margin-bottom: 100px; padding: 90px 0 100px; }
+}
+@media (max-width: 767px) {
+  .attendance-body h2 { font-size: 24px; }
+  .attendance-body { margin-bottom: 50px; padding: 40px 0 50px; }
+}
+
+/* ===========================================================================
+   Shared long-form list styling for the two policy pages.
+   Elementor renders the text-editor's `ul` with the browser's disc marker.
+   =========================================================================== */
+.policy-list { list-style: disc; padding-left: 1.3em; }
+.policy-list li + li { margin-top: .4em; }
+
+/* ===========================================================================
+   /make-a-payment — post-1091
+   =========================================================================== */
+
+/* #238b138: cream band carrying the snail illustration along its bottom edge. */
+.payment-intro {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8) url("/images/snail.svg") bottom center no-repeat;
+  padding: 130px 0 70px;
+}
+/* #6f2904b: the second cream band, waved along the bottom. */
+.payment-online {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8);
+  margin-bottom: 100px;
+  padding: 60px 0 130px;
+}
+.payment-split { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.payment-split > * { width: 50%; }
+
+/* #0727c4a / #e23c53f: the photos slide under the white card. */
+.payment-photo img { width: 100%; height: auto; border-radius: 7px; }
+.payment-photo--left img { margin: -76px -40px 0 0; }
+.payment-photo--right img { margin: 58px 0 0 -40px; }
+
+/* #7036007 / #05be30c: the white card that overlaps the photo. */
+.payment-card {
+  position: relative;
+  z-index: 1;
+  padding: 60px;
+  background: var(--color-accent-5);
+  border-radius: 8px;
+}
+.payment-card > * + * { margin-top: 10px; }
+.payment-card p + p { margin-top: 1.25em; }
+.payment-card a { text-decoration: underline; }
+.payment-card .theme-button { margin-top: 10px; }
+
+/* #6a16b44: the question form. */
+.payment-form { margin-bottom: 100px; }
+
+@media (max-width: 1024px) {
+  .payment-intro { background-size: 531px auto; padding: 90px 0 80px; }
+  .payment-online { margin-bottom: 0; padding: 20px 0 80px; }
+  .payment-split > * { width: 100%; }
+  .payment-photo--left img,
+  .payment-photo--right img { margin: 0; }
+  .payment-photo--left { padding-bottom: 10px; }
+  .payment-photo--right { margin-top: 10px; }
+  .payment-card { padding: 20px; }
+  .payment-form { margin: 70px 0 100px; }
+}
+@media (max-width: 767px) {
+  .payment-intro { background-size: 270px auto; padding: 50px 0 60px; }
+  .payment-online { padding: 20px 0 70px; }
+  /* #6f2904b is `elementor-reverse-mobile`: the photo leads on phones. */
+  .payment-online .payment-split { flex-direction: column-reverse; }
+  .payment-card { margin-top: 20px; }
+  .payment-form { margin: 40px 0 50px; }
+}
+
+/* ===========================================================================
+   /student-handbook — post-1093
+   =========================================================================== */
+
+/* #dcea93f: cream band with the snail along the bottom. */
+.handbook-intro {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-accent-8) url("/images/snail.svg") bottom center no-repeat;
+  padding: 110px 0 130px;
+}
+.handbook-split { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.handbook-split > * { width: 50%; }
+.handbook-photo img { width: 100%; height: auto; margin: 40px -40px 0 0; border-radius: 7px; }
+.handbook-card {
+  position: relative;
+  z-index: 1;
+  padding: 60px;
+  background: var(--color-accent-5);
+  border-radius: 8px;
+}
+.handbook-card > * + * { margin-top: 10px; }
+.handbook-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 30px; margin-top: 10px; }
+/* The saved Download button has no file behind it in this app, so it keeps its
+   wording without pretending to be operable. */
+.handbook-unavailable { font-size: 15px; color: var(--color-muted); }
+
+/* #beafbf7: the handbook text itself, on white, opened by a cream wave. */
+.handbook-body { position: relative; --w-wave-top: var(--color-accent-8); margin-bottom: 100px; padding: 130px 0 0; }
+/* Rendered as h3 so the level after the card's h2 is not skipped; the saved
+   widgets are h4-sized, uppercase. */
+.handbook-body h3 { margin-top: 20px; font-size: 20px; font-weight: 800; line-height: 1.27; text-transform: uppercase; }
+.handbook-body__block:first-child h3 { margin-top: 0; }
+.handbook-body p + p { margin-top: 1.25em; }
+
+@media (max-width: 1024px) {
+  .handbook-body h3 { font-size: 18px; }
+  .calendar-contact p { font-size: 18px; }
+  .handbook-intro { background-size: 531px auto; padding: 100px 0 80px; }
+  .handbook-split > * { width: 100%; }
+  .handbook-photo img { margin: 0; }
+  .handbook-card { padding: 20px; }
+  .handbook-body { margin-bottom: 100px; padding: 70px 0 0; }
+}
+@media (max-width: 767px) {
+  .handbook-body h3 { font-size: 16px; }
+  .calendar-contact p { font-size: 16px; }
+  .handbook-intro { background-size: 270px auto; padding: 50px 0 60px; }
+  .handbook-card { margin-top: 20px; }
+  .handbook-actions { gap: 15px; }
+  .handbook-body { margin-bottom: 50px; padding: 50px 0 0; }
+}
+
+/* ===========================================================================
+   /school-calendar — post-1095
+   =========================================================================== */
+
+/* #5ad8d59: this hero's art is wider and hangs less far than the shared
+   default, so the two measurements are restated for this page only. */
+.calendar-hero .w-hero__image { width: 52%; }
+.calendar-hero .w-hero__art-inner { margin-bottom: -10%; }
+
+/* #bb43474 / #64f449e / #1453d0e / #2e6fc0b / #27bcef0: pairs of month lists
+   on cream. Only the first and last rows differ in block padding. */
+.calendar-months { position: relative; overflow: hidden; background: var(--color-accent-8); padding: 50px 0 0; }
+.calendar-months--first { padding-top: 130px; }
+.calendar-months--last {
+  background-image: url("/images/home/illustration-mountain.svg");
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  padding-bottom: 130px;
+}
+.calendar-pair { display: flex; flex-wrap: wrap; }
+.calendar-pair > * { width: 50%; }
+.calendar-pair > :first-child { padding-right: 40px; }
+.calendar-pair > :last-child { padding-left: 40px; }
+.calendar-month h2 { color: var(--color-accent-2); }
+
+/* #e52443b and its eight siblings: Elementor's `price-list`, rebuilt as a
+   description list. Separators are switched off in the save. */
+.calendar-list { margin-top: 10px; }
+.calendar-list__row { display: flex; align-items: baseline; gap: 20px; color: var(--color-accent-3); }
+.calendar-list__row + .calendar-list__row { margin-top: 20px; }
+.calendar-list__event { margin: 0; flex: 1 1 auto; }
+.calendar-list__date { margin: 0; flex: none; font-weight: 600; white-space: nowrap; }
+
+/* #3b6a1e2: the closing "Come / over and look around." band. */
+.calendar-visit { position: relative; margin-top: 100px; }
+.calendar-come {
+  padding-left: 130px;
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1;
+  color: var(--color-heading);
+}
+.calendar-visit__inner { display: flex; flex-wrap: wrap; align-items: flex-start; max-width: 1000px; margin: 0 auto; }
+.calendar-visit__art { width: 39.222%; text-align: center; }
+.calendar-visit__art img { width: 100%; height: auto; }
+.calendar-visit__copy { width: 60.778%; }
+.calendar-visit__copy p { padding-bottom: 10px; }
+.calendar-visit__actions { display: flex; flex-wrap: wrap; align-items: center; }
+.calendar-visit__or { padding: 10px 20px; }
+
+/* #574b62d / #ec551c8: the leaf-and-tree strip on the path illustration. */
+.calendar-scene {
+  overflow: hidden;
+  margin: -140px 0 -70px;
+  background: url("/images/home/path-1.svg") bottom left no-repeat;
+}
+.calendar-scene__row { display: flex; align-items: flex-end; }
+.calendar-scene__left { width: 50%; padding: 0 0 152px 45px; }
+.calendar-scene__right { width: 50%; padding: 0 60px 106px 0; text-align: right; }
+.calendar-scene__leaf-2 { padding-bottom: 40px; }
+.calendar-scene__leaf-1 { padding-left: 50px; }
+
+/* #7d669c8: the four-up address row, snail along the bottom. */
+.calendar-contact {
+  overflow: hidden;
+  margin-bottom: 100px;
+  padding: 0 0 120px;
+  background: url("/images/snail.svg") bottom center no-repeat;
+}
+.calendar-contact__grid { display: flex; flex-wrap: wrap; max-width: 1000px; margin: 0 auto; }
+.calendar-contact__grid > * { width: 25%; }
+/* The saved widgets are h4s, but they are an address block, not section
+   headings, so they keep the size and lose the heading role. */
+.calendar-contact p { font-size: 20px; font-weight: 800; line-height: 1.27; color: var(--color-heading); overflow-wrap: anywhere; }
+.calendar-contact a { text-decoration: underline; }
+
+@media (max-width: 1024px) {
+  .calendar-months--first { padding-top: 130px; }
+  .calendar-months--last { background-size: 179px auto; padding-bottom: 100px; }
+  .calendar-visit { margin-top: 70px; }
+  .calendar-come { padding-left: 0; font-size: 130px; }
+  .calendar-visit__inner { padding-bottom: 20%; }
+  .calendar-visit__art { margin-top: 60px; }
+  .calendar-visit__or { width: 100%; padding-left: 0; }
+  .calendar-scene { margin: -300px 0 -90px; }
+  .calendar-scene__right { padding: 0 20px 165px 0; }
+  .calendar-contact { padding-bottom: 100px; }
+  .calendar-contact__grid > * { width: 50%; margin-bottom: 20px; }
+}
+@media (max-width: 767px) {
+  .calendar-months { padding: 40px 0 0; }
+  .calendar-months--first { padding-top: 40px; }
+  .calendar-months--last { padding-bottom: 60px; }
+  .calendar-pair > * { width: 100%; padding: 0; }
+  .calendar-pair > :last-child { padding-top: 40px; }
+  .calendar-visit { margin-top: 50px; }
+  .calendar-come { font-size: 80px; }
+  /* #ef9b108 is `elementor-reverse-mobile`, and its art column is
+     `elementor-hidden-phone`, so only the copy remains. */
+  .calendar-visit__inner { padding-bottom: 0; }
+  .calendar-visit__art { display: none; }
+  .calendar-visit__copy { width: 100%; }
+  .calendar-visit__copy h2 { font-size: 30px; }
+  /* #574b62d is `elementor-hidden-phone`. */
+  .calendar-scene { display: none; }
+  .calendar-contact { margin: 50px 0; padding-bottom: 0; }
+  /* The saved columns are elementor-col-25 with no phone width, so they stack
+     full width; at 50% the email address is clipped by the section overflow. */
+  .calendar-contact__grid > * { width: 100%; }
+  .calendar-contact__grid > :last-child { margin-bottom: 100px; }
+}

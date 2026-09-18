@@ -1,0 +1,423 @@
+/* ---------------------------------------------------------------------------
+   Shared widget layer.
+
+   Everything here backs a component in src/components/ui and is ported from the
+   Elementor page stylesheets (post-46, post-1050, post-1042, post-1068,
+   post-2461 and the kit, post-1675). Page groups supply the copy and the per
+   instance colours through the documented custom properties; they must not
+   restyle these classes.
+
+   Naming: every class is prefixed `w-`.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Extra entrance animations.
+
+   globals.css already ships fadeIn, fadeInUp, fadeInDown, bounceInUp,
+   bounceInDown, zoomIn, zoomInDown, rotateInUpLeft, rotateInUpRight, rubberBand
+   and jello. The 25 saved pages also ask for the names below, so they live here
+   once instead of being duplicated (and conflicting) in 25 page stylesheets.
+   They follow the same contract as globals.css: PageMotion adds .motion-ready
+   and then .motion-visible, and the delays are plain attribute selectors.
+--------------------------------------------------------------------------- */
+[data-delay="100"] { animation-delay: 100ms; }
+[data-delay="150"] { animation-delay: 150ms; }
+[data-delay="500"] { animation-delay: 500ms; }
+[data-delay="600"] { animation-delay: 600ms; }
+[data-delay="800"] { animation-delay: 800ms; }
+[data-delay="1000"] { animation-delay: 1000ms; }
+[data-delay="1100"] { animation-delay: 1100ms; }
+[data-delay="1200"] { animation-delay: 1200ms; }
+[data-delay="1700"] { animation-delay: 1700ms; }
+[data-delay="1900"] { animation-delay: 1900ms; }
+
+[data-reveal="bounceIn"].motion-visible { animation-name: bounceIn; }
+[data-reveal="fadeInLeft"].motion-visible { animation-name: fadeInLeft; }
+[data-reveal="fadeInRight"].motion-visible { animation-name: fadeInRight; }
+[data-reveal="headShake"].motion-visible { animation-name: headShake; }
+[data-reveal="rotateInDownLeft"].motion-visible { animation-name: rotateInDownLeft; }
+[data-reveal="rotateInDownRight"].motion-visible { animation-name: rotateInDownRight; }
+[data-reveal="slideInUp"].motion-visible { animation-name: slideInUp; }
+[data-reveal="swing"].motion-visible { animation-name: swing; transform-origin: top center; }
+[data-reveal="wobble"].motion-visible { animation-name: wobble; }
+[data-reveal="zoomInLeft"].motion-visible { animation-name: zoomInLeft; }
+
+@keyframes bounceIn {
+  from, 20%, 40%, 60%, 80%, to { animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
+  from { opacity: 0; transform: scale3d(.3, .3, .3); }
+  20% { transform: scale3d(1.1, 1.1, 1.1); }
+  40% { transform: scale3d(.9, .9, .9); }
+  60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
+  80% { transform: scale3d(.97, .97, .97); }
+  to { opacity: 1; transform: scale3d(1, 1, 1); }
+}
+@keyframes fadeInLeft { from { opacity: 0; transform: translate3d(-100%, 0, 0); } to { opacity: 1; transform: none; } }
+@keyframes fadeInRight { from { opacity: 0; transform: translate3d(100%, 0, 0); } to { opacity: 1; transform: none; } }
+@keyframes headShake {
+  0% { transform: translateX(0); }
+  6.5% { transform: translateX(-6px) rotateY(-9deg); }
+  18.5% { transform: translateX(5px) rotateY(7deg); }
+  31.5% { transform: translateX(-3px) rotateY(-5deg); }
+  43.5% { transform: translateX(2px) rotateY(3deg); }
+  50% { transform: translateX(0); }
+}
+@keyframes rotateInDownLeft {
+  from { transform-origin: left bottom; transform: rotate3d(0, 0, 1, -45deg); opacity: 0; }
+  to { transform-origin: left bottom; transform: none; opacity: 1; }
+}
+@keyframes rotateInDownRight {
+  from { transform-origin: right bottom; transform: rotate3d(0, 0, 1, 45deg); opacity: 0; }
+  to { transform-origin: right bottom; transform: none; opacity: 1; }
+}
+@keyframes slideInUp { from { transform: translate3d(0, 100%, 0); visibility: visible; } to { transform: translate3d(0, 0, 0); } }
+@keyframes swing {
+  20% { transform: rotate3d(0, 0, 1, 15deg); }
+  40% { transform: rotate3d(0, 0, 1, -10deg); }
+  60% { transform: rotate3d(0, 0, 1, 5deg); }
+  80% { transform: rotate3d(0, 0, 1, -5deg); }
+  to { transform: rotate3d(0, 0, 1, 0deg); }
+}
+@keyframes wobble {
+  from { transform: none; }
+  15% { transform: translate3d(-25%, 0, 0) rotate3d(0, 0, 1, -5deg); }
+  30% { transform: translate3d(20%, 0, 0) rotate3d(0, 0, 1, 3deg); }
+  45% { transform: translate3d(-15%, 0, 0) rotate3d(0, 0, 1, -3deg); }
+  60% { transform: translate3d(10%, 0, 0) rotate3d(0, 0, 1, 2deg); }
+  75% { transform: translate3d(-5%, 0, 0) rotate3d(0, 0, 1, -1deg); }
+  to { transform: none; }
+}
+@keyframes zoomInLeft {
+  from { opacity: 0; transform: scale3d(.1, .1, .1) translate3d(-1000px, 0, 0); animation-timing-function: cubic-bezier(.55, .055, .675, .19); }
+  60% { opacity: 1; transform: scale3d(.475, .475, .475) translate3d(10px, 0, 0); animation-timing-function: cubic-bezier(.175, .885, .32, 1); }
+}
+
+/* ---------------------------------------------------------------------------
+   Wavy shape divider, recoloured.
+
+   ShapeDivider paints /images/waves.svg as a white background image. Several
+   sections need the wave in the colour of the neighbouring band instead (the
+   saved CSS sets `.elementor-shape-fill` per section). Adding `w-wave--top` or
+   `w-wave--bottom` to ShapeDivider's className switches it to a mask, so the
+   colour comes from `--w-wave-top` / `--w-wave-bottom` set on any ancestor.
+--------------------------------------------------------------------------- */
+.w-wave--top .shape-wave,
+.w-wave--bottom .shape-wave {
+  background-image: none;
+  -webkit-mask-image: url("/images/waves.svg");
+  mask-image: url("/images/waves.svg");
+  -webkit-mask-size: auto 28px;
+  mask-size: auto 28px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+}
+.w-wave--top .shape-wave { background-color: var(--w-wave-top, var(--color-accent-5)); }
+.w-wave--bottom .shape-wave { background-color: var(--w-wave-bottom, var(--color-accent-5)); }
+
+/* ---------------------------------------------------------------------------
+   PageHero - the `theme-page-title` band.
+
+   Cream variant measured from post-2461 #f75d70b, post-1042 #a991a89 and
+   post-1068 #99e3143 (all identical): -60px top margin so the band slides under
+   the header, 100px top padding, 35vh minimum, 40/60 split, art 36% wide
+   hanging 18% below the band. 1024: no negative margin, 100px block padding,
+   60/40, art centred at 60%. 767: stacked, 70px block padding, art 46%.
+--------------------------------------------------------------------------- */
+.w-hero { position: relative; overflow: hidden; background: var(--color-accent-8); margin-top: -60px; padding: 100px 0 0; }
+.w-hero__layout { display: flex; align-items: flex-end; min-height: 35vh; }
+.w-hero__copy { display: flex; flex-direction: column; gap: 10px; width: 40%; align-self: center; }
+.w-hero__lead { font-size: 20px; font-weight: 400; line-height: 1.5; }
+.w-hero__art { width: 60%; text-align: right; }
+.w-hero__art-inner { margin-bottom: -18%; transform-origin: center bottom; }
+.w-hero__image { display: inline-block; width: 36%; height: auto; transform-origin: center bottom; }
+
+/* Media variant - post-1050 #6d2a6f98: a video/photo band with a tinted overlay
+   and centred white type. The backdrop is a local poster supplied by the page;
+   nothing external is fetched. */
+.w-hero--media { background: var(--color-accent-3); margin-top: -48px; padding: 80px 0; }
+.w-hero--media .w-hero__layout { flex-direction: column; align-items: stretch; justify-content: center; min-height: 50vh; }
+.w-hero--media .w-hero__copy { width: 100%; align-items: center; text-align: center; }
+.w-hero--media .w-hero__copy h1 { color: var(--color-accent-5); }
+.w-hero--media .w-hero__lead { max-width: 50%; font-size: 23px; font-weight: 500; color: var(--color-accent-5); }
+.w-hero__backdrop { position: absolute; inset: 0; z-index: 0; }
+.w-hero__backdrop img { width: 100%; height: 100%; object-fit: cover; }
+.w-hero__overlay { position: absolute; inset: 0; z-index: 1; background: var(--w-hero-overlay, var(--color-accent-2)); opacity: var(--w-hero-overlay-opacity, .46); }
+.w-hero__container { position: relative; z-index: 2; }
+
+@media (max-width: 1024px) {
+  .w-hero { margin-top: 0; padding: 100px 0; }
+  .w-hero__layout { min-height: 0; }
+  .w-hero__copy { width: 60%; }
+  .w-hero__art { width: 40%; text-align: center; }
+  .w-hero__art-inner { margin-bottom: 0; }
+  .w-hero__image { width: 60%; }
+  .w-hero--media { margin-top: -48px; }
+  .w-hero--media .w-hero__copy { width: 100%; }
+  .w-hero--media .w-hero__lead { max-width: 80%; }
+}
+@media (max-width: 767px) {
+  .w-hero { padding: 70px 0; }
+  .w-hero__layout { flex-direction: column; align-items: stretch; }
+  .w-hero__copy, .w-hero__art { width: 100%; }
+  .w-hero__lead { font-size: 15px; line-height: 1.63; }
+  .w-hero__art { margin-top: 100px; }
+  .w-hero__art-inner { margin-bottom: -30%; }
+  .w-hero__image { width: 46%; }
+  .w-hero--media { margin-top: 20px; padding: 30px 0 20px; }
+  .w-hero--media .w-hero__copy { align-items: flex-start; text-align: start; }
+  .w-hero--media .w-hero__lead { max-width: none; font-size: 15px; line-height: 1.63; }
+}
+
+/* ---------------------------------------------------------------------------
+   ImageBox - Elementor `image-box`.
+
+   All 36 instances in the save are the same card: a coloured panel with the
+   title above the photo, then the description and a small meta line, wrapped in
+   one link. Colours differ per card (post-46 #202409e / #a812e9c / #be1e1a1 /
+   #c6f8413), so they come in as custom properties.
+--------------------------------------------------------------------------- */
+.w-imagebox {
+  background: var(--w-imagebox-bg, transparent);
+  padding: var(--w-imagebox-padding, 20px 0 65px);
+  transition: background 1s;
+}
+.w-imagebox:hover { background: var(--w-imagebox-bg-hover, var(--w-imagebox-bg, transparent)); }
+.w-imagebox__wrapper { display: flex; flex-direction: column; text-align: var(--w-imagebox-align, center); color: inherit; }
+.w-imagebox--left .w-imagebox__wrapper,
+.w-imagebox--right .w-imagebox__wrapper { flex-direction: row; align-items: flex-start; text-align: var(--w-imagebox-align, start); }
+.w-imagebox--right .w-imagebox__wrapper { flex-direction: row-reverse; }
+.w-imagebox__figure { width: var(--w-imagebox-image-width, 85%); margin: 0 auto 15px; }
+.w-imagebox--left .w-imagebox__figure { margin: 0 15px 0 0; flex: none; }
+.w-imagebox--right .w-imagebox__figure { margin: 0 0 0 15px; flex: none; }
+.w-imagebox__figure img { display: block; width: 100%; height: auto; transition-duration: .3s; }
+.w-imagebox__content { width: 100%; }
+.w-imagebox__title { margin-bottom: 20px; color: var(--w-imagebox-title-color, var(--color-heading)); }
+.w-imagebox__description { font-size: 16px; line-height: 1.3; color: var(--color-accent-3); }
+.w-imagebox__meta { margin-top: 10px; white-space: pre-wrap; color: var(--color-accent-3); }
+
+/* The theme's small eye decoration, from the `vamtam-eye` markup. The theme's
+   own stylesheet was not part of the capture, so the geometry here is a
+   reconstruction; only the three colours are ported (post-46). */
+.w-imagebox__eye { display: flex; justify-content: center; margin-top: 20px; }
+.w-imagebox__eye-outer {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--w-imagebox-eye-color, var(--color-accent-1));
+}
+.w-imagebox__eye-inner {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--color-accent-5);
+}
+.w-imagebox__eye-pupil { position: relative; display: block; width: 100%; height: 100%; transform: rotate(var(--w-imagebox-eye-angle, 60deg)); }
+.w-imagebox__eye-pupil::after {
+  content: ""; position: absolute; top: 3px; left: 50%;
+  width: 8px; height: 8px; margin-left: -4px; border-radius: 50%;
+  background: var(--color-accent-6);
+}
+@media (max-width: 767px) {
+  .w-imagebox__figure { margin-bottom: 15px; }
+  .w-imagebox--left .w-imagebox__wrapper,
+  .w-imagebox--right .w-imagebox__wrapper { flex-direction: column; }
+  .w-imagebox--left .w-imagebox__figure,
+  .w-imagebox--right .w-imagebox__figure { margin: 0 auto 15px; }
+}
+
+/* ---------------------------------------------------------------------------
+   IconBox - Elementor `icon-box`.
+   The base flex rules are the captured Elementor ones; the framed variant is
+   post-2461 #be74d59 (1px accent-4 border with an 8px offset grey block shadow
+   that deepens to the dark teal on hover).
+--------------------------------------------------------------------------- */
+.w-iconbox { display: block; color: inherit; }
+.w-iconbox__wrapper { display: flex; flex-direction: column; gap: var(--w-iconbox-gap, 15px); text-align: var(--w-iconbox-align, center); align-items: var(--w-iconbox-items, center); }
+.w-iconbox--left .w-iconbox__wrapper { flex-direction: row; text-align: var(--w-iconbox-align, start); align-items: flex-start; }
+.w-iconbox--right .w-iconbox__wrapper { flex-direction: row-reverse; text-align: var(--w-iconbox-align, start); align-items: flex-start; }
+.w-iconbox--align-start .w-iconbox__wrapper { text-align: start; align-items: flex-start; }
+.w-iconbox--align-end .w-iconbox__wrapper { text-align: end; align-items: flex-end; }
+.w-iconbox__icon { flex: 0 0 auto; line-height: 0; font-size: var(--w-iconbox-icon-size, 60px); color: var(--w-iconbox-icon-color, var(--color-accent-3)); }
+.w-iconbox__icon svg { width: 1em; height: 1em; fill: currentColor; }
+.w-iconbox__icon img { display: inline-block; height: auto; }
+.w-iconbox__content { flex-grow: 1; width: 100%; }
+.w-iconbox__description { margin: 0; color: var(--w-iconbox-description-color, inherit); }
+.w-iconbox--boxed { padding: 20px 30px; border: 1px solid var(--color-accent-4); box-shadow: 8px 8px 0 0 var(--color-accent-7); transition: border-color .3s, box-shadow .3s; }
+.w-iconbox--boxed:hover,
+.w-iconbox--boxed:focus-within { border-color: var(--color-accent-3); box-shadow: 10px 10px 0 0 var(--color-accent-3); }
+@media (max-width: 767px) {
+  .w-iconbox__icon { font-size: var(--w-iconbox-icon-size-sm, 40px); }
+  .w-iconbox--left .w-iconbox__wrapper,
+  .w-iconbox--right .w-iconbox__wrapper { flex-direction: column; align-items: var(--w-iconbox-items, center); }
+}
+
+/* ---------------------------------------------------------------------------
+   FlipBox - Elementor `flip-box`.
+   Heights are per instance in the save (330-490px), so they arrive as custom
+   properties. Faces are swapped with `inert`, which also removes the hidden face
+   from the accessibility tree and from the tab order.
+--------------------------------------------------------------------------- */
+/* `overflow: hidden` is Elementor's own `.elementor-flip-box` rule. Without it a
+   `slide` flip box parks its hidden face at translateX(±100%) outside the card,
+   which both overflows the page sideways and draws over the row above once the
+   grid wraps. The element's own focus outline is not clipped by its own
+   overflow, so the focus ring survives. */
+.w-flipbox { position: relative; height: var(--w-flipbox-height, 330px); overflow: hidden; perspective: 1000px; }
+.w-flipbox:focus-visible { outline: 2px solid var(--color-accent-2); outline-offset: 5px; }
+.w-flipbox__layer {
+  position: absolute; inset: 0; display: flex; overflow: hidden;
+  border-radius: var(--w-flipbox-radius, 0);
+  transition: transform .6s ease, opacity .6s ease;
+  backface-visibility: hidden;
+}
+.w-flipbox__overlay { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; padding: var(--w-flipbox-padding, 10px); text-align: center; }
+.w-flipbox__front { background: var(--w-flipbox-front-bg, var(--color-accent-8)); }
+.w-flipbox__back { background: var(--w-flipbox-back-bg, var(--color-accent-5)); text-decoration: none; }
+.w-flipbox__icon { margin-bottom: 15px; font-size: 50px; line-height: 0; color: var(--w-flipbox-icon-color, var(--color-accent-1)); }
+.w-flipbox__icon svg { width: 1em; height: 1em; fill: currentColor; }
+.w-flipbox__image { margin-bottom: 15px; }
+.w-flipbox__image img { display: inline-block; height: auto; }
+.w-flipbox__title { margin-bottom: 10px; }
+.w-flipbox__description { font-size: 18px; color: var(--color-accent-6); }
+.w-flipbox__back .w-flipbox__description { margin-bottom: 20px; }
+
+/* Each effect is driven by `data-flipped`, plus :hover / :focus-within while the
+   card is still un-hydrated, so it turns over with JavaScript unavailable too.
+   Once FlipBox sets data-hydrated the React state alone drives it, which is what
+   lets Escape flip the card back while the card itself keeps focus. */
+.w-flipbox--flip .w-flipbox__front { transform: rotateY(0deg); }
+.w-flipbox--flip .w-flipbox__back { transform: rotateY(180deg); }
+.w-flipbox--flip[data-flipped="true"] .w-flipbox__front,
+.w-flipbox--flip:not([data-hydrated]):hover .w-flipbox__front,
+.w-flipbox--flip:not([data-hydrated]):focus-within .w-flipbox__front { transform: rotateY(-180deg); }
+.w-flipbox--flip[data-flipped="true"] .w-flipbox__back,
+.w-flipbox--flip:not([data-hydrated]):hover .w-flipbox__back,
+.w-flipbox--flip:not([data-hydrated]):focus-within .w-flipbox__back { transform: rotateY(0deg); }
+
+.w-flipbox--fade .w-flipbox__layer { backface-visibility: visible; }
+.w-flipbox--fade .w-flipbox__back { opacity: 0; }
+.w-flipbox--fade[data-flipped="true"] .w-flipbox__front,
+.w-flipbox--fade:not([data-hydrated]):hover .w-flipbox__front,
+.w-flipbox--fade:not([data-hydrated]):focus-within .w-flipbox__front { opacity: 0; }
+.w-flipbox--fade[data-flipped="true"] .w-flipbox__back,
+.w-flipbox--fade:not([data-hydrated]):hover .w-flipbox__back,
+.w-flipbox--fade:not([data-hydrated]):focus-within .w-flipbox__back { opacity: 1; }
+
+.w-flipbox--slide .w-flipbox__layer { backface-visibility: visible; }
+.w-flipbox--slide .w-flipbox__back { transform: translate(var(--w-flipbox-slide-x, 100%), var(--w-flipbox-slide-y, 0px)); }
+.w-flipbox--slide[data-flipped="true"] .w-flipbox__front,
+.w-flipbox--slide:not([data-hydrated]):hover .w-flipbox__front,
+.w-flipbox--slide:not([data-hydrated]):focus-within .w-flipbox__front { transform: translate(calc(var(--w-flipbox-slide-x, 100%) * -1), calc(var(--w-flipbox-slide-y, 0px) * -1)); }
+.w-flipbox--slide[data-flipped="true"] .w-flipbox__back,
+.w-flipbox--slide:not([data-hydrated]):hover .w-flipbox__back,
+.w-flipbox--slide:not([data-hydrated]):focus-within .w-flipbox__back { transform: translate(0, 0); }
+.w-flipbox--slide-left { --w-flipbox-slide-x: -100%; --w-flipbox-slide-y: 0px; }
+.w-flipbox--slide-right { --w-flipbox-slide-x: 100%; --w-flipbox-slide-y: 0px; }
+.w-flipbox--slide-up { --w-flipbox-slide-x: 0px; --w-flipbox-slide-y: -100%; }
+.w-flipbox--slide-down { --w-flipbox-slide-x: 0px; --w-flipbox-slide-y: 100%; }
+
+@media (max-width: 1024px) {
+  .w-flipbox { height: var(--w-flipbox-height-md, var(--w-flipbox-height, 330px)); }
+}
+@media (max-width: 767px) {
+  .w-flipbox { height: var(--w-flipbox-height-sm, var(--w-flipbox-height-md, var(--w-flipbox-height, 330px))); }
+}
+/* Reduced motion: no rotation or travel, just a cross-fade. */
+@media (prefers-reduced-motion: reduce) {
+  .w-flipbox .w-flipbox__layer { transition: opacity .2s linear; backface-visibility: visible; transform: none; }
+  .w-flipbox .w-flipbox__back { opacity: 0; }
+  .w-flipbox[data-flipped="true"] .w-flipbox__front,
+  .w-flipbox:not([data-hydrated]):hover .w-flipbox__front,
+  .w-flipbox:not([data-hydrated]):focus-within .w-flipbox__front { opacity: 0; transform: none; }
+  .w-flipbox[data-flipped="true"] .w-flipbox__back,
+  .w-flipbox:not([data-hydrated]):hover .w-flipbox__back,
+  .w-flipbox:not([data-hydrated]):focus-within .w-flipbox__back { opacity: 1; transform: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Accordion - Elementor `accordion`/`toggle`.
+   post-1068 removes every border and sets the icon colour to accent-3; the row
+   padding is 20px 0 30px at <=1024 and 10px 0 20px at <=767.
+--------------------------------------------------------------------------- */
+.w-accordion { display: block; }
+.w-accordion__header { margin: 0; }
+.w-accordion__trigger {
+  display: flex; align-items: flex-start; gap: 15px;
+  width: 100%; padding: 20px 0 30px;
+  background: none; border: 0;
+  font-family: inherit; font-size: 20px; font-weight: 800; line-height: 1.3;
+  color: var(--color-heading); text-align: start;
+}
+.w-accordion__icon { flex: none; width: 1em; height: 1em; margin-top: .15em; color: var(--color-accent-3); }
+.w-accordion__icon svg { display: block; width: 100%; height: 100%; }
+.w-accordion__panel { padding: 0 0 20px; }
+/* `hidden="until-found"` is `content-visibility: hidden`, which collapses the
+   panel's content but not its own padding, leaving a 20px gap under every
+   closed row. */
+.w-accordion__panel[hidden] { padding-bottom: 0; }
+.w-accordion__panel > * + * { margin-top: 1.25em; }
+@media (max-width: 767px) {
+  .w-accordion__trigger { padding: 10px 0 20px; font-size: 18px; }
+}
+
+/* ---------------------------------------------------------------------------
+   Counter - Elementor `counter` (post-1042: accent-1, 100px bold, 75px <=1024).
+--------------------------------------------------------------------------- */
+.w-counter { display: block; }
+.w-counter__number { display: block; font-size: 100px; font-weight: 700; line-height: 1.1; color: var(--w-counter-color, var(--color-accent-1)); }
+.w-counter__title { font-weight: 700; text-transform: uppercase; color: var(--color-heading); }
+@media (max-width: 1024px) {
+  .w-counter__number { font-size: 75px; }
+}
+
+/* ---------------------------------------------------------------------------
+   ContactForm - Elementor `form`.
+   Control styling is the kit's (post-1675): 15px text, white field, 1px accent-7
+   border, 4px radius, 15px padding; 10px padding at <=1024 and 16px text at
+   <=767. The 10px row gap and the percentage column widths are Elementor's.
+--------------------------------------------------------------------------- */
+.w-form__grid { display: flex; flex-wrap: wrap; margin: 0 -5px; }
+.w-form__field { width: 100%; padding: 0 5px; margin-bottom: 10px; }
+.w-form__field--25 { width: 25%; }
+.w-form__field--33 { width: 33.3333%; }
+.w-form__field--50 { width: 50%; }
+.w-form__field--66 { width: 66.6666%; }
+.w-form__field--75 { width: 75%; }
+.w-form__field--100 { width: 100%; }
+.w-form__label { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 600; color: var(--color-heading); }
+.w-form__required { color: var(--color-accent-1); }
+.w-form__control {
+  display: block; width: 100%;
+  font-family: inherit; font-size: 15px; line-height: 1.5;
+  color: rgba(0, 0, 0, .6); background-color: var(--color-accent-5);
+  border: 1px solid var(--color-accent-7); border-radius: 4px;
+  padding: 15px;
+}
+.w-form__control:focus { color: var(--color-accent-6); caret-color: var(--color-accent-6); }
+.w-form__control[aria-invalid="true"] { border-color: var(--color-accent-1); }
+textarea.w-form__control { min-height: 120px; resize: vertical; }
+.w-form__check { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; }
+.w-form__check input { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--color-accent-1); }
+.w-form__error { display: block; margin-top: 6px; font-size: 14px; font-weight: 600; color: var(--color-accent-1); }
+.w-form__heading { margin: 10px 0 0; }
+.w-form__submit {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 15px 30px; border: 0; border-radius: 4px;
+  font-family: var(--font-handwritten); font-size: 15px; line-height: 1.2;
+  color: var(--color-accent-5); background-color: var(--color-accent-1);
+  transition: background-color .3s;
+}
+.w-form__submit:hover:not(:disabled),
+.w-form__submit:focus-visible:not(:disabled) { background-color: var(--color-accent-3); }
+.w-form__submit:disabled { opacity: .7; cursor: progress; }
+.w-form__actions--stretch .w-form__submit { width: 100%; }
+.w-form__actions--center { text-align: center; }
+.w-form__summary { margin-bottom: 15px; font-weight: 600; color: var(--color-accent-1); }
+.w-form__success { padding: 25px 30px; border: 1px solid var(--color-accent-4); border-radius: 4px; background: var(--color-accent-8); }
+.w-form__success p + p { margin-top: .75em; }
+@media (max-width: 1024px) {
+  .w-form__control { padding: 10px; }
+}
+@media (max-width: 767px) {
+  .w-form__control { font-size: 16px; }
+  .w-form__field { width: 100%; }
+}

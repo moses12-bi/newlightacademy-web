@@ -1,0 +1,711 @@
+/* ---------------------------------------------------------------------------
+   misc — page styles ported from the Elementor page stylesheets for the four
+   routes in this group:
+
+     /home-2      post-1104.css
+     /blog        post-595.css
+     /location    post-1074.css
+     /coming-soon post-1942.css
+
+   Every class below is prefixed with its route (`home2-`, `blog-`, `location-`,
+   `coming-`) so no other conversion group can collide with it.
+
+   Two rules touch a shared widget class, and both are scoped inside one of this
+   group's own classes so they cannot reach another page:
+     .home2-ages .w-imagebox__meta   keeps the saved h6 scale on an h4 element
+     .home2-program .w-iconbox__title  the Sensei face post-1104 gives the six
+                                       programme links
+   Everything else is supplied through the widgets' documented custom properties.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   /coming-soon  (post-1942)
+   Section #5dbd4e4c: min-height 100vh, 30px padding, the footer illustration as
+   the page background. 767: 40px block margin, 20px padding.
+   =========================================================================== */
+.coming-panel {
+  display: flex;
+  overflow: hidden;
+  padding: 30px 0;
+  background: var(--color-accent-5) url("/images/footer-bg.svg") bottom center / cover no-repeat;
+}
+.coming-shell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+.coming-logo { align-self: flex-start; }
+.coming-logo img { width: 160px; height: auto; }
+
+/* #72d308fd — the dots sit absolutely at -33px/-33px behind the announcement. */
+.coming-intro { position: relative; text-align: center; }
+.coming-dots {
+  position: absolute;
+  top: -33px;
+  left: -33px;
+  right: 33px;
+  z-index: 0;
+  width: 771px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  transform-origin: center top;
+}
+.coming-title { position: relative; z-index: 1; font-size: 35px; }
+.coming-kicker {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-accent-2);
+}
+
+/* #6eefa7ab — `padding: 0 25%` on the widget, full width from 1024 down. */
+.coming-form { width: 50%; margin: 0 auto; }
+
+/* #163b093 — the scenery row, capped at 887px. */
+.coming-scene {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 887px;
+  margin: 30px auto 0;
+}
+.coming-scene__col { display: flex; flex-direction: column; }
+.coming-scene__col--trees { width: 25%; }
+.coming-scene__col--people { width: 48.468%; }
+.coming-scene__col--leaf { width: 10.726%; }
+.coming-scene__col--bird { width: 15.809%; }
+.coming-scene img { height: auto; }
+.coming-leaf-1 { align-self: flex-end; }
+.coming-tree-1 { align-self: flex-start; }
+
+.coming-socials {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+.coming-socials a {
+  display: inline-flex;
+  padding: 0.5em;
+  border-radius: 50%;
+  color: var(--color-accent-3);
+  background-color: rgb(255 255 255 / 0);
+  transition: background-color 0.3s, color 0.3s;
+}
+.coming-socials a:hover,
+.coming-socials a:focus-visible { color: var(--color-accent-5); background-color: var(--color-accent-3); }
+
+@media (max-width: 1024px) {
+  .coming-title { line-height: 1.4em; }
+  .coming-form { width: 100%; padding-top: 20px; }
+  .coming-socials { justify-content: flex-end; gap: 0; }
+}
+@media (max-width: 767px) {
+  .coming-panel { margin: 40px 0; padding: 20px 0; }
+  .coming-title { font-size: 24px; }
+  .coming-form { margin-top: 20px; padding-top: 0; }
+  .coming-scene { flex-direction: column; margin-top: 0; }
+  .coming-scene__col { width: 100%; }
+  .coming-leaf-1, .coming-tree-1, .coming-tree-3 { width: 10%; }
+  .coming-scene__col--people { margin-top: -200px; }
+  .coming-people { width: 32%; align-self: center; }
+  .coming-leaf-2 { width: 12%; margin-top: -60px; align-self: flex-end; }
+  .coming-bird { width: 17%; margin: -100px 0 0 90px; }
+  .coming-socials { justify-content: center; gap: 50px; padding-top: 20px; margin-top: 0; }
+  .coming-socials a { padding: 0.4em; }
+  .coming-socials svg { width: 30px; height: 30px; }
+}
+
+/* ===========================================================================
+   /location  (post-1074)
+   =========================================================================== */
+
+/* #a3cc9ed — 100px block padding, 50/50 columns that stack from 1024 down. */
+.location-visit { padding: 100px 0; }
+.location-visit__layout { display: flex; align-items: center; }
+.location-map { width: 50%; overflow: hidden; border-radius: 10px; align-self: flex-start; }
+.location-map__frame { display: block; width: 100%; height: 756px; border: 0; }
+
+/* The facade keeps the column's height so the layout does not jump when the
+   embed replaces it. */
+.location-map__facade {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 756px;
+  padding: 40px;
+  background: var(--color-accent-8);
+  border: 1px solid var(--color-accent-4);
+  border-radius: 10px;
+}
+.location-map__place { font-size: 26px; font-weight: 900; line-height: 1.21; color: var(--color-heading); }
+.location-map__note { margin-top: 12px; max-width: 42ch; font-size: 16px; }
+.location-map__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-top: 25px; }
+.location-map__button {
+  display: inline-flex;
+  padding: 15px 30px;
+  border: 0;
+  border-radius: 4px;
+  font-family: var(--font-handwritten);
+  font-size: 15px;
+  color: var(--color-accent-5);
+  background: var(--color-accent-1);
+  transition: background-color 0.3s;
+}
+.location-map__button:hover,
+.location-map__button:focus-visible { background: var(--color-accent-3); }
+.location-map__link { font-weight: 600; color: var(--color-accent-2); text-decoration: underline; }
+
+.location-tour { width: 50%; padding-left: 40px; }
+/* #ee07fef — the heading is the theme's h3 scale, set in Sensei. */
+.location-tour__title {
+  margin-bottom: 20px;
+  font-family: var(--font-handwritten);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.21;
+}
+
+/* #69cb625 — cream, the mountain bottom-left, wavy edges, 100px bottom margin. */
+.location-faq {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 100px;
+  padding: 100px 0;
+  background: var(--color-accent-8) url("/images/home/illustration-mountain.svg") bottom left no-repeat;
+}
+.location-faq__list { padding-bottom: 50px; }
+
+@media (max-width: 1024px) {
+  .location-visit { padding: 50px 0; }
+  .location-visit__layout { flex-direction: column; align-items: stretch; }
+  .location-map, .location-tour { width: 100%; }
+  .location-map__frame, .location-map__facade { height: 400px; }
+  .location-map__facade { padding: 30px; }
+  .location-tour { padding: 40px 0 0; }
+  .location-faq { margin: 30px 0 100px; background-size: 153px auto; }
+  .location-faq__list { padding-bottom: 0; }
+}
+@media (max-width: 767px) {
+  .location-map__frame, .location-map__facade { height: 226px; }
+  .location-map__facade { height: auto; min-height: 226px; padding: 25px 20px; }
+  .location-map__place { font-size: 24px; }
+  .location-faq { margin: 0 0 50px; padding: 50px 0 70px; background-size: 97px auto; }
+}
+
+/* ===========================================================================
+   /blog  (post-595)
+   =========================================================================== */
+
+/* #602da732 — 140px/60px band, re-declared per breakpoint; the value is applied
+   inline by the page so the shared `.w-hero` rules stay untouched. */
+.blog-hero { --blog-hero-pad: 140px 0 60px; }
+
+/* #4e5a96a — cream band, white wave at the foot, 66/33 columns. */
+.blog-feed {
+  position: relative;
+  margin-bottom: 80px;
+  padding: 80px 0 100px;
+  background: var(--color-accent-8);
+}
+.blog-feed__layout { display: flex; align-items: flex-start; }
+.blog-feed__main { width: 66.666%; margin-right: 50px; flex: 1 1 auto; }
+.blog-feed__side { width: 33.333%; padding-left: 20px; flex: none; }
+.blog-feed__side > * + * { margin-top: 50px; }
+
+.blog-cards { display: flex; flex-direction: column; gap: 40px; }
+.blog-card {
+  overflow: hidden;
+  position: relative;
+  border-radius: 10px;
+  background: var(--color-accent-8);
+}
+.blog-card__thumb { position: relative; width: 100%; padding-bottom: 60%; }
+.blog-card__image { object-fit: cover; transition: filter 0.3s; }
+.blog-card:hover .blog-card__image { filter: brightness(115%); }
+.blog-card__badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 15px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-accent-5);
+  background: var(--color-accent-2);
+}
+.blog-card__text { padding: 20px 30px 30px; }
+.blog-card__title { margin-bottom: 20px; font-size: 26px; font-weight: 800; line-height: 1.3; }
+.blog-card__title a { color: var(--color-accent-3); }
+.blog-card__title a:hover { color: var(--color-accent-1); }
+.blog-card__excerpt { margin-bottom: 20px; font-size: 18px; }
+.blog-card__more { font-size: 16px; font-weight: 600; color: var(--color-accent-1); }
+.blog-card__more:hover { color: var(--color-accent-3); }
+.blog-empty { margin-top: 30px; font-size: 18px; }
+
+/* #52d8cf1 — 50px tall container, 3px radius, 16.6px inner gutters. */
+.blog-search__field { position: relative; display: flex; align-items: center; }
+.blog-search__input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 50px 0 16.66px;
+  border: 1px solid var(--color-accent-4);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--color-accent-6);
+  background: var(--color-accent-5);
+}
+.blog-search__icon {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  color: var(--color-accent-3);
+}
+.blog-search__count { margin-top: 10px; font-size: 15px; color: var(--color-accent-3); }
+
+/* #4dbff67 — three buttons, 15px gutters, 5em tall at a 15px base. */
+.blog-share { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-size: 15px; }
+.blog-share__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5em;
+  border-radius: 3px;
+  color: var(--color-accent-5);
+  transition: filter 0.3s;
+}
+.blog-share__button svg { width: 2.6em; height: 2.6em; }
+.blog-share__button:hover,
+.blog-share__button:focus-visible { filter: brightness(115%); }
+.blog-share__button--facebook { background: var(--color-facebook); }
+.blog-share__button--twitter { background: var(--color-twitter); }
+.blog-share__button--linkedin { background: var(--color-linkedin); }
+
+/* #fba2629 — the Facebook widget's white card, minus the Facebook SDK. */
+.blog-facebook {
+  margin-top: -10px;
+  padding: 30px;
+  border-radius: 14px;
+  background: var(--color-accent-5);
+}
+.blog-facebook__title { font-size: 20px; font-weight: 800; color: var(--color-heading); }
+.blog-facebook__body { margin-top: 10px; font-size: 16px; }
+.blog-facebook__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  font-weight: 600;
+  color: var(--color-accent-2);
+  text-decoration: underline;
+}
+
+/* The single-post page: the archive excerpt plus a note, never an invented body. */
+.blog-post { padding: 60px 0 100px; }
+.blog-post__inner { max-width: 960px; }
+.blog-post__meta { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 15px; }
+.blog-post__badge {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-accent-5);
+  background: var(--color-accent-2);
+}
+.blog-post__title { margin-bottom: 30px; font-size: 48px; font-weight: 800; line-height: 1.1; }
+.blog-post__photo { overflow: hidden; border-radius: 10px; }
+.blog-post__photo img { display: block; width: 100%; height: auto; }
+.blog-post__excerpt { margin-top: 30px; font-size: 18px; }
+.blog-post__note {
+  margin-top: 25px;
+  padding: 20px 25px;
+  border-left: 3px solid var(--color-accent-1);
+  background: var(--color-accent-8);
+  font-size: 16px;
+}
+.blog-post__back { display: inline-block; margin-top: 30px; font-weight: 600; color: var(--color-accent-1); }
+
+@media (max-width: 1024px) {
+  .blog-hero { --blog-hero-pad: 100px 0; }
+  .blog-feed { margin-bottom: 100px; padding: 0; }
+  .blog-feed__main { margin-right: 30px; }
+  .blog-feed__side { padding-left: 0; }
+  .blog-post__title { font-size: 30px; line-height: 1.2; }
+}
+@media (max-width: 767px) {
+  .blog-hero { --blog-hero-pad: 70px 0; }
+  .blog-feed { padding: 50px 0 0; }
+  .blog-feed__layout { flex-direction: column; }
+  .blog-feed__main { width: 100%; margin-right: 0; }
+  .blog-feed__side { width: 100%; margin-top: 40px; }
+  .blog-card__thumb { padding-bottom: 50%; }
+  .blog-card__text { padding: 20px; }
+  .blog-post { padding: 40px 0 60px; }
+  .blog-post__title { font-size: 26px; }
+}
+
+/* ===========================================================================
+   /home-2  (post-1104)
+
+   Assets referenced only from the saved CSS were never downloaded, so several
+   decorative backgrounds are absent here and are listed in the report:
+   slider2-bg-splash.svg, slider2-bg-text.svg, approuach-bg-left/right.svg and
+   number-01..04_white.svg. (illustration-people-4.svg DID come down with the
+   /careers assets, so the learning band below uses it.)
+   =========================================================================== */
+
+/* The big Sensei display word that opens five of the sections (#98722dd and
+   friends): 240px, indented 130px; 130px at 1024 and 80px at 767. */
+.home2-word {
+  padding-left: 130px;
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1em;
+  color: var(--color-accent-3);
+}
+.home2-word--tall { line-height: 1.2em; }
+
+/* --------------------------------------------------------------- hero */
+/* #1e2d0f5 — pink with the dot pattern, sliding 85px under the header. */
+.home2-hero {
+  overflow: hidden;
+  margin: -85px 0;
+  background: var(--color-tint-blush) url("/images/home/dots.svg") center center / contain no-repeat;
+}
+/* #d9a5061 — a full-width row, 400px tall, everything sitting on the floor. */
+/* The columns stretch to the stage's height and each one places its own widget:
+   the photos sit on the floor (`elementor-section-content-bottom`), the title is
+   centred (#4a9a6f3 `align-items: center`). */
+.home2-hero__stage { display: flex; align-items: stretch; min-height: 400px; }
+.home2-hero__col { display: flex; flex-direction: column; justify-content: flex-end; }
+.home2-hero__col--kid { width: 31%; align-items: flex-start; }
+.home2-hero__col--title { width: 26.296%; align-items: center; justify-content: center; }
+.home2-hero__col--jump { width: 15.897%; align-items: stretch; padding-bottom: 20px; z-index: 2; }
+.home2-hero__col--kid2 { width: 26.787%; align-items: flex-end; }
+
+.home2-hero__kid { width: 27vw; max-width: 27vw; height: auto; margin-left: -5%; }
+.home2-hero__jump-wrap { margin: 50px 0 -30px -260px; text-align: right; }
+.home2-hero__jump { display: inline-block; width: 39vw; max-width: 50vw; height: auto; }
+.home2-hero__kid2 { width: 27vw; max-width: 30vw; height: auto; margin-left: -80px; }
+
+/* The five title lines keep their own vw sizes, so the h1 itself is neutral. */
+.home2-hero__title { font-size: 16px; font-weight: 900; text-align: center; color: var(--color-accent-5); }
+.home2-hero__line { display: block; font-weight: 900; }
+.home2-hero__line--1 { font-size: 3.8vw; line-height: 0.9em; }
+.home2-hero__line--2 { font-size: 3.2vw; line-height: 0.8em; }
+.home2-hero__line--3 { font-size: 1.6vw; line-height: 0.8em; }
+.home2-hero__line--4 { font-size: 6.2vw; line-height: 0.9em; }
+.home2-hero__line--5 { font-size: 2vw; line-height: 0.4em; }
+
+/* #358428e — the white wave head is pulled up over the stage. */
+.home2-hero__wave { margin-top: -23%; }
+.home2-hero__wave img { display: block; width: 100%; height: auto; }
+
+/* ----------------------------------------------------------- approach */
+/* #7473be5 */
+.home2-approach { overflow: hidden; margin-top: 160px; }
+.home2-approach__row { display: flex; align-items: flex-start; }
+.home2-approach__tv { width: 37.143%; margin-top: -40px; text-align: center; }
+.home2-tv-top { display: inline-block; width: auto; max-width: 100%; height: auto; }
+/* #1a8e0ea — the screen is framed like the TV on home 1. */
+.home2-tv-screen {
+  margin: -1px 0;
+  overflow: hidden;
+  border: 20px solid var(--color-accent-3);
+  border-radius: 36px;
+}
+.home2-tv-bottom { display: inline-block; width: 70%; height: auto; }
+.home2-approach__copy { width: 36.032%; padding: 0 40px 0 60px; }
+.home2-approach__copy h2 { color: var(--color-accent-3); }
+.home2-approach__copy p:first-of-type { margin-top: 10px; }
+.home2-approach__cta { margin-top: 10px; }
+.home2-approach__people { width: 26.132%; margin-top: -72px; text-align: center; }
+.home2-approach__people img { display: inline-block; width: 100%; height: auto; }
+
+/* ----------------------------------------------------------- learning */
+/* #6b03187f — pale blue, wavy edges, 109px above it. */
+.home2-learning {
+  position: relative;
+  overflow: hidden;
+  margin-top: 109px;
+  padding: 130px 0;
+  background: var(--color-tint-powder) url("/images/careers/illustration-people-4.svg")
+    bottom left / 28vw auto no-repeat;
+}
+.home2-learning__intro { margin-left: 33%; padding-right: 130px; }
+.home2-learning__intro h2 { margin-bottom: 15px; color: var(--color-accent-3); }
+
+/* #e2275f7 — a 430px band whose four cards sit at staggered heights. */
+.home2-subjects {
+  display: flex;
+  align-items: stretch;
+  min-height: 430px;
+  margin-top: -10px;
+}
+.home2-subject { width: 25%; display: flex; }
+.home2-subject--a { align-items: flex-start; }
+.home2-subject--b { align-items: flex-end; padding-bottom: 10%; }
+.home2-subject--c { align-items: center; padding-top: 10%; }
+.home2-subject--d { align-items: flex-end; }
+.home2-subject__box { width: 100%; }
+.home2-subject__number {
+  display: block;
+  font-family: var(--font-handwritten);
+  font-size: 1em;
+  line-height: 1;
+  color: var(--color-accent-5);
+}
+
+/* --------------------------------------------------------------- ages */
+/* #5462622 — the cut-out illustration anchors the bottom-right corner. */
+.home2-ages {
+  overflow: hidden;
+  margin-top: 130px;
+  padding-bottom: 130px;
+  background: url("/images/home/illustration-right-cut.svg") bottom right no-repeat;
+}
+.home2-ages__title { padding: 0 130px 50px 0; text-align: end; color: var(--color-accent-3); }
+.home2-ages__grid { display: flex; align-items: stretch; margin: 0 -25px; }
+.home2-ages__grid > li { width: 25%; padding: 0 25px; }
+.home2-ages__grid > li > * { height: 100%; }
+/* The age/time line is an h4 so the card's headings stay in order, but it keeps
+   the h6 scale the kit gives it (14px/600, 12px from 1024 down). */
+.home2-ages .w-imagebox__meta { font-size: 14px; font-weight: 600; line-height: 1.5; }
+
+/* ------------------------------------------------------------ empower */
+.home2-empower-word { overflow: hidden; }
+/* #5cada6c — the standing illustration sits behind the badge grid. */
+.home2-empower { overflow: hidden; margin-bottom: 130px; }
+.home2-empower__row { display: flex; flex-direction: row-reverse; align-items: center; min-height: 463px; }
+.home2-empower__grid {
+  width: 54.603%;
+  background: url("/images/home/illustration-people-1.svg") center center no-repeat;
+}
+.home2-empower__line { display: flex; }
+.home2-empower__line > li { width: 33.333%; }
+.home2-empower__line--one { min-height: 300px; padding-top: 50px; align-items: flex-end; }
+.home2-empower__line--one > li:nth-child(2) { margin-bottom: 150px; align-self: flex-start; }
+.home2-empower__line--two { min-height: 357px; align-items: flex-start; }
+.home2-empower__line--two > li:nth-child(1) { padding-top: 50px; }
+.home2-empower__line--two > li:nth-child(2) { align-self: flex-end; padding-bottom: 50px; }
+.home2-empower__line--two > li:nth-child(3) { padding-top: 50px; }
+.home2-program__badge {
+  display: block;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--home2-badge-color, var(--color-accent-1));
+  transition: transform 0.3s;
+}
+.home2-program:hover .home2-program__badge,
+.home2-program:focus-within .home2-program__badge { transform: scale(1.1); }
+.home2-program .w-iconbox__title {
+  font-family: var(--font-handwritten);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-accent-3);
+}
+.home2-empower__copy { width: 45.359%; padding: 0 40px 0 60px; }
+.home2-empower__copy h2 { color: var(--color-accent-3); }
+.home2-empower__copy p:first-of-type { margin-top: 15px; }
+.home2-empower__cta { margin-top: 15px; }
+
+/* --------------------------------------------------------------- news */
+/* #189eee96 — cream, the mountain bottom-left, wavy edges. */
+.home2-news {
+  position: relative;
+  overflow: hidden;
+  padding: 130px 0;
+  background: var(--color-accent-8) url("/images/home/illustration-mountain.svg") bottom left no-repeat;
+}
+.home2-news__title {
+  padding-bottom: 20px;
+  font-family: var(--font-handwritten);
+  font-weight: 400;
+  line-height: 1.6em;
+  text-align: center;
+  color: var(--color-accent-3);
+}
+.home2-news__grid { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 40px; row-gap: 30px; }
+.home2-news__card { position: relative; overflow: hidden; border-radius: 10px; background: var(--color-accent-8); }
+.home2-news__thumb { position: relative; width: 100%; padding-bottom: 60%; }
+.home2-news__image { object-fit: cover; transition: filter 0.3s; }
+.home2-news__card:hover .home2-news__image { filter: brightness(115%); }
+.home2-news__badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 15px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-accent-5);
+  background: var(--color-accent-2);
+}
+.home2-news__heading { margin: 10px 0 15px; font-size: 26px; font-weight: 800; line-height: 1.3; }
+.home2-news__heading a { color: var(--color-accent-3); }
+.home2-news__heading a:hover { color: var(--color-accent-1); }
+.home2-news__footer { display: flex; align-items: center; margin-top: -30px; }
+.home2-news__cta { width: 66.666%; padding-left: 33.333%; text-align: center; }
+.home2-news__tree { width: auto; height: auto; margin: 40px 3px -27px auto; }
+
+/* -------------------------------------------------------------- visit */
+/* #f6c5369 / #29f40ff — the inner row is capped at 900px. */
+.home2-visit { overflow: hidden; margin: 130px 0 100px; }
+.home2-visit__row {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.home2-visit__address { width: 39.222%; }
+.home2-visit__people { display: block; width: 95%; height: auto; margin: 0 30px 20px 0; }
+.home2-visit__place { font-size: 20px; font-weight: 800; line-height: 1.27; color: var(--color-accent-3); }
+.home2-visit__details { margin-top: 10px; line-height: 1.4em; }
+.home2-visit__details a { color: var(--color-accent-1); }
+.home2-visit__details a:hover { color: var(--color-accent-3); }
+.home2-visit__form { width: 60.778%; padding-left: 40px; }
+.home2-visit__form h2 { color: var(--color-accent-3); }
+.home2-visit__lead { padding: 10px 0 20px; }
+
+@media (max-width: 1024px) {
+  .home2-word { padding-left: 0; font-size: 130px; }
+
+  .home2-hero { margin: 0; padding-top: 30px; }
+  .home2-hero__col--kid { width: 28%; }
+  .home2-hero__col--title { width: 36%; }
+  .home2-hero__col--jump { width: 32%; }
+  .home2-hero__col--kid2 { width: 3%; }
+  .home2-hero__kid2 { display: none; }
+  .home2-hero__line--1 { font-size: 4.5vw; }
+  .home2-hero__line--2 { font-size: 3.9vw; }
+  .home2-hero__line--3 { font-size: 2.1vw; }
+  .home2-hero__line--4 { font-size: 7.6vw; }
+  .home2-hero__line--5 { font-size: 2.6vw; }
+
+  .home2-approach { margin-top: 70px; }
+  .home2-approach__tv { width: 40%; margin-top: 0; }
+  .home2-approach__copy { width: 40%; padding: 0 0 0 20px; }
+  .home2-approach__people { width: 20%; margin-top: 0; padding-left: 20px; }
+
+  .home2-learning { margin-top: 80px; padding: 80px 0 200px; background-position: bottom center; background-size: 44vw auto; }
+  .home2-learning__intro { margin-left: 0; padding-right: 0; }
+  .home2-learning__intro h2 { margin: 5px 0 10px; }
+  .home2-subjects { flex-wrap: wrap; min-height: 0; margin: 20px 0; }
+  .home2-subject { width: 50%; }
+  .home2-subject--b, .home2-subject--c { padding: 0; }
+  .home2-subject__number { font-size: 0.75em; }
+
+  .home2-ages { margin-top: 70px; padding-bottom: 0; }
+  .home2-ages__title { padding: 0 0 30px; text-align: start; }
+  .home2-ages__grid { flex-wrap: wrap; margin: 0; }
+  .home2-ages__grid > li { width: 50%; padding: 0; }
+  .home2-ages__grid > li:nth-child(1) { padding-right: 10px; }
+  .home2-ages__grid > li:nth-child(2) { padding-left: 10px; }
+  .home2-ages__grid > li:nth-child(3) { padding: 20px 10px 0 0; }
+  .home2-ages__grid > li:nth-child(4) { padding: 20px 0 0 10px; }
+  .home2-ages .w-imagebox__meta { font-size: 12px; line-height: 1.17; }
+
+  .home2-empower { margin-bottom: 0; }
+  .home2-empower__row { flex-direction: column; align-items: stretch; min-height: 356px; }
+  .home2-empower__grid, .home2-empower__copy { width: 100%; }
+  .home2-empower__grid { background-position: 50% 213px; }
+  .home2-empower__copy { padding: 0; }
+  .home2-empower__copy h2 { margin-top: 23px; }
+
+  .home2-news { padding: 70px 0 20px; }
+  .home2-news__title { font-size: 129px; text-align: start; }
+  .home2-news__grid { grid-template-columns: 1fr; }
+  .home2-news__footer { margin-top: 0; }
+  .home2-news__cta { width: auto; padding-left: 0; }
+
+  .home2-visit { margin: 70px 0 100px; }
+  .home2-visit__row { padding-bottom: 100px; }
+  .home2-visit__address, .home2-visit__form { padding: 0; }
+  .home2-visit__people { margin-top: 60px; }
+}
+
+@media (max-width: 767px) {
+  .home2-word { font-size: 80px; }
+  .home2-word--tall { line-height: 1em; }
+
+  .home2-hero { padding-top: 0; }
+  /* #d9a5061 at 767: the jumping child becomes the stage's own background. */
+  .home2-hero__stage {
+    min-height: 449px;
+    padding-bottom: 50px;
+    background: url("/images/home-2/image-jump-child.png") 48vw 0 / auto 100% no-repeat;
+  }
+  .home2-hero__col--kid,
+  .home2-hero__col--jump,
+  .home2-hero__col--kid2 { display: none; }
+  .home2-hero__col--title { width: 100%; margin: 3% 10% 0; }
+  .home2-hero__title { font-size: 16px; }
+  .home2-hero__line--1 { font-size: 2.7em; }
+  .home2-hero__line--2 { font-size: 2.4em; }
+  .home2-hero__line--3 { font-size: 1.2em; }
+  .home2-hero__line--4 { font-size: 4.6em; }
+  .home2-hero__line--5 { font-size: 1.5em; }
+
+  .home2-approach__row { flex-direction: column; }
+  .home2-approach__tv { width: 100%; margin-top: 30px; order: 2; }
+  .home2-approach__copy { width: 100%; padding: 0 0 15px; order: 1; }
+  .home2-approach__people { width: 100%; padding: 0 0 15px; order: 3; }
+  .home2-approach__people img { width: 50%; }
+
+  .home2-learning { padding: 50px 0 200px; background-size: 76% auto; }
+  .home2-subjects { flex-direction: column; margin: 0; }
+  .home2-subject { width: 100%; padding: 0; }
+  .home2-subject__box { padding: 15%; }
+
+  /* #5462622 at 767: `background-size: 0px auto` hides the cut-out entirely. */
+  .home2-ages { background-image: none; }
+  .home2-ages__grid { flex-direction: column; }
+  .home2-ages__grid > li,
+  .home2-ages__grid > li:nth-child(1),
+  .home2-ages__grid > li:nth-child(2),
+  .home2-ages__grid > li:nth-child(3),
+  .home2-ages__grid > li:nth-child(4) { width: 100%; padding: 0 0 20px; }
+
+  .home2-empower__row { min-height: 0; }
+  .home2-empower__grid { padding: 60px 0 50px; background-image: none; }
+  .home2-empower__line { flex-wrap: wrap; }
+  .home2-empower__line--one { min-height: 162px; margin-bottom: 10px; padding-top: 0; }
+  .home2-empower__line--two { min-height: 154px; }
+  .home2-empower__line > li,
+  .home2-empower__line--one > li:nth-child(2),
+  .home2-empower__line--two > li:nth-child(1),
+  .home2-empower__line--two > li:nth-child(2),
+  .home2-empower__line--two > li:nth-child(3) { width: 33.33%; margin: 0; padding: 0; align-self: auto; }
+  .home2-program__badge { width: 64px; height: 64px; }
+
+  .home2-news { padding: 60px 0 40px; }
+  .home2-news__title { font-size: 80px; }
+  .home2-news__thumb { padding-bottom: 50%; }
+  .home2-news__footer { flex-direction: column; align-items: stretch; padding-top: 20px; }
+  .home2-news__cta { margin-bottom: 20px; }
+  .home2-news__tree { margin: 0 auto -30px; }
+
+  .home2-visit { margin: 50px 0; }
+  .home2-visit__row { flex-direction: column; padding-bottom: 0; }
+  .home2-visit__address, .home2-visit__form { width: 100%; }
+  .home2-visit__address { padding-top: 30px; }
+  .home2-visit__people { width: 50%; margin: 0 0 20px; }
+}

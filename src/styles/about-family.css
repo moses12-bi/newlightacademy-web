@@ -1,0 +1,745 @@
+/* ---------------------------------------------------------------------------
+   about-family — page styles ported from the Elementor page stylesheets for
+   /gallery (post-1039), /our-teachers (post-1042), /careers (post-1044) and
+   /daily-schedule (post-1048 + the nested template post-2265).
+
+   Every class is prefixed with its route so the parallel conversion groups
+   cannot collide. Breakpoints follow the theme: <=767 mobile, 768-1024 tablet,
+   >=1025 desktop.
+--------------------------------------------------------------------------- */
+
+/* ===========================================================================
+   /gallery — post-1039
+   =========================================================================== */
+
+/* #355e47b5: a plain white band, 50/30/80 padding, no shape dividers. The
+   second column (#7503fe4f) is empty and `elementor-hidden-phone`, so only the
+   40% title column is rendered. */
+.gallery-intro {
+  background: var(--color-accent-5);
+  padding: 50px 0 80px;
+}
+.gallery-intro__copy {
+  width: 40%;
+}
+
+@media (max-width: 1024px) and (min-width: 768px) {
+  .gallery-intro__copy {
+    width: 60%;
+  }
+}
+
+/* #85a8dbb: cream band with a wave on both edges, 700px minimum, 130px block
+   padding and a 100px gap before the footer. */
+.gallery-section {
+  position: relative;
+  background: var(--color-accent-8);
+  margin-bottom: 100px;
+  padding: 130px 0;
+}
+.gallery-section__inner {
+  min-height: 700px;
+}
+
+/* #5f571d4: `gallery_layout: justified`, ideal row height 340/150/150 and a
+   30/20/20px gap.
+
+   Elementor measures and lays the rows out in JavaScript. Flexbox reaches the
+   same result without a runtime: with `flex-basis` AND `flex-grow` both
+   proportional to each photo's aspect ratio, every item in a row ends up
+   exactly as wide as its ratio demands, so the whole row shares one height,
+   and the basis decides how many fit before the row wraps.
+
+   `--gallery-row` is the packing constant, not the ideal height: it is tuned so
+   the rows wrap at the counts Elementor's justified algorithm picks (it keeps
+   the image that overruns a row when doing so lands nearer the ideal height).
+   Counts verified at 320/390/768/1024/1025/1280/1440 = 1/2/3/4/2/2/2; once the
+   count matches, the row geometry matches the original exactly. */
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gallery-gap, 30px);
+  --gallery-row: 271px;
+}
+.gallery-item {
+  position: relative;
+  flex: var(--gallery-ar) 1 calc(var(--gallery-ar) * var(--gallery-row));
+  min-width: 0;
+  aspect-ratio: var(--gallery-ar);
+  overflow: hidden;
+  border: var(--image-border-width, 10px) solid var(--color-accent-5);
+  border-radius: 46px;
+  background: var(--color-accent-5);
+  transition: border-radius 300ms;
+}
+.gallery-item:hover,
+.gallery-item:focus-visible {
+  border-radius: 26px;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* `image_hover_animation: shrink-contained` — the widget's own stylesheet is
+     not in the capture, so the scale step here is a reconstruction; the
+     300ms duration and the hover filter are ported from post-1039. */
+  transform: scale(1.12);
+  filter: contrast(100%) saturate(100%);
+  transition: transform 300ms, filter 300ms;
+}
+.gallery-item:hover img,
+.gallery-item:focus-visible img {
+  transform: scale(1);
+  filter: contrast(97%) saturate(150%);
+}
+
+/* Lightbox */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: rgba(6, 61, 20, 0.94);
+}
+.gallery-lightbox__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 15px 20px;
+  color: var(--color-accent-5);
+}
+.gallery-lightbox__count {
+  font-size: 16px;
+  font-weight: 600;
+}
+.gallery-lightbox__stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0 20px 30px;
+}
+.gallery-lightbox__figure {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  height: 100%;
+}
+.gallery-lightbox__figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.gallery-lightbox__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  color: var(--color-accent-5);
+  background: transparent;
+  transition: background-color 200ms, border-color 200ms;
+}
+.gallery-lightbox__button:hover,
+.gallery-lightbox__button:focus-visible {
+  border-color: var(--color-accent-5);
+  background: rgba(255, 255, 255, 0.15);
+}
+.gallery-lightbox__button svg {
+  width: 20px;
+  height: 20px;
+}
+.gallery-lightbox__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 20px 25px;
+}
+
+@media (max-width: 1024px) {
+  .gallery-section {
+    margin-bottom: 0;
+    padding: 50px 0;
+  }
+  .gallery-grid {
+    --gallery-row: 123px;
+    --gallery-gap: 20px;
+  }
+}
+@media (max-width: 767px) {
+  .gallery-intro {
+    padding: 50px 0 20px;
+  }
+  .gallery-intro__copy {
+    width: 100%;
+  }
+  .gallery-grid {
+    --gallery-row: 92px;
+  }
+  /* The rows are only ~100px tall here, so the frame is scaled with them. */
+  .gallery-item {
+    border-width: 6px;
+    border-radius: 30px;
+  }
+  .gallery-item:hover,
+  .gallery-item:focus-visible {
+    border-radius: 18px;
+  }
+}
+
+/* ===========================================================================
+   /our-teachers — post-1042
+   =========================================================================== */
+
+/* #a26fb86: a 1000px well with a hairline under it, 130px of head room. */
+.teachers-profile {
+  border-bottom: 1px solid var(--color-accent-7);
+  padding: 130px 0 0;
+  overflow: hidden;
+}
+.teachers-profile__inner {
+  display: flex;
+  align-items: flex-end;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.teachers-profile__photo {
+  width: 48.095%;
+}
+.teachers-profile__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline-start: auto;
+}
+.teachers-profile__portrait {
+  margin-right: 50px;
+  text-align: end;
+}
+.teachers-profile__copy {
+  width: 51.867%;
+  padding-bottom: 60px;
+}
+/* #730c27e is an h4 in the save; it is rendered as a paragraph so the outline
+   does not jump h2 -> h4, and carries the kit's h4 type here instead. */
+.teachers-profile__role {
+  padding-bottom: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.27;
+  color: var(--color-heading);
+}
+.teachers-profile__intro {
+  padding-bottom: 20px;
+}
+.teachers-profile__story {
+  padding: 30px 0 20px;
+}
+.teachers-profile__sign {
+  width: 159px;
+  height: auto;
+}
+.teachers-profile__since {
+  text-align: center;
+}
+
+/* #77ad163: two stat columns, 34.789% / 65.209%. */
+.teachers-stats {
+  display: flex;
+  align-items: flex-start;
+}
+.teachers-stats__col:first-child {
+  width: 34.789%;
+}
+.teachers-stats__col:last-child {
+  width: 65.209%;
+}
+/* #ee51d0d and friends: the label sits on a white strip pulled 20px up into
+   the numeral, which is how the theme clips the counter's descender. */
+.teachers-stat__label {
+  position: relative;
+  margin-top: -20px;
+  padding-top: 10px;
+  background: var(--color-accent-5);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-heading);
+}
+
+/* #25b79f4 / #5d7977a: the oversized handwritten word in front of a heading. */
+.teachers-band {
+  overflow: hidden;
+  margin-top: 130px;
+}
+.teachers-band__inner {
+  padding-left: 130px;
+}
+.teachers-display {
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1.1;
+  color: var(--color-accent-3);
+}
+.teachers-band h2 {
+  padding: 0 10% 0 20%;
+}
+
+/* #f1b0259: a full-width row of six flip boxes. */
+.teachers-team {
+  overflow: hidden;
+  margin: 50px 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+/* The shared `slide` flip box parks its hidden face outside the card, so on the
+   wrapped tablet/phone grids it would draw over the row above. Clipped here
+   only for this page; the widget layer owns the general fix. */
+.teachers-team .w-flipbox {
+  overflow: hidden;
+}
+
+/* #5d7977a */
+.teachers-closing {
+  overflow: hidden;
+  margin: 130px 0 100px;
+}
+.teachers-closing__inner {
+  padding-left: 130px;
+}
+.teachers-closing__split {
+  display: flex;
+  align-items: center;
+  padding-bottom: 50px;
+}
+.teachers-closing__art {
+  width: 32.743%;
+  text-align: center;
+}
+/* #7d74ecc has no width rule at desktop, so the illustration keeps its own
+   227px and is only centred inside its column. */
+.teachers-closing__art img {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+.teachers-closing__copy {
+  width: 67.257%;
+  padding-right: 130px;
+}
+.teachers-closing__copy > * + * {
+  margin-top: 20px;
+}
+
+@media (max-width: 1024px) {
+  .teachers-profile {
+    padding: 0;
+  }
+  .teachers-profile__role {
+    font-size: 18px;
+  }
+  .teachers-profile__photo {
+    width: 45%;
+  }
+  .teachers-profile__portrait {
+    margin-right: 4%;
+  }
+  .teachers-profile__copy {
+    width: 55%;
+    padding-bottom: 10px;
+  }
+  .teachers-profile__story {
+    padding: 10px 0 0;
+  }
+  .teachers-stats__col:first-child {
+    width: 40%;
+  }
+  .teachers-stats__col:last-child {
+    width: 60%;
+  }
+  .teachers-band {
+    margin-top: 70px;
+  }
+  .teachers-band__inner,
+  .teachers-closing__inner {
+    padding-left: 0;
+  }
+  .teachers-display {
+    font-size: 130px;
+  }
+  .teachers-band h2 {
+    padding: 0;
+  }
+  .teachers-team {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .teachers-closing {
+    margin: 70px 0 100px;
+  }
+  .teachers-closing__split {
+    padding-bottom: 20%;
+  }
+  .teachers-closing__art {
+    margin-top: 60px;
+  }
+  .teachers-closing__copy {
+    padding-right: 0;
+  }
+}
+@media (max-width: 767px) {
+  .teachers-profile__inner,
+  .teachers-closing__split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .teachers-profile__photo,
+  .teachers-profile__copy,
+  .teachers-closing__copy {
+    width: 100%;
+  }
+  .teachers-profile__copy {
+    padding-bottom: 40px;
+  }
+  .teachers-profile__role {
+    font-size: 16px;
+  }
+  .teachers-profile__mobile-photo {
+    padding-bottom: 10px;
+  }
+  .teachers-stats__col:first-child,
+  .teachers-stats__col:last-child {
+    width: 50%;
+  }
+  .teachers-profile__sign-wrap {
+    margin-top: 20px;
+  }
+  .teachers-display {
+    font-size: 80px;
+  }
+  .teachers-band {
+    margin-top: 50px;
+  }
+  .teachers-team {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 50px 0 70px;
+  }
+  .teachers-closing {
+    margin: 0 0 50px;
+  }
+  .teachers-closing__split {
+    padding-bottom: 0;
+  }
+  .teachers-closing__copy h2 {
+    font-size: 30px;
+  }
+}
+
+/* ===========================================================================
+   /careers — post-1044
+   =========================================================================== */
+
+/* #28fa3cb: the cream hero carries a 50%-opaque white overlay, which resolves
+   to this flat tint. The bottom wave is filled with the next band's blue. */
+.careers-hero {
+  background-color: var(--color-surface-warm-alt);
+}
+
+/* #e9b120f: the pale-blue band. The illustration is a background image, as in
+   the save (bottom left, 28vw wide). */
+.careers-perks {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-tint-powder);
+  background-image: url("/images/careers/illustration-people-4.svg");
+  background-position: bottom left;
+  background-repeat: no-repeat;
+  background-size: 28vw auto;
+}
+.careers-perks__inner {
+  position: relative;
+  z-index: 1;
+  padding: 130px 0;
+}
+
+/* #303feb7 */
+.careers-lede__display {
+  margin-bottom: 20px;
+  padding-left: 130px;
+  font-family: var(--font-handwritten);
+  font-size: 240px;
+  line-height: 1;
+  color: var(--color-accent-3);
+}
+.careers-lede__body {
+  margin-left: 33%;
+  padding-right: 130px;
+}
+.careers-lede__body h2 {
+  padding-bottom: 15px;
+  color: var(--color-accent-3);
+}
+
+/* #5634b98: four numbered perks, staggered vertically on desktop. */
+.careers-numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: start;
+  min-height: 430px;
+  margin-top: -10px;
+}
+.careers-number {
+  position: relative;
+  container-type: inline-size;
+  padding-top: var(--careers-number-pad, 23%);
+}
+.careers-number:nth-child(2) {
+  align-self: end;
+  padding-bottom: 10%;
+}
+.careers-number:nth-child(3) {
+  align-self: center;
+  margin-top: 10%;
+}
+.careers-number:nth-child(4) {
+  align-self: end;
+}
+/* The saved numerals are `number-0X_white.svg` background images that did not
+   download, so they are redrawn as text in the same white. */
+.careers-number__numeral {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  /* The saved numerals are sized as a percentage of the widget width
+     (76/70/100/82%, 75% on tablet), so the type is scaled the same way. */
+  font-size: calc(var(--careers-numeral-ratio, 45) * 1cqw);
+  font-weight: 900;
+  line-height: 0.75;
+  color: var(--color-accent-5);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* #bf6576c: the four benefit cards. */
+.careers-benefits {
+  padding: 100px 0 50px;
+}
+.careers-benefits__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 50px;
+}
+
+/* #e8a94a2: two framed link cards in a 1000px well. */
+.careers-cta {
+  max-width: 1000px;
+  margin: 0 auto 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+.careers-cta > * {
+  background: var(--color-accent-5);
+}
+
+@media (max-width: 1024px) {
+  .careers-perks {
+    background-position: bottom center;
+    background-size: 44vw auto;
+    padding-bottom: 200px;
+  }
+  .careers-perks__inner {
+    padding: 80px 0 0;
+  }
+  .careers-lede__display {
+    padding-left: 0;
+    font-size: 130px;
+  }
+  .careers-lede__body {
+    margin-left: 0;
+    padding-right: 0;
+  }
+  .careers-lede__body h2 {
+    margin: 10px 0;
+    padding-bottom: 0;
+  }
+  .careers-numbers {
+    grid-template-columns: repeat(2, 1fr);
+    min-height: 0;
+    margin: 20px 0;
+  }
+  .careers-number,
+  .careers-number:nth-child(2),
+  .careers-number:nth-child(3),
+  .careers-number:nth-child(4) {
+    align-self: center;
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+  .careers-number__numeral {
+    --careers-numeral-ratio: 45;
+  }
+  .careers-benefits {
+    padding: 70px 0;
+  }
+  .careers-benefits__grid {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 20px;
+    row-gap: 20px;
+  }
+  .careers-cta {
+    margin-bottom: 70px;
+  }
+}
+@media (max-width: 767px) {
+  .careers-perks {
+    background-size: 76% auto;
+    padding: 50px 0 200px;
+  }
+  .careers-perks__inner {
+    padding: 20px 0 0;
+  }
+  .careers-lede__display {
+    font-size: 80px;
+  }
+  .careers-numbers {
+    grid-template-columns: 1fr;
+    margin: 0 0 40px;
+  }
+  .careers-number {
+    padding: 15% 15% 15%;
+  }
+  .careers-number__numeral {
+    --careers-numeral-ratio: 38;
+  }
+  .careers-benefits__grid {
+    grid-template-columns: 1fr;
+  }
+  .careers-cta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================================================================
+   /daily-schedule — post-1048 and the nested template post-2265
+   =========================================================================== */
+
+.daily {
+  padding: 130px 0;
+}
+.daily__layout {
+  display: flex;
+  /* The aside must stretch to the row's full height, otherwise its sticky
+     child has no room to travel. */
+  align-items: stretch;
+}
+.daily__aside {
+  width: 40%;
+}
+/* #75276b1c: `sticky: top` with a 100px offset, `sticky_parent`, on desktop and
+   tablet only. `position: sticky` needs no JavaScript for this. */
+.daily__sticky {
+  position: sticky;
+  top: 100px;
+}
+.daily__title {
+  font-family: var(--font-handwritten);
+  font-size: 85px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+.daily__lead {
+  padding-top: 10px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.daily__art {
+  margin-top: 20px;
+  text-align: center;
+}
+.daily__art img {
+  display: inline-block;
+  width: 46%;
+  height: auto;
+  transform-origin: center center;
+}
+.daily__list {
+  width: 60%;
+  padding: 30px 0 0 90px;
+}
+/* The schedule entry titles are h3 in the save, directly under the page h1.
+   They are h2 here so the outline has no level skip; the kit's h3 scale is
+   pinned back on so the rendering is unchanged. */
+.daily__item h2 {
+  color: var(--color-accent-2);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.21;
+}
+@media (max-width: 767px) {
+  .daily__item h2 { font-size: 24px; }
+}
+.daily__time {
+  font-weight: 700;
+}
+.daily__note {
+  margin-bottom: 40px;
+}
+
+@media (max-width: 1024px) {
+  .daily {
+    padding: 80px 0 70px;
+  }
+  .daily__aside {
+    width: 50%;
+  }
+  .daily__lead {
+    padding-top: 0;
+  }
+  .daily__art img {
+    width: 97%;
+    max-width: 93%;
+  }
+  .daily__list {
+    width: 50%;
+    padding: 0 0 0 20px;
+  }
+}
+@media (max-width: 767px) {
+  .daily {
+    padding: 40px 0 0;
+  }
+  .daily__layout {
+    flex-direction: column;
+  }
+  .daily__sticky {
+    position: static;
+  }
+  .daily__aside,
+  .daily__list {
+    width: 100%;
+  }
+  .daily__title {
+    font-size: 55px;
+  }
+  .daily__lead {
+    font-size: 15px;
+    line-height: 1.63;
+  }
+  .daily__art img {
+    width: 44%;
+    max-width: 44%;
+  }
+  .daily__list {
+    padding: 20px 0 0;
+  }
+}

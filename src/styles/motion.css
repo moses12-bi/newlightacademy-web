@@ -1,0 +1,41 @@
+/*
+ * Motion runtime support that is not tied to one page.
+ *
+ * The entrance keyframes all live in src/styles/widgets.css (which globals.css
+ * imports after this file, so a second copy here would silently shadow it) and
+ * in globals.css. PageMotion sets `animation-name` inline from each element's
+ * data-reveal, so a stylesheet only has to supply the @keyframes.
+ */
+
+/* `swing` needs an explicit origin before the reveal starts as well as during. */
+[data-reveal="swing"] { transform-origin: top center; }
+
+/*
+ * A background motion_fx layer moves independently of its section, so it is an
+ * oversized absolutely-positioned child. Only this layer is transformed.
+ */
+[data-fx-layer] {
+  position: absolute;
+  inset: -10%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Reduced motion: nothing continuous, nothing left hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .motion-ready,
+  .motion-ready.motion-visible {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  [data-fx],
+  [data-fx-bg],
+  [data-motion],
+  [data-fx-layer] {
+    transform: none !important;
+    filter: none !important;
+  }
+}

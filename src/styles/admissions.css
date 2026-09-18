@@ -1,0 +1,537 @@
+/* ---------------------------------------------------------------------------
+   Admissions group — /admissions, /tuition, /how-to-apply, /faq,
+   /schedule-a-tour.
+
+   Ported from post-2461 (admissions), post-1066 (tuition), post-1064
+   (how-to-apply), post-1068 (faq) and post-1070 (schedule-a-tour).
+
+   Prefixes: `adm-` for anything shared by the five routes, then `tui-`,
+   `hta-`, `faq-` and `tour-` for the per-route pieces. Breakpoints follow the
+   theme: <=767 phone, 768-1024 tablet, >=1025 desktop.
+--------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Hero art widths.
+
+   PageHero ships the 36% / 60% / 46% the cream heroes share; three of these
+   five pages size their illustration differently (post-1064 #5addf59 is
+   28/38/46, post-1070 #09328b0 is 36/48/46). Only the width of that one image
+   is overridden, per page, through a custom property.
+--------------------------------------------------------------------------- */
+.adm-hero .w-hero__image { width: var(--adm-hero-art, 36%); }
+
+/* post-2461 #f75d70b and post-1066 #1e1c759 lay a 50%-opacity white overlay
+   over the cream, which the faq / how-to-apply / schedule-a-tour heroes do not. */
+.adm-hero--tinted::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: var(--color-accent-5);
+  opacity: .5;
+  pointer-events: none;
+}
+@media (max-width: 1024px) {
+  .adm-hero .w-hero__image { width: var(--adm-hero-art-md, 60%); }
+  .adm-hero { margin-bottom: var(--adm-hero-mb-md, 0); }
+}
+@media (max-width: 767px) {
+  .adm-hero .w-hero__image { width: var(--adm-hero-art-sm, 46%); }
+  /* post-1064 #ee8cd9b / post-1068 #99e3143 add a phone-only bottom margin. */
+  .adm-hero { margin-bottom: var(--adm-hero-mb-sm, 0); }
+}
+
+/* ---------------------------------------------------------------------------
+   Section scaffolding shared by the group: the cream / white bands and the
+   "row of columns" that Elementor's boxed sections produce.
+--------------------------------------------------------------------------- */
+.adm-band { position: relative; overflow: hidden; }
+.adm-band--cream { background-color: var(--color-accent-8); }
+
+/* An Elementor `elementor-container` row. Column widths arrive per child. */
+.adm-row { display: flex; flex-wrap: wrap; }
+.adm-row > * { min-width: 0; }
+
+/* Elementor column gaps: extended = 15px each side, wide = 20px each side. */
+.adm-row--extended { margin: 0 -15px; }
+.adm-row--extended > * { padding: 0 15px; }
+.adm-row--wide { margin: 0 -20px; }
+.adm-row--wide > * { padding: 0 20px; }
+
+/* A stack of widgets inside one column: Elementor's 10px widget gap. */
+.adm-stack > * + * { margin-top: 10px; }
+
+/* Body copy inside a text-editor widget. */
+.adm-copy p + p { margin-top: 1.25em; }
+/* The kit's link colour; `:not(.theme-button)` keeps the shared Button's own
+   white-on-orange treatment intact when a button sits inside the copy. */
+.adm-copy a:not(.theme-button) { color: var(--color-accent-1); }
+.adm-copy a:not(.theme-button):hover { color: var(--color-midnight); }
+
+/* The oversized Sensei word that opens two of these sections
+   (post-2461 #2658834, post-1066 #60cfa95). Decorative scale, real text. */
+.adm-bigword {
+  font-family: var(--font-handwritten);
+  line-height: 1.1;
+  color: var(--color-accent-3);
+}
+
+/* ---------------------------------------------------------------------------
+   /admissions
+--------------------------------------------------------------------------- */
+
+/* Key dates — post-2461 #aa3d687 */
+.adm-dates { padding: 130px 0 50px; }
+.adm-dates__label { width: 40%; padding-left: 0; padding-right: 0; }
+.adm-dates__col { width: 24%; }
+.adm-dates__col--b { width: 18.333%; }
+.adm-dates__col--c { width: 17.607%; }
+@media (max-width: 1024px) {
+  .adm-dates { padding: 90px 0 20px; }
+  .adm-dates__label { width: 25%; padding: 0 5px 0 0; }
+  .adm-dates__col { width: 25%; padding: 0 5px 0 0; }
+  .adm-dates__col--b { width: 25%; padding: 0 5px; }
+  .adm-dates__col--c { width: 25%; padding: 0 0 0 5px; }
+}
+@media (max-width: 767px) {
+  .adm-dates { padding: 40px 0 0; }
+  .adm-dates__label,
+  .adm-dates__col,
+  .adm-dates__col--b,
+  .adm-dates__col--c { width: 100%; padding: 0; }
+  .adm-dates__col { margin-top: 20px; }
+  .adm-dates__label h2 { font-size: 30px; }
+}
+
+/* Snail band — post-2461 #10d2c83: the snail sits on the bottom edge and
+   drifts sideways with the scroll (translateX, desktop only). */
+.adm-snail { position: relative; z-index: 3; overflow: hidden; background-color: var(--color-accent-8); }
+.adm-snail__layer {
+  position: absolute;
+  inset: 0;
+  background: url("/images/snail.svg") bottom center / contain no-repeat;
+}
+.adm-snail__spacer { position: relative; height: 62px; }
+@media (max-width: 767px) {
+  .adm-snail { padding: 40px 0 0; }
+  .adm-snail__layer { background-size: 270px auto; }
+  .adm-snail__spacer { height: 10px; }
+}
+
+/* Education band — post-2461 #b6b0197: cream, mountain illustration bottom
+   left, wavy bottom edge. */
+.adm-education {
+  padding: 70px 0 130px;
+  background-image: url("/images/home/illustration-mountain.svg");
+  background-position: bottom left;
+  background-repeat: no-repeat;
+}
+.adm-education__heading { width: 40%; padding-left: 0; }
+.adm-education__body { width: 60%; padding-right: 0; }
+@media (max-width: 1024px) {
+  .adm-education { padding: 40px 0 70px; background-size: 153px auto; }
+  .adm-education__heading { width: 25%; padding: 0 20px 0 0; }
+  .adm-education__body { width: 75%; padding: 0 0 0 20px; }
+}
+@media (max-width: 767px) {
+  .adm-education { padding: 20px 0 60px; }
+  .adm-education__heading,
+  .adm-education__body { width: 100%; padding: 0; }
+  .adm-education__body { margin-top: 20px; }
+  .adm-education__heading h2 { font-size: 30px; }
+}
+
+/* Download cards — post-2461 #f69c619 / #efeeb57 */
+.adm-forms { margin-top: 130px; }
+.adm-forms--second { margin-top: 0; margin-bottom: 100px; }
+.adm-forms__col { width: 33.3333%; }
+@media (max-width: 1024px) {
+  .adm-forms { margin-top: 70px; }
+  .adm-forms--second { margin-top: 20px; margin-bottom: 70px; }
+}
+@media (max-width: 767px) {
+  .adm-forms { margin-top: 50px; padding-bottom: 20px; }
+  .adm-forms--second { margin-top: 0; margin-bottom: 30px; }
+  .adm-forms__col { width: 100%; }
+  .adm-forms__col + .adm-forms__col { margin-top: 20px; }
+}
+
+/* The framed download card's own typography — post-2461 #be74d59. */
+.adm-download { --w-iconbox-icon-size: 55px; --w-iconbox-icon-size-sm: 40px; --w-iconbox-icon-color: var(--color-accent-3); }
+.adm-download .w-iconbox__title { color: var(--color-accent-3); }
+.adm-download .w-iconbox__description { font-size: 16px; font-weight: 800; color: var(--color-accent-2); }
+
+/* Team intro — post-2461 #5b7598b */
+.adm-team { margin-top: 130px; }
+.adm-team .adm-bigword { padding-left: 130px; font-size: 240px; }
+.adm-team__heading { padding: 0 130px 0 300px; }
+.adm-team__copy { padding: 0 130px 0 300px; }
+@media (max-width: 1024px) {
+  .adm-team .adm-bigword { padding-left: 0; font-size: 131px; }
+  .adm-team__heading,
+  .adm-team__copy { padding: 0; }
+}
+@media (max-width: 767px) {
+  .adm-team .adm-bigword { font-size: 80px; }
+  .adm-team__heading h2 { font-size: 30px; }
+}
+
+/* ---------------------------------------------------------------------------
+   Heading levels.
+
+   Several of these sections open at `h3` (or `h4`) under the page `h1` with no
+   `h2` in between. The levels are shifted up so the outline has no gaps, and
+   the type scale the saved design used is pinned back on here.
+--------------------------------------------------------------------------- */
+.adm-h3-scale { font-size: 26px; font-weight: 900; line-height: 1.21; }
+.adm-h4-scale { font-size: 20px; font-weight: 800; line-height: 1.27; }
+@media (max-width: 1024px) {
+  .adm-h4-scale { font-size: 18px; }
+}
+@media (max-width: 767px) {
+  .adm-h3-scale { font-size: 24px; }
+  .adm-h4-scale { font-size: 16px; }
+}
+
+/* ---------------------------------------------------------------------------
+   The numbered step rows on /admissions (post-2461 #70325f8) and
+   /how-to-apply (post-1064 #33fd8ac).
+--------------------------------------------------------------------------- */
+.adm-steps { margin: 40px 0 120px; }
+.adm-steps__row { align-items: center; }
+.adm-steps__stroke { display: flex; align-items: center; justify-content: center; }
+.adm-steps__stroke img { width: 100%; height: auto; }
+
+/* Elementor renders these icon boxes `elementor-view-stacked` +
+   `elementor-shape-circle`: a coloured disc with a white numeral at 50%
+   opacity, 58-60px glyph inside 20px of padding. */
+.adm-step { --w-iconbox-gap: 0px; }
+/* Only the /admissions cards are padded panels with a cream hover
+   (post-2461 #818462b); post-1064 #4d8f19e explicitly zeroes its padding. */
+.adm-step--panel .w-iconbox__wrapper {
+  padding: 40px;
+  border-radius: 6px;
+  transition: background-color .3s;
+}
+.adm-step--panel:hover .w-iconbox__wrapper,
+.adm-step--panel:focus-within .w-iconbox__wrapper { background-color: var(--color-accent-8); }
+.adm-step .w-iconbox__title {
+  margin-bottom: 10px;
+  color: var(--adm-step-title, var(--color-heading));
+  font-size: 20px; font-weight: 800; line-height: 1.27;
+}
+@media (max-width: 1024px) { .adm-step .w-iconbox__title { font-size: 18px; } }
+@media (max-width: 767px) { .adm-step .w-iconbox__title { font-size: 16px; } }
+.adm-step .w-iconbox__description { color: var(--color-accent-3); }
+.adm-step__disc {
+  display: inline-flex;
+  padding: 20px;
+  border-radius: 50%;
+  background-color: var(--adm-step-disc, var(--color-accent-1));
+  transition: background-color .3s;
+}
+.adm-step:hover .adm-step__disc,
+.adm-step:focus-within .adm-step__disc { background-color: var(--color-accent-3); }
+.adm-step__disc svg { display: block; width: 1em; height: 1em; fill: rgba(255, 255, 255, .5); }
+
+/* /admissions: 3 steps separated by two hand-drawn strokes. */
+.adm-steps--three .adm-steps__box { width: 25.561%; }
+.adm-steps--three .adm-steps__box--b { width: 25.794%; }
+.adm-steps--three .adm-steps__box--c { width: 24.742%; }
+.adm-steps--three .adm-steps__stroke { width: 11.905%; }
+.adm-steps--three .adm-steps__stroke--b { width: 11.952%; }
+@media (max-width: 1024px) {
+  .adm-steps { margin: 0 0 100px; }
+  .adm-steps--three .adm-steps__box,
+  .adm-steps--three .adm-steps__box--b,
+  .adm-steps--three .adm-steps__box--c { width: 33.33%; }
+  .adm-steps__stroke { display: none; }
+}
+@media (max-width: 767px) {
+  .adm-steps { margin: 50px 0; }
+  .adm-steps--three .adm-steps__box,
+  .adm-steps--three .adm-steps__box--b,
+  .adm-steps--three .adm-steps__box--c { width: 100%; }
+  .adm-step--panel .w-iconbox__wrapper { padding: 20px; }
+}
+
+/* ---------------------------------------------------------------------------
+   /tuition
+--------------------------------------------------------------------------- */
+.tui-plans-band { padding: 130px 0 0; }
+.tui-plans-band--second {
+  padding: 0 0 130px;
+  background-image: url("/images/home/illustration-mountain.svg");
+  background-position: bottom left;
+  background-repeat: no-repeat;
+}
+@media (max-width: 1024px) {
+  .tui-plans-band { padding: 100px 0 0; }
+  .tui-plans-band--second { padding: 20px 0 90px; }
+}
+@media (max-width: 767px) {
+  .tui-plans-band { padding: 50px 0 0; }
+  .tui-plans-band--second { margin-bottom: 50px; padding: 0 0 60px; }
+}
+
+.tui-plans { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.tui-plans > li { width: 33.3333%; transition: background-color .3s; }
+.tui-plans > li:nth-child(1) { padding: 0 25px 0 0; }
+.tui-plans > li:nth-child(2) { padding: 0 12.5px; }
+.tui-plans > li:nth-child(3) { padding: 0 0 0 25px; }
+.tui-plans--first > li:nth-child(1) { padding-bottom: 40px; }
+.tui-plans--second > li { padding-bottom: 50px; }
+.tui-plans > li:hover { background-color: var(--color-accent-8); }
+@media (max-width: 1024px) {
+  .tui-plans > li:nth-child(1) { padding: 0 10px 0 0; }
+  .tui-plans > li:nth-child(2) { padding: 0 5px; }
+  .tui-plans > li:nth-child(3) { padding: 0 0 0 10px; }
+}
+@media (max-width: 767px) {
+  .tui-plans > li,
+  .tui-plans > li:nth-child(1),
+  .tui-plans > li:nth-child(2),
+  .tui-plans > li:nth-child(3) { width: 100%; padding: 0; }
+  .tui-plans > li + li { margin-top: 20px; }
+  .tui-plans--second > li { padding-top: 20px; }
+}
+
+/* The card itself — post-1066 #42ce0ec and its five twins. The 10px "border"
+   is a white frame that grows from a 26px radius to 60px on hover. */
+.tui-plan {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 10px solid var(--color-accent-5);
+  border-radius: 26px;
+  background-color: var(--color-accent-5);
+  text-align: center;
+  transition: border-radius .3s;
+}
+.tui-plan:hover { border-radius: 60px; }
+.tui-plan__header { padding: 50px 0 0; }
+/* post-1066 styles all six `.elementor-price-table__heading`s the same:
+   44px Sensei in accent 3, dropping to 33px at 1024. The weight is not declared
+   in the source, and only Sensei-Medium is loaded, so the weight is pinned to
+   400 rather than inheriting the h2 scale and synthesising a fake bold — the
+   same treatment every other Sensei heading in this port gets. */
+.tui-plan__name {
+  font-family: var(--font-handwritten);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.21;
+  color: var(--color-accent-3);
+}
+.tui-plan__subheading { font-size: 18px; font-weight: 700; color: var(--color-accent-3); }
+.tui-plan__facts { flex-grow: 1; margin: 0; }
+.tui-plan__price {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+  padding: 50px 0 30px;
+  font-size: 65px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-accent-1);
+}
+.tui-plan__currency { align-self: center; font-size: .55em; }
+.tui-plan__period {
+  align-self: flex-end;
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 2.4;
+  text-transform: uppercase;
+}
+.tui-plan__features { margin: 0; padding: 0 0 50px; }
+.tui-plan__feature { font-size: 18px; color: var(--color-accent-3); }
+.tui-plan__feature::before {
+  content: "";
+  display: block;
+  margin: 15px auto;
+  border-top: 2px solid var(--color-accent-4);
+}
+.tui-plan__footer { padding: 0 0 50px; }
+@media (max-width: 1024px) {
+  .tui-plan__header { padding: 20px 0 0; }
+  .tui-plan__name { font-size: 33px; }
+}
+
+/* Discounts — post-1066 #0a9aad3, inside a 1000px container. */
+.tui-discounts { padding: 150px 0 10px; }
+.tui-discounts__well { max-width: 1000px; margin: 0 auto; }
+.tui-discounts__word { width: 30%; padding-bottom: 130px; }
+.tui-discounts__word .adm-bigword { font-size: 200px; line-height: 1; }
+.tui-discounts__copy { width: 70%; padding-right: 20%; }
+.tui-discounts__copy h2 { padding-top: 120px; }
+@media (max-width: 1024px) {
+  .tui-discounts { margin-top: 70px; padding: 0; }
+  .tui-discounts__word { width: 100%; padding-bottom: 0; }
+  .tui-discounts__word .adm-bigword { font-size: 150px; }
+  .tui-discounts__copy { width: 60%; padding-right: 0; }
+  .tui-discounts__copy h2 { padding-top: 0; }
+}
+@media (max-width: 767px) {
+  .tui-discounts__word .adm-bigword { font-size: 80px; }
+  .tui-discounts__copy { width: 100%; }
+  .tui-discounts__copy h2 { font-size: 30px; }
+}
+
+/* Support cards — post-1066 #7cc31d2 */
+.tui-support { margin: 50px 0 80px; padding-bottom: 20px; }
+.tui-support__well { max-width: 1000px; margin: 0 auto; }
+.tui-support__col { width: 33.3333%; display: flex; }
+.tui-support__col > * { width: 100%; }
+@media (max-width: 1024px) {
+  .tui-support { margin: 0 0 100px; }
+}
+@media (max-width: 767px) {
+  .tui-support { margin: 0 0 30px; padding-top: 40px; }
+  .tui-support__col { width: 100%; }
+  .tui-support__col + .tui-support__col { margin-top: 20px; }
+}
+
+/* ---------------------------------------------------------------------------
+   /how-to-apply
+--------------------------------------------------------------------------- */
+.hta-choices { margin-top: 100px; }
+.hta-choices__col { width: 33.3333%; }
+.hta-choices__col--middle { position: relative; margin: 20px 0; z-index: 2; }
+@media (max-width: 1024px) {
+  .hta-choices { margin-top: 80px; }
+}
+@media (max-width: 767px) {
+  .hta-choices { margin-top: 0; padding-bottom: 30px; }
+  .hta-choices__col { width: 100%; }
+  .hta-choices__col--middle { margin: -20px 0; }
+}
+
+/* Per-instance flip-box colours — post-1064 #49c9db0 / #a6c4142 / #922d16f.
+   `overflow: hidden` is Elementor's own `.elementor-flip-box` rule; the shared
+   FlipBox does not set it, and without it the two `slide` cards park their back
+   face 100% to the side and push the page sideways. */
+.hta-flip {
+  overflow: hidden;
+  --w-flipbox-front-bg: var(--color-accent-8);
+  --w-flipbox-back-bg: var(--color-accent-5);
+  --w-flipbox-padding: 10px;
+}
+.hta-flip .w-flipbox__description { color: var(--color-accent-6); font-size: 18px; }
+/* Saved as `h3`; rendered a level up (see the heading-levels note above). */
+.hta-flip .w-flipbox__title { font-size: 26px; font-weight: 900; line-height: 1.21; }
+.hta-flip .w-flipbox__icon { color: var(--color-accent-1); font-size: 50px; }
+.hta-flip--card {
+  --w-flipbox-front-bg: var(--color-accent-5);
+  --w-flipbox-radius: 23px;
+  border-radius: 23px;
+  box-shadow: 0 6px 34px 0 rgba(0, 0, 0, .07);
+}
+.hta-flip--card .w-flipbox__image img { width: 125px; height: auto; }
+@media (max-width: 767px) {
+  .hta-flip .w-flipbox__title { font-size: 24px; }
+  .hta-flip { --w-flipbox-padding: 0 0 20px; }
+  .hta-flip--last { --w-flipbox-padding: 20px 0 0; }
+  .hta-flip--card { --w-flipbox-padding: 40px 10px; }
+}
+
+/* Four numbered steps in a 920px well — post-1064 #33fd8ac */
+.hta-steps { margin: 50px 0 130px; }
+.hta-steps__well { max-width: 920px; margin: 0 auto; }
+.hta-steps__row { align-items: flex-start; }
+.hta-steps__box { width: 15.217%; }
+.hta-steps__box--b { width: 15.871%; }
+.hta-steps__box--c { width: 17.617%; }
+.hta-steps__box--d { width: 17.117%; }
+.hta-steps__stroke { width: 11.196%; }
+.hta-steps__stroke--b { width: 10.667%; }
+.hta-steps__stroke--c { width: 11.167%; }
+@media (max-width: 1024px) {
+  .hta-steps { margin: 70px 0; }
+  .hta-steps__box,
+  .hta-steps__box--b,
+  .hta-steps__box--c,
+  .hta-steps__box--d { width: 50%; padding-bottom: 20px; }
+}
+@media (max-width: 767px) {
+  .hta-steps { margin: 40px 0; }
+}
+
+/* Form band — post-1064 #094b59f */
+.hta-formband { margin-bottom: 100px; padding: 130px 0; scroll-margin-top: 90px; }
+.hta-formband .w-form__grid { margin: 0 -8.5px; }
+.hta-formband .w-form__field { padding: 0 8.5px; margin-bottom: 20px; }
+@media (max-width: 1024px) {
+  .hta-formband { padding: 100px 0; }
+}
+@media (max-width: 767px) {
+  .hta-formband { margin-bottom: 50px; padding: 50px 0; }
+}
+
+/* ---------------------------------------------------------------------------
+   /faq
+--------------------------------------------------------------------------- */
+.faq-body { margin: 130px 0 150px; }
+.faq-toc-col { width: 27.46%; padding-right: 80px; }
+.faq-groups { width: 72.205%; }
+@media (max-width: 1024px) {
+  .faq-body { margin: 0 0 70px; }
+  .faq-toc-col { padding-right: 0; }
+  .faq-groups { padding-left: 30px; }
+}
+@media (max-width: 767px) {
+  .faq-toc-col,
+  .faq-groups { width: 100%; padding-left: 0; }
+  .faq-groups { margin-top: 40px; }
+}
+
+/* Table of contents — post-1068 #351d1a2: numbered, black, 18px markers, a
+   20px rule under the header, sticky 30px below the sticky header. */
+.faq-toc__header {
+  margin: 0 0 20px;
+  padding-bottom: 20px;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-accent-6);
+  border-bottom: 1px solid var(--color-accent-7);
+}
+.faq-toc__list { margin: 0; padding: 0 0 0 1.3em; list-style: decimal; }
+.faq-toc__list li { margin-bottom: .5em; font-size: 18px; color: var(--color-accent-6); }
+.faq-toc__list li::marker { color: var(--color-accent-6); }
+.faq-toc__list a { color: inherit; text-decoration: none; }
+.faq-toc__list a:hover,
+.faq-toc__list a:focus-visible { text-decoration: underline; }
+.faq-toc__list a[aria-current="true"] { color: var(--color-accent-1); font-weight: 700; }
+@media (min-width: 768px) {
+  /* The saved widget is `sticky: top` with a 30px offset; this app's own header
+     is 74px tall and sticky, so the offset is measured from under it. */
+  .faq-toc { position: sticky; top: 104px; }
+}
+
+/* A collapsed panel is `hidden="until-found"`, which is `content-visibility:
+   hidden` — the content collapses but the shared 20px bottom padding does not,
+   leaving a gap under every closed row. Elementor's closed tab is `display:
+   none`, so the padding is removed here while the panel is closed. */
+.faq-groups .w-accordion__panel[hidden] { padding-bottom: 0; }
+
+.faq-group + .faq-group { margin-top: 50px; }
+.faq-group__heading { scroll-margin-top: 104px; }
+@media (max-width: 767px) {
+  .faq-group + .faq-group { margin-top: 65px; }
+}
+
+/* ---------------------------------------------------------------------------
+   /schedule-a-tour — post-1070 #7bde810
+--------------------------------------------------------------------------- */
+.tour-formband { padding: 100px 0 160px; }
+.tour-formband__well { max-width: 1000px; margin: 0 auto; }
+.tour-formband .w-form__grid { margin: 0 -10px; }
+.tour-formband .w-form__field { padding: 0 10px; margin-bottom: 30px; }
+.tour-formband .w-form__label,
+.tour-formband .w-form__check label { color: var(--color-accent-3); }
+@media (max-width: 1024px) {
+  .tour-formband { padding: 100px 0 50px; }
+}
+@media (max-width: 767px) {
+  .tour-formband { margin-bottom: 70px; padding: 50px 0 70px; }
+}

@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+.env*.local
+next-env.d.ts
+*.tsbuildinfo
+
+# Verification output: screenshots and browser logs written by scripts/*.cjs.
+# Regenerate with `npm run verify`; it reaches ~150MB, so it stays out of git.
+artifacts/
+
+# Local runtime noise
+*.log
+.DS_Store
+Thumbs.db

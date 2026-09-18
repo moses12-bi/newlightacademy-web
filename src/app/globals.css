@@ -1,0 +1,510 @@
+@import "tailwindcss";
+
+/* Page + widget styles, one file per conversion group (keeps this entry stable). */
+@import "../styles/motion.css";
+@import "../styles/widgets.css";
+@import "../styles/programs.css";
+@import "../styles/about-family.css";
+@import "../styles/admissions.css";
+@import "../styles/parents.css";
+@import "../styles/misc.css";
+
+/* ---------------------------------------------------------------------------
+   Design tokens — ported from the Elementor kit (.elementor-kit-1675).
+   Tailwind v4 turns each entry below into utilities: bg-accent-8, text-heading,
+   border-accent-1, font-display, ...
+--------------------------------------------------------------------------- */
+/* `static` stops Tailwind v4 tree-shaking the variables: many of these are
+   referenced through var() in plain CSS and inline styles rather than through a
+   utility class, and would otherwise be omitted from the output entirely. */
+@theme static {
+  /* ---------------------------------------------------------------------
+     New Light Academy palette. The token NAMES are the theme's originals so
+     every component keeps consuming the same variable it always did; only the
+     values move. Approved brand colours:
+
+       Primary Green  #085D1C    Dark Green   #063D14    White        #FFFFFF
+       Secondary Grn  #22540C    Soft Green   #EEF6EF    Primary Text #18211A
+       Accent Gold    #FCC501    Cream        #FFF9EA    Secondary Tx #5F6A65
+                                 Soft Border  #DDE6DD
+
+     The theme needs more slots than the palette has entries (a seven-colour
+     nav rainbow, eight card accents, four tint pairs). Those extra slots are
+     filled with tints and shades DERIVED from the two brand hues — green and
+     gold — never with a new hue. Each derived value is marked `derived`.
+     --------------------------------------------------------------------- */
+  --color-accent-1: #085d1c; /* primary green — buttons, active nav, bullets */
+  --color-accent-2: #22540c; /* secondary green */
+  --color-accent-3: #063d14; /* dark green — headings, button hover, TV frame */
+  --color-accent-4: #dde6dd; /* soft border */
+  --color-accent-5: #ffffff; /* white — page + card background */
+  --color-accent-6: #18211a; /* primary text, near-black */
+  --color-accent-7: #eef6ef; /* soft green */
+  --color-accent-8: #fff9ea; /* cream — section backgrounds */
+
+  --color-ink: #18211a; /* body copy — primary text */
+  --color-heading: #063d14; /* every heading — dark green, as accent-3 */
+  --color-muted: #5f6a65; /* every footer legal row — secondary text */
+
+  /* ---------------------------------------------------------------------
+     The seven `nav-*` values are the header's rainbow, applied to the
+     top-level menu items in order (478 uses each). Re-voiced as a green-to-
+     gold progression so the items stay distinguishable on hover without
+     leaving the brand.
+     --------------------------------------------------------------------- */
+  --color-nav-1: #085d1c; /* Home       (= accent-1) */
+  --color-nav-2: #22540c; /* About      (= accent-2) */
+  --color-nav-3: #063d14; /* Programs   (= accent-3) */
+  --color-nav-4: #0b7a26; /* Admissions — light primary green, derived */
+  --color-nav-5: #7a6104; /* Parents    — deep gold, derived */
+  --color-nav-6: #816c0e; /* Blog       — mid bronze gold, derived (AA on white) */
+  --color-nav-7: #8a730d; /* Location   — light bronze gold, derived (AA on white) */
+
+  /* Section and card accents used across the programme and marketing pages. */
+  --color-brand-orange: #78660f; /* deep bronze gold, derived — card title text */
+  --color-brand-coral: #6f5f11; /* dark bronze gold, derived — card title text */
+  --color-brand-green: #085d1c; /* primary green */
+  --color-brand-purple: #22540c; /* secondary green */
+  --color-brand-violet: #0b7a26; /* light green, derived */
+  --color-brand-sky: #063d14; /* dark green */
+  --color-brand-gold: #fcc501; /* accent gold */
+  --color-brand-apricot: #ffe08a; /* light gold, derived */
+
+  /* Paired card tints: the resting fill and its hover step. All derived by
+     lightening the brand green and gold — the hover step stays one notch
+     darker than its resting fill, exactly as the original pairs did. */
+  --color-tint-peach: #eef6ef; /* soft green */
+  --color-tint-peach-hover: #e2efe4; /* derived */
+  --color-tint-cream: #fff9ea; /* cream */
+  --color-tint-cream-hover: #fff2d6; /* derived */
+  --color-tint-ice: #e8f3ea; /* derived */
+  --color-tint-ice-hover: #dcebdf; /* derived */
+  --color-tint-mint: #f2f8f3; /* derived */
+  --color-tint-mint-hover: #e6f1e8; /* derived */
+
+  /* Neutrals beyond the accent scale. */
+  --color-surface-muted: #f7faf7; /* pale panel fill, derived */
+  --color-surface-warm: #fffdf5; /* warm off-white, derived from cream */
+  --color-hairline: #dde6dd; /* nav pointer underline — soft border */
+  --color-midnight: #0a1a0d; /* near-black overlay text, derived */
+
+  /* Further accents and tints found in the page stylesheets. */
+  --color-brand-lime: #0b7a26; /* light green, derived */
+  --color-brand-teal-deep: #22540c; /* secondary green */
+  --color-brand-amber: #7f6a0f; /* mid bronze gold, derived — step title text */
+  --color-tint-powder: #dde6dd; /* soft border */
+  --color-tint-blush: #ffe08a; /* light gold, derived */
+  /* Kept a shade apart from --color-surface-warm rather than snapped to it,
+     as in the original, so the two warm panels stay distinguishable. */
+  --color-surface-warm-alt: #fffcf3; /* derived */
+
+  /* Third-party brand colours for the blog's share buttons. The original page
+     carries elementor-share-btn_facebook / _twitter / _linkedin; Elementor
+     supplies these values from its own stylesheet, not the page CSS. */
+  --color-facebook: #3b5998;
+  --color-twitter: #1da1f2;
+  --color-linkedin: #0077b5;
+
+  --font-handwritten: "Sensei", ui-sans-serif, sans-serif;
+
+  /* next/font/google exposes Catamaran on --font-catamaran (set in layout.tsx). */
+  --font-display: var(--font-catamaran), "Catamaran", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ---------------------------------------------------------------------------
+   Base element styling. Tailwind's preflight already zeroes heading/paragraph
+   margins, so spacing stays the responsibility of the layout utilities.
+--------------------------------------------------------------------------- */
+@layer base {
+  body {
+    background-color: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-heading);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: 60px;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  h3 {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.21;
+  }
+
+  h4 {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.27;
+  }
+
+  h5 {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
+  h6 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1024px) {
+    body { font-size: 16px; }
+    h1 { font-size: 50px; }
+    h2 { font-size: 30px; line-height: 1.2; }
+    h4 { font-size: 18px; }
+    h6 { font-size: 12px; }
+  }
+  @media (max-width: 767px) {
+    h1 { font-size: 44px; }
+    h2 { font-size: 26px; }
+    h3 { font-size: 24px; }
+    h4 { font-size: 16px; }
+    h5 { font-size: 14px; }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+--------------------------------------------------------------------------- */
+
+/* Paragraph rhythm inside the white cards: every paragraph after the first
+   gets a top margin, matching Elementor's text-editor widget spacing. */
+@utility card-copy {
+  & > p + p {
+    margin-top: 1.25em;
+  }
+}
+
+
+@font-face {
+  font-family: "Sensei";
+  src: url("/fonts/Sensei-Medium.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+:focus-visible { outline: 2px solid var(--color-accent-1); outline-offset: 5px; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+.theme-button { font-family: var(--font-handwritten); }
+.shape-wave { background: url("/images/waves.svg") center top / auto 28px repeat-x; }
+
+/* Dimensions and breakpoints from the saved post-593 stylesheet. */
+.about-hero { margin-top: -60px; padding: 100px 0 0; }
+.hero-layout { display: flex; align-items: flex-end; min-height: 35vh; }
+.hero-copy { width: 40%; align-self: center; }
+.hero-subtitle { font-size: 20px; line-height: 1.5; }
+.hero-art { width: 60%; text-align: right; }
+.hero-art > div { margin-bottom: -18%; transform-origin: center bottom; }
+.hero-fox { display: inline-block; width: 36%; height: auto; transform-origin: center bottom; }
+.section-layout { display: flex; align-items: center; }
+.history-section { padding: 100px 0 10px; }
+.history-tv { width: 50%; }
+.history-copy { width: 50%; padding: 6% 5% 0; }
+.graduates-section { background: var(--color-accent-8); margin-top: 80px; padding: 130px 0 65px; }
+.community-section { background: var(--color-accent-8); padding: 65px 0; }
+.safety-section { background: var(--color-accent-8); margin-bottom: 100px; padding: 65px 0 130px; }
+.section-card { position: relative; z-index: 1; width: 50%; padding: 60px; background: white; border-radius: 8px; }
+.section-photo { width: 50%; }
+.photo-motion { margin-left: -40px; }
+.community-section .photo-motion { margin: 66px -40px 0 0; }
+.safety-section .photo-motion { margin: 155px 0 -77px -40px; }
+.community-decoration { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.community-snail { position: absolute; bottom: 0; left: calc(50% - 204px); width: 408px; height: 66px; background: url("/images/snail.svg") center bottom / contain no-repeat; }
+.footer-main { background-image: url("/images/footer-bg.svg"); background-position: center top; background-repeat: no-repeat; }
+
+@media (max-width: 1024px) {
+  .about-hero { margin-top: 0; padding: 100px 0; }
+  .hero-layout { min-height: 0; }
+  .hero-copy { width: 60%; }
+  .hero-art { width: 40%; text-align: center; }
+  .hero-art > div { margin: 0; }
+  .hero-fox { width: 60%; }
+  .section-layout { flex-direction: column; }
+  .history-section { padding: 0; }
+  .history-tv, .history-copy, .section-card, .section-photo { width: 100%; }
+  .history-copy { padding: 0; }
+  .section-card { padding: 20px; }
+  .graduates-section { margin-top: 50px; padding: 100px 0 50px; }
+  .community-section { padding: 50px 0 85px; }
+  .safety-section { padding: 20px 0 100px; }
+  .photo-motion, .safety-section .photo-motion { margin: 10px 0 0; }
+  .community-section .photo-motion { margin: 0; }
+  .community-section .section-card { margin-top: 10px; }
+}
+@media (max-width: 767px) {
+  .about-hero { padding: 70px 0; }
+  .hero-layout { flex-direction: column; }
+  .hero-copy, .hero-art { width: 100%; }
+  .hero-subtitle { font-size: 15px; line-height: 1.63; }
+  .hero-art { margin-top: 100px; }
+  .hero-art > div { margin-bottom: -30%; }
+  .hero-fox { width: 46%; }
+  .history-tv { margin-bottom: 40px; }
+  .graduates-section { padding: 70px 0 0; }
+  .community-section { padding: 50px 0 60px; }
+  .safety-section { margin-bottom: 50px; padding: 20px 0 70px; }
+  .graduates-section .section-photo, .safety-section .section-photo { order: -1; }
+  .section-card, .community-section .section-card { margin-top: 20px; }
+  .photo-motion, .safety-section .photo-motion { margin: 0; }
+  .community-snail { width: 270px; height: 44px; left: calc(50% - 135px); }
+  .section-card .card-copy { margin-top: 10px; }
+}
+
+/* Content is visible without JavaScript; only observed elements enter animation. */
+.motion-ready:not(.motion-visible) { opacity: 0; }
+/* `backwards`, not `both`: the from-state has to hold through `data-delay`, but
+   keeping the animation's final keyframe afterwards would outrank the inline
+   transform PageMotion writes each frame and permanently freeze every scroll or
+   pointer effect that shares an element with a reveal. Each reveal ends in the
+   element's natural state, so nothing here needs `forwards`. */
+.motion-ready.motion-visible { animation-duration: 1.25s; animation-fill-mode: backwards; }
+[data-delay="200"] { animation-delay: 200ms; }
+[data-delay="300"] { animation-delay: 300ms; }
+[data-delay="400"] { animation-delay: 400ms; }
+[data-delay="700"] { animation-delay: 700ms; }
+[data-delay="900"] { animation-delay: 900ms; }
+[data-reveal="fadeIn"].motion-visible { animation-name: fadeIn; }
+[data-reveal="bounceInUp"].motion-visible { animation-name: bounceInUp; }
+[data-reveal="bounceInDown"].motion-visible { animation-name: bounceInDown; }
+[data-reveal="rotateInUpLeft"].motion-visible { animation-name: rotateInUpLeft; }
+[data-reveal="rotateInUpRight"].motion-visible { animation-name: rotateInUpRight; }
+[data-reveal="fadeInUp"].motion-visible { animation-name: fadeInUp; }
+[data-reveal="fadeInDown"].motion-visible { animation-name: fadeInDown; }
+[data-reveal="zoomIn"].motion-visible { animation-name: zoomIn; }
+[data-reveal="zoomInDown"].motion-visible { animation-name: zoomInDown; }
+[data-reveal="rubberBand"].motion-visible { animation-name: rubberBand; }
+[data-reveal="jello"].motion-visible { animation-name: jello; transform-origin: center; }
+[data-motion] { transition: transform 100ms linear; }
+.social-pop:hover, .social-pop:focus-visible { animation: pop 300ms linear; }
+@keyframes pop { 50% { transform: scale(1.2); } }
+@keyframes pulse { from, to { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* Home 1 — recreated from the original Elementor page and its local assets. */
+.home-one-hero { position: relative; min-height: 700px; margin-top: -50px; overflow: hidden; background: var(--color-tint-ice) url("/images/home/iStock-1069933778-scaled.jpg") center / cover no-repeat; }
+.home-one-hero::before { content: ""; position: absolute; z-index: 3; inset: 0 0 auto; height: 28px; background: radial-gradient(ellipse 58px 27px at 50% 0, #fff 98%, transparent 100%) 0 0 / 112px 28px repeat-x; pointer-events: none; }
+.home-one-hero-shade { position: absolute; inset: 0; background: rgba(0,0,0,.05); }
+.home-one-floral { position: absolute; z-index: 1; left: 50%; bottom: 12px; width: min(852px, 62vw); height: min(585px, 43vw); min-height: 490px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8%; background: url("/images/home/slider-bg-floral.svg") bottom center / contain no-repeat; }
+.home-one-bird { width: 8%; height: auto; min-width: 60px; }
+.home-one-title { position: relative; z-index: 2; text-align: center; color: var(--color-accent-3); }
+.home-one-title p { font-size: 42px; line-height: 1; font-weight: 800; }
+.home-one-title strong { display: block; margin: -5px 0; font-size: 80px; line-height: 1; font-weight: 900; }
+.home-one-people { position: relative; z-index: 2; display: flex; justify-content: center; align-items: flex-start; width: 100%; min-height: 185px; margin-top: -2%; padding-top: 5%; background: url("/images/home/people-button.svg") top center / auto 100% no-repeat; }
+.home-one-people .theme-button { min-width: 160px; padding: 12px 40px; }
+.home-one-dots { position: absolute; z-index: 1; left: calc(50% - 385px); top: 29%; width: min(771px, 55vw); height: auto; pointer-events: none; }
+
+.home-passion { position: relative; overflow: hidden; padding: 110px 0 40px; }
+.home-passion-heading { display: grid; grid-template-columns: 48% 52%; align-items: end; padding-bottom: 90px; }
+.home-passion-heading > span, .home-section-heading > span { display: block; font-family: var(--font-handwritten); font-size: 170px; line-height: .8; color: var(--color-accent-3); }
+.home-passion-heading > div { max-width: 520px; padding: 0 20px 10px; }
+.home-passion-heading h2, .home-section-heading h2 { margin-bottom: 24px; }
+.home-experience { display: grid; grid-template-columns: 36% 64%; align-items: center; min-height: 500px; }
+.home-tabs-col { position: relative; z-index: 2; }
+.home-tabs { display: flex; flex-direction: column; gap: 5px; }
+/* WCAG 2.2.2: the five-second rotation needs a control that stops it. */
+.home-tabs-pause { margin: 14px 0 0 18px; font-size: 15px; font-weight: 700; color: var(--color-accent-3); text-decoration: underline; }
+.home-tabs-pause:hover, .home-tabs-pause:focus-visible { color: var(--color-accent-1); }
+.home-tab { display: flex; align-items: center; gap: 16px; width: 100%; padding: 12px 18px; border-radius: 8px 0 0 8px; text-align: left; color: var(--color-accent-3); font-size: 20px; font-weight: 800; transition: color .25s, background .25s, transform .25s; }
+.home-tab span { display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; flex: none; border-radius: 50%; color: var(--color-accent-2); font-family: var(--font-handwritten); font-size: 24px; }
+.home-tab[aria-selected="true"] { color: var(--color-accent-2); background: white; transform: translateX(12px); box-shadow: 0 10px 30px rgba(6,61,20,.08); }
+.home-tab[aria-selected="true"] span { color: white; background: var(--color-accent-2); }
+.home-feature-panel { position: relative; min-height: 500px; overflow: hidden; border-radius: 8px; background: var(--color-accent-8); }
+.home-feature-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: fadeIn .5s both; }
+.home-feature-caption { position: absolute; z-index: 1; left: 30px; right: 30px; bottom: 30px; padding: 24px 28px; border-radius: 8px; background: rgba(255,255,255,.93); }
+.home-feature-caption h3 { margin-bottom: 4px; }
+.home-passion-illustration { display: flex; justify-content: flex-end; margin-top: -165px; pointer-events: none; }
+
+.home-programs { padding: 140px 0; overflow: hidden; background: var(--color-accent-8) url("/images/home/illustration-right-cut.svg") right bottom / auto 100% no-repeat; }
+.home-section-heading { margin-bottom: 60px; }
+.home-section-heading > span { font-size: 130px; }
+.home-section-heading h2 { max-width: 600px; }
+.home-program-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.home-program-card { display: block; color: var(--color-ink); }
+.home-program-photo { position: relative; aspect-ratio: 1.3; overflow: hidden; border-radius: 8px; }
+.home-program-photo img { object-fit: cover; transition: transform .45s; }
+.home-program-card:hover img { transform: scale(1.06); }
+.home-program-card h3 { margin-top: 20px; }
+.home-program-card p { min-height: 82px; margin-top: 10px; font-size: 16px; }
+.home-program-card > span { color: var(--color-accent-2); font-size: 14px; font-weight: 800; white-space: pre-wrap; }
+
+.home-tour { position: relative; overflow: hidden; padding: 100px 0 50px; }
+.home-tour-layout { display: grid; grid-template-columns: 40% 60%; align-items: end; }
+.home-tour-person { text-align: center; }
+.home-tour-copy { max-width: 650px; padding-bottom: 50px; }
+.home-tour-copy .home-section-heading { margin-bottom: 20px; }
+.home-tour-actions { display: flex; align-items: center; gap: 18px; margin-top: 30px; }
+.home-tour-actions > a:last-child { color: var(--color-accent-1); font-family: var(--font-handwritten); }
+
+.home-contact { padding: 110px 0; color: white; background: var(--color-accent-2) url("/images/home/illustration-mountain.svg") center / 270px auto repeat; }
+.home-contact h4, .home-contact a { color: white; }
+.home-contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.home-contact-grid > div { text-align: center; }
+
+.home-news { position: relative; overflow: hidden; padding: 130px 0 110px; background: var(--color-accent-8); }
+.home-news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.home-news-photo { position: relative; aspect-ratio: 2 / 1; overflow: hidden; border-radius: 8px; }
+.home-news-photo img { object-fit: cover; transition: transform .45s; }
+.home-news-card:hover img { transform: scale(1.05); }
+.home-news-card > span { display: inline-block; margin: 18px 0 8px; color: var(--color-accent-1); font-family: var(--font-handwritten); }
+.home-news-card h3 { font-size: 24px; }
+.home-news-more { margin-top: 50px; text-align: center; }
+
+.home-testimonials { position: relative; overflow: hidden; padding: 130px 0 70px; }
+.home-testimonial-layout { position: relative; display: grid; grid-template-columns: 52% 48%; align-items: center; }
+.home-testimonial-tv { width: 100%; }
+.home-tv-top, .home-tv-bottom { display: block; margin: 0 auto; }
+.home-tv-screen { margin: -1px 20px; overflow: hidden; border: 20px solid var(--color-accent-3); border-radius: 36px; }
+.home-testimonial-copy { padding: 40px 12% 0; }
+.home-testimonial-copy .home-section-heading { margin-bottom: 20px; }
+.home-testimonial-copy p { margin-bottom: 24px; }
+.home-testimonial-people { position: absolute; z-index: 2; right: 0; bottom: -40px; width: 22%; height: auto; pointer-events: none; }
+
+.home-cta { padding: 20px 0 80px; }
+.home-cta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.home-cta-grid > a { display: flex; align-items: center; gap: 18px; min-height: 130px; padding: 28px; border-radius: 8px; color: white; transition: transform .3s; }
+.home-cta-grid > a:hover { transform: translateY(-6px); }
+.home-cta-grid > a:nth-child(1) { background: var(--color-accent-2); }
+.home-cta-grid > a:nth-child(2) { background: var(--color-accent-1); }
+.home-cta-grid > a:nth-child(3) { background: var(--color-nav-5); }
+.home-cta-grid > a > span { font-family: var(--font-handwritten); font-size: 48px; }
+.home-cta-grid h3 { color: white; }
+
+@media (max-width: 1024px) {
+  .home-one-hero { min-height: 620px; margin-top: 0; }
+  .home-one-floral { width: 85vw; height: 560px; padding-top: 13%; }
+  .home-one-title p { font-size: 30px; }
+  .home-one-title strong { font-size: 50px; }
+  .home-one-dots { left: 15%; width: 70%; }
+  .home-passion-heading { grid-template-columns: 1fr; gap: 30px; }
+  .home-passion-heading > span { font-size: 130px; }
+  .home-passion-heading > div { max-width: 700px; padding: 0; }
+  .home-experience { grid-template-columns: 1fr; }
+  .home-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .home-tabs-col { margin-bottom: 20px; }
+  .home-tabs-pause { margin-left: 0; }
+  .home-tab { border-radius: 8px; }
+  .home-tab[aria-selected="true"] { transform: none; }
+  .home-passion-illustration { margin-top: 20px; }
+  .home-program-grid { grid-template-columns: 1fr 1fr; }
+  .home-tour-layout { grid-template-columns: 35% 65%; }
+  .home-contact-grid { grid-template-columns: 1fr 1fr; }
+  .home-news-grid { grid-template-columns: 1fr; }
+  .home-news-photo { aspect-ratio: 2.2 / 1; }
+  .home-testimonial-layout { grid-template-columns: 1fr; }
+  .home-testimonial-copy { padding: 70px 0 0; }
+  .home-testimonial-people { width: 30%; }
+}
+
+@media (max-width: 767px) {
+  .home-one-hero { min-height: 590px; background-position: 62% center; }
+  .home-one-floral { width: 110vw; height: 470px; min-height: 0; bottom: 18px; padding-top: 15%; }
+  .home-one-bird { min-width: 42px; }
+  .home-one-title p, .home-one-title strong { margin: 0; font-size: 6.7vw; line-height: 1.5; }
+  .home-one-people { min-height: 130px; margin-top: -3%; padding-top: 8%; background-size: 70vw auto; }
+  .home-one-people .theme-button { min-width: 110px; padding: 9px 20px; font-size: 12px; }
+  .home-one-dots { left: 4%; top: 22%; width: 92%; }
+  .home-passion, .home-programs, .home-tour, .home-testimonials { padding: 70px 0; }
+  .home-passion-heading { padding-bottom: 50px; }
+  .home-passion-heading > span, .home-section-heading > span { font-size: 80px; }
+  .home-tabs { grid-template-columns: 1fr; }
+  .home-tab { padding: 8px; font-size: 17px; }
+  .home-tab span { width: 42px; height: 42px; }
+  .home-feature-panel { min-height: 430px; }
+  .home-feature-caption { left: 15px; right: 15px; bottom: 15px; padding: 18px; }
+  .home-passion-illustration { justify-content: center; }
+  .home-program-grid, .home-contact-grid, .home-cta-grid { grid-template-columns: 1fr; }
+  .home-program-card p { min-height: 0; }
+  .home-tour-layout { grid-template-columns: 1fr; }
+  .home-tour-person { order: 2; margin-top: 40px; }
+  .home-tour-copy { padding: 0; }
+  .home-tour-actions { flex-wrap: wrap; }
+  .home-contact { padding: 80px 0; }
+  .home-news { padding: 90px 0; }
+  .home-news-photo { aspect-ratio: 1.5 / 1; }
+  .home-tv-screen { margin-inline: 0; border-width: 12px; border-radius: 25px; }
+  .home-testimonial-people { position: static; display: block; width: 65%; margin: 35px auto -30px; }
+}
+
+@keyframes fadeInUp { from { opacity:0; transform:translate3d(0,100%,0); } to { opacity:1; transform:none; } }
+@keyframes fadeInDown { from { opacity:0; transform:translate3d(0,-100%,0); } to { opacity:1; transform:none; } }
+@keyframes zoomIn { from { opacity:0; transform:scale3d(.3,.3,.3); } 50% { opacity:1; } }
+@keyframes zoomInDown { from { opacity:0; transform:scale3d(.1,.1,.1) translate3d(0,-1000px,0); } 60% { opacity:1; transform:scale3d(.475,.475,.475) translate3d(0,60px,0); } }
+@keyframes rubberBand { from { transform:scale3d(1,1,1); } 30% { transform:scale3d(1.25,.75,1); } 40% { transform:scale3d(.75,1.25,1); } 50% { transform:scale3d(1.15,.85,1); } 65% { transform:scale3d(.95,1.05,1); } 75% { transform:scale3d(1.05,.95,1); } to { transform:scale3d(1,1,1); } }
+@keyframes jello { from,11.1%,to { transform:none; } 22.2% { transform:skewX(-12.5deg) skewY(-12.5deg); } 33.3% { transform:skewX(6.25deg) skewY(6.25deg); } 44.4% { transform:skewX(-3.125deg) skewY(-3.125deg); } 55.5% { transform:skewX(1.5625deg) skewY(1.5625deg); } 66.6% { transform:skewX(-.78125deg) skewY(-.78125deg); } 77.7% { transform:skewX(.390625deg) skewY(.390625deg); } 88.8% { transform:skewX(-.1953125deg) skewY(-.1953125deg); } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+  .motion-ready:not(.motion-visible) { opacity: 1; }
+  [data-motion], .theme-button:hover, .theme-button:focus-visible { transform: none !important; }
+}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}.fadeIn{animation-name:fadeIn}
+@keyframes bounceInUp{60%,75%,90%,from,to{animation-timing-function:cubic-bezier(0.215,0.61,0.355,1)}from{opacity:0;transform:translate3d(0,3000px,0)}60%{opacity:1;transform:translate3d(0,-20px,0)}75%{transform:translate3d(0,10px,0)}90%{transform:translate3d(0,-5px,0)}to{transform:translate3d(0,0,0)}}.bounceInUp{animation-name:bounceInUp}
+@keyframes bounceInDown{60%,75%,90%,from,to{animation-timing-function:cubic-bezier(0.215,0.61,0.355,1)}0%{opacity:0;transform:translate3d(0,-3000px,0)}60%{opacity:1;transform:translate3d(0,25px,0)}75%{transform:translate3d(0,-10px,0)}90%{transform:translate3d(0,5px,0)}to{transform:none}}.bounceInDown{animation-name:bounceInDown}
+@keyframes rotateInUpLeft{from{transform-origin:left bottom;transform:rotate3d(0,0,1,45deg);opacity:0}to{transform-origin:left bottom;transform:none;opacity:1}}.rotateInUpLeft{animation-name:rotateInUpLeft}
+@keyframes rotateInUpRight{from{transform-origin:right bottom;transform:rotate3d(0,0,1,-90deg);opacity:0}to{transform-origin:right bottom;transform:none;opacity:1}}.rotateInUpRight{animation-name:rotateInUpRight}
+/* The crest replaces a 110x39 wordmark; at 39px tall it read as a favicon.
+   Width-driven with height:auto so it can never distort, and the desktop step
+   stays inside the row the nav items already set (46px + padding). */
+.site-logo-img { display: block; width: 62px; height: auto; }
+@media (min-width: 768px) { .site-logo-img { width: 64px; } }
+@media (min-width: 1025px) { .site-logo-img { width: 68px; } }
+
+.desktop-nav-item[data-active="true"] > a { color: var(--nav-accent); }
+.nav-dot { position: absolute; pointer-events: none; top: 4px; left: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; background: var(--nav-accent); opacity: 0; transform: translateY(-6px); transition: opacity 300ms, transform 300ms; }
+.desktop-nav-item:hover .nav-dot, .desktop-nav-item:focus-within .nav-dot, .desktop-nav-item[data-active="true"] .nav-dot { opacity: 1; transform: translateY(0); }
+@media (min-width: 1025px) and (max-width: 1150px) {
+  header nav[aria-label="Main"] { margin-left: 15px; }
+  .desktop-nav-item > a { padding-left: 10px; padding-right: 10px; }
+}
+
+[data-reveal="pulse"].motion-visible { animation-name: pulse; }
+
+.footer-columns { display: grid; grid-template-columns: 20.004% 17.128% 26.94% 18.822% 17.106%; }
+.footer-logo { padding-top: 20px; }
+/* The crest is square, unlike the theme's wordmark. Size it by WIDTH with
+   height:auto so it can never be letterboxed or squashed by the column, and
+   keep it here rather than in Tailwind variants: an arbitrary min-[1025px]:
+   utility does not reliably outrank md: in the generated cascade. */
+.footer-logo img { display: block; margin-inline: auto; width: 200px; height: auto; max-width: 100%; }
+.footer-contact { padding-left: 20px; overflow-wrap: anywhere; }
+@media (min-width: 768px) and (max-width: 1024px) {
+  .footer-columns { grid-template-columns: 20% 15% 20% 25% 20%; }
+  .footer-logo { padding-top: 0; }
+  .footer-logo img { width: 130px; }
+  .footer-contact { padding-left: 10px; }
+}
+@media (max-width: 767px) {
+  .footer-columns { grid-template-columns: 1fr 1fr; }
+  .footer-logo, .footer-contact, .footer-actions { grid-column: 1 / -1; }
+  .footer-logo { padding: 35px 0 50px; }
+  .footer-logo img { width: 170px; }
+  .footer-contact { padding: 0 0 30px; }
+}
