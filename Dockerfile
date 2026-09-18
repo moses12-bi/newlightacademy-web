@@ -32,7 +32,8 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
 
 RUN addgroup -g 10001 -S nodejs \
     && adduser -u 10001 -S -G nodejs -s /sbin/nologin nextjs
@@ -45,7 +46,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+# GET with a real timeout and a long start-period: the home page renders a
+# Cloudinary gallery on first load and can take a few seconds to warm up.
+HEALTHCHECK --interval=30s --timeout=15s --start-period=45s --retries=4 \
+    CMD wget -q -T 12 -O /dev/null http://127.0.0.1:3000/ || exit 1
 
 CMD ["node", "server.js"]
