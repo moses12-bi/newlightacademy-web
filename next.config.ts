@@ -2,6 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Emit a self-contained server build (.next/standalone) so the Docker image
+  // carries only the files it needs to run `node server.js`.
+  output: 'standalone',
   images: {
     /* School photographs are served from Cloudinary. The per-image loader in
        src/lib/cloudinary.ts builds these URLs; this entry is what allows them. */

@@ -1,0 +1,108 @@
+name: Build and deploy
+
+# main -> https://newlight-academy.rw  (the client's dedicated server)
+#
+# GitHub builds the Docker image and pushes it to GHCR; the server only pulls
+# and restarts. The server's long-haul link is flaky, so keeping the heavy
+# work off it — build here, pull there — is deliberate.
+#
+# Cloudinary: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is inlined into the browser
+# bundle, so it is a build arg. The key/secret are server-side only and reach
+# the container as runtime env from the server's .env file (never built in).
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-newlight
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/moses12-bi/newlightacademy-web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+          tags: |
+            ${{ env.IMAGE }}:main
+            ${{ env.IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          : "${SSH_HOST:?SSH_HOST secret is empty}"
+          : "${SSH_USER:?SSH_USER secret is empty}"
+          : "${SSH_KEY:?SSH_PRIVATE_KEY secret is empty}"
+          SSH_HOST="$(printf '%s' "$SSH_HOST" | tr -d '[:space:]')"
+          SSH_USER="$(printf '%s' "$SSH_USER" | tr -d '[:space:]')"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null 2>&1 \
+            || { echo "::error::SSH_PRIVATE_KEY is not a valid OpenSSH private key"; exit 1; }
+          ssh-keyscan -t ed25519 "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o ServerAliveInterval=15 "$SSH_USER@$SSH_HOST" bash -s <<EOF
+            set -euo pipefail
+            echo '$GHCR_TOKEN' | docker login ghcr.io -u '$ACTOR' --password-stdin
+            cd ~/sites/newlight/app
+            docker compose --env-file .env pull app
+            docker compose --env-file .env up -d --no-build
+            docker image prune -f
+            docker logout ghcr.io
+          EOF
+
+      - name: Wait for the site to be healthy
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          set -euo pipefail
+          SSH_HOST="$(printf '%s' "$SSH_HOST" | tr -d '[:space:]')"
+          SSH_USER="$(printf '%s' "$SSH_USER" | tr -d '[:space:]')"
+          for i in $(seq 1 30); do
+            ST=$(ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes "$SSH_USER@$SSH_HOST" \
+                 "docker inspect --format '{{.State.Health.Status}}' newlight-app 2>/dev/null" || echo starting)
+            echo "  attempt $i: $ST"
+            [ "$ST" = healthy ] && exit 0
+            sleep 10
+          done
+          echo "::error::newlight-app did not become healthy"
+          ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes "$SSH_USER@$SSH_HOST" "docker logs --tail 50 newlight-app" || true
+          exit 1

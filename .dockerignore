@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.git
+.env*.local
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+# Verification output (screenshots/logs) — large, never needed in the image.
+scripts/verify-output
