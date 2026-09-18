@@ -177,36 +177,13 @@ export default function Footer() {
               horizontal menu right (`elementor-element-b988b7c`, 14px/normal). */}
           <div className="flex flex-col items-center gap-4 pt-5 pb-5 text-sm font-normal text-muted md:pt-20 min-[1025px]:flex-row min-[1025px]:justify-between min-[1025px]:pt-5 min-[1025px]:pb-0">
             <div className="flex flex-wrap items-center justify-center gap-x-[5px] text-center min-[1025px]:justify-start min-[1025px]:text-start">
-            {/* Ownership is the school's; the VamTam and Freepik credits are kept
-                because the theme licence has not been checked and attribution
-                must not be dropped on an assumption. */}
+            {/* The theme and icon credits the demo carried were removed at the
+                school's instruction and replaced with the build credit. */}
             <span>
               &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
             </span>
             <span aria-hidden="true">|</span>
-            <span>
-              Theme by{" "}
-              <a
-                href="https://vamtam.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted hover:underline focus-visible:underline"
-              >
-                VamTam
-              </a>
-            </span>
-            <span aria-hidden="true">|</span>
-            <span>
-              Icons by{" "}
-              <a
-                href="https://www.freepik.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted hover:underline focus-visible:underline"
-              >
-                Freepik
-              </a>
-            </span>
+            <span>Built by 360DEVZ</span>
             </div>
 
             <nav aria-label="Legal" className="shrink-0">

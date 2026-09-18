@@ -34,8 +34,8 @@ node scripts/final-search.cjs                          # scans src/ for demo/for
 node scripts/compare-shots.cjs artifacts/a artifacts/b # per-page geometry diff
 ```
 
-`final-search.cjs` is expected to report exactly two in-code hits — the VamTam and Freepik credits in the footer,
-kept until the theme licence is checked.
+`final-search.cjs` should report zero in-code hits. One comment in `CareersIcons.tsx` still names the theme as
+provenance for an icon set, which is a code comment rather than anything a visitor sees.
 
 ## Where things live
 
