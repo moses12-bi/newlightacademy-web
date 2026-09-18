@@ -400,7 +400,10 @@ button { cursor: pointer; }
 
 @media (max-width: 1024px) {
   .home-one-hero { min-height: 620px; margin-top: 0; }
-  .home-one-floral { width: 85vw; height: 560px; padding-top: 13%; }
+  /* Height tracks the SVG ratio (852x585) so the circle fills the box; the copy
+     then starts ~17% down it, matching the desktop composition. Note padding-top
+     percentages resolve against the PARENT width, not this element. */
+  .home-one-floral { width: 95vw; height: calc(95vw / 1.4564); padding-top: 12.5%; }
   .home-one-title p { font-size: 30px; }
   .home-one-title strong { font-size: 50px; }
   .home-one-dots { left: 15%; width: 70%; }
@@ -431,7 +434,7 @@ button { cursor: pointer; }
      110vw wide that circle only filled the lower ~294px, leaving the headline
      sitting on the bare photo. Tie the box height to the image ratio so the
      backdrop covers the copy, as it already does from 768 up. */
-  .home-one-floral { width: 128vw; height: calc(128vw / 1.4564); min-height: 0; bottom: 18px; padding-top: 6%; }
+  .home-one-floral { width: 155vw; height: calc(155vw / 1.4564); min-height: 0; bottom: 18px; padding-top: 19%; }
   .home-one-bird { min-width: 42px; }
   .home-one-title p, .home-one-title strong { margin: 0; font-size: 6.7vw; line-height: 1.5; }
   .home-one-people { min-height: 130px; margin-top: -3%; padding-top: 8%; background-size: 70vw auto; }
