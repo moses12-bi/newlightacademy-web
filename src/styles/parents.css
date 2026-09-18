@@ -1,9 +1,9 @@
 /* ---------------------------------------------------------------------------
-   Parents group — /parents, /attendance-policy, /make-a-payment,
+   Parents group — /parents, /make-a-payment,
    /student-handbook, /school-calendar.
 
    Ported from the saved Elementor page stylesheets:
-     post-3216 (/for-our-parents)   post-1089 (/attendance-policy)
+     post-3216 (/for-our-parents)
      post-1091 (/make-a-payment)    post-1093 (/student-handbook)
      post-1095 (/school-calendar)
    and the kit, post-1675. Every class is prefixed with its route so the other
@@ -123,28 +123,15 @@
   .parents-flip--raise { --w-flipbox-padding: 10px; }
 }
 
-/* ===========================================================================
-   /attendance-policy — post-1089
-   =========================================================================== */
-
 /* #02ff223: one long column of headings and copy under the hero. */
-.attendance-body { padding: 100px 0 160px; }
 /* Each widget carries a 10px bottom gap (#3f92e56) and every text-editor adds
    20px on top of it. */
 /* Saved as h3 widgets; h2 elements here so the level after the page h1 is not
    skipped, kept at the saved h3 scale. */
-.attendance-body h2 { margin-bottom: 10px; font-size: 26px; font-weight: 900; line-height: 1.21; }
-.attendance-body p + ul,
-.attendance-body p + p { margin-top: 1.25em; }
-.attendance-body__block { margin-bottom: 30px; }
-.attendance-body__block:last-child { margin-bottom: 0; }
 
 @media (max-width: 1024px) {
-  .attendance-body { margin-bottom: 100px; padding: 90px 0 100px; }
 }
 @media (max-width: 767px) {
-  .attendance-body h2 { font-size: 24px; }
-  .attendance-body { margin-bottom: 50px; padding: 40px 0 50px; }
 }
 
 /* ===========================================================================

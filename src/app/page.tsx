@@ -15,16 +15,16 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: "Baby Class", image: "/images/home/h-17.jpg", text: "Our youngest children settle in gently, learning to play, to share and to explore with confidence.", meta: "Ages 3–4 years", href: "/infants" },
-  { title: "Middle Class", image: "/images/home/h-19.jpg", text: "Children grow in language, curiosity and early number sense through guided play.", meta: "Ages 4–5 years", href: "/toddlers" },
-  { title: "Top Class", image: "/images/home/h-16.jpg", text: "Children prepare for Primary 1 with early reading, writing and counting.", meta: "Ages 5–6 years", href: "/preschool" },
-  { title: "Primary", image: "/images/home/h-20.jpg", text: "Pupils follow the Rwanda national curriculum and work towards the Primary Leaving Examination.", meta: "P1 to P6", href: "/kindergarten" },
+  { title: "Baby Class", image: "/images/school/nursery-pair.jpg", text: "Our youngest children settle in gently, learning to play, to share and to explore with confidence.", meta: "Ages 3–4 years", href: "/infants" },
+  { title: "Middle Class", image: "/images/school/nursery-group-small.jpg", text: "Children grow in language, curiosity and early number sense through guided play.", meta: "Ages 4–5 years", href: "/toddlers" },
+  { title: "Top Class", image: "/images/school/nursery-pupils-outdoors.jpg", text: "Children prepare for Primary 1 with early reading, writing and counting.", meta: "Ages 5–6 years", href: "/preschool" },
+  { title: "Primary", image: "/images/school/primary-pupils-group.jpg", text: "Pupils follow the Rwanda national curriculum and work towards the Primary Leaving Examination.", meta: "P1 to P6", href: "/kindergarten" },
 ] as const;
 
 const posts = [
-  { tag: "Learning", title: "Why play matters so much in the early years", image: "/images/home/blog-photo-2.jpg" },
-  { tag: "Parents", title: "Helping your child settle happily into a new class", image: "/images/home/h-20.jpg" },
-  { tag: "Reading", title: "Simple ways to read together with your child at home", image: "/images/home/blog-photo-1.jpg" },
+  { tag: "Learning", title: "Why play matters so much in the early years", image: "/images/school/role-play-activity-table.jpg" },
+  { tag: "Parents", title: "Helping your child settle happily into a new class", image: "/images/school/brass-band.jpg" },
+  { tag: "Reading", title: "Simple ways to read together with your child at home", image: "/images/school/pupils-with-certificates.jpg" },
 ] as const;
 
 export default function HomePage() {
@@ -99,7 +99,7 @@ export default function HomePage() {
       </section>
 
       <section className="home-testimonials"><Container className="home-testimonial-layout">
-        <div className="home-testimonial-tv" data-reveal="jello"><Image src="/images/tv-top.svg" alt="" width={266} height={129} unoptimized className="home-tv-top" /><div className="home-tv-screen"><VideoFrame videoId="SXNboPPEQKI" title="A short video about early learning" poster="/images/home/parents-1.jpg" /></div><Image src="/images/tv-bottom.svg" alt="" width={205} height={53} unoptimized className="home-tv-bottom" /></div>
+        <div className="home-testimonial-tv" data-reveal="jello"><Image src="/images/tv-top.svg" alt="" width={266} height={129} unoptimized className="home-tv-top" /><div className="home-tv-screen"><VideoFrame videoId="SXNboPPEQKI" title="A short video about early learning" poster="/images/school/graduation-assembly.jpg" /></div><Image src="/images/tv-bottom.svg" alt="" width={205} height={53} unoptimized className="home-tv-bottom" /></div>
         <div className="home-testimonial-copy"><div className="home-section-heading"><span>Happy</span><h2>children. That is what we<br />hope for every child.</h2></div><p>Learning begins early, and it begins with feeling safe and cared for. That is the work we set ourselves at {site.name}: curiosity, kindness and steady progress, day after day.</p><Button href="/about" variant="outline">More About Our School</Button></div>
         <Image src="/images/home/illustration-people-3.svg" alt="" width={320} height={250} unoptimized className="home-testimonial-people" />
       </Container></section>

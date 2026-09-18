@@ -2,7 +2,7 @@ import type { FormField } from "@/components/ui/ContactForm";
 
 /**
  * The "come and visit us" enquiry form. The same nine fields are rendered on
- * /home-2 and /parents, so they are described once here rather than in both
+ * more than one page, so they are described once here rather than inline in each
  * sections.
  *
  * The placeholder is the only visible label in this layout, so each one is

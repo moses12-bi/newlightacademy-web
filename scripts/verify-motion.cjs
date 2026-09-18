@@ -20,10 +20,10 @@ const base = process.env.BASE_URL || 'http://localhost:3000';
 const ARTIFACTS = 'artifacts';
 
 const ALL_ROUTES = [
-  '/', '/about', '/home-2', '/gallery', '/our-teachers', '/careers', '/daily-schedule',
+  '/', '/about', '/gallery', '/our-teachers', '/careers', '/daily-schedule',
   '/programs', '/infants', '/toddlers', '/preschool', '/kindergarten', '/flex-care',
   '/art-program', '/admissions', '/tuition', '/how-to-apply', '/faq', '/schedule-a-tour',
-  '/coming-soon', '/parents', '/attendance-policy', '/make-a-payment', '/student-handbook',
+  '/coming-soon', '/parents', '/make-a-payment', '/student-handbook',
   '/school-calendar', '/blog', '/location',
 ];
 const routes = process.env.ROUTES ? process.env.ROUTES.split(',').map((r) => r.trim()) : ALL_ROUTES;

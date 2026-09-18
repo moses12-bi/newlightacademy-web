@@ -2,7 +2,7 @@
  * The school news feed, as a typed local data module.
  *
  * There is no CMS behind this app, so the cards on `/blog` and the three News
- * cards on `/home-2` are rendered from this list.
+ * cards are rendered from this list.
  *
  * The list is deliberately empty. Everything the template shipped here was
  * transcribed from another school's website, and none of it is New Light
@@ -32,7 +32,7 @@ export const blogPosts: BlogPost[] = [];
 /** The posts the `/blog` archive lists, in its order. */
 export const blogArchiveSlugs: string[] = [];
 
-/** The posts the `/home-2` News row shows, in its order. */
+/** The posts the home page News row shows, in its order. */
 export const homeTwoNewsSlugs: string[] = [];
 
 export function getPost(slug: string): BlogPost | undefined {

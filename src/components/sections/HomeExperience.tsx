@@ -5,10 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/lib/site";
 
 const features = [
-  { title: "A Caring Environment", text: "Children are welcomed warmly, known by name and encouraged to settle in happily from their very first day.", image: "/images/home/gautam-arora-78Ae6N7rNvI-unsplash.jpg" },
-  { title: "Christian Values", text: `Our crest carries the motto “${site.motto}”. Faith, kindness and good character shape the way we treat one another.`, image: "/images/home/h-15.jpg" },
-  { title: "National Curriculum", text: "We follow the Rwanda national curriculum from Baby Class through P6, preparing pupils for the Primary Leaving Examination.", image: "/images/home/anna-samoylova-w55SpMmoPgE-unsplash.jpg" },
-  { title: "An Inclusive School", text: "We are accredited by NESA, and we work to give every learner an inclusive education in which each child can take part.", image: "/images/home/leo-rivas-wtxcaDIdOCM-unsplash.jpg" },
+  { title: "A Caring Environment", text: "Children are welcomed warmly, known by name and encouraged to settle in happily from their very first day.", image: "/images/school/nursery-group-small.jpg" },
+  { title: "Christian Values", text: `Our crest carries the motto “${site.motto}”. Faith, kindness and good character shape the way we treat one another.`, image: "/images/school/nursery-graduation-gowns.jpg" },
+  { title: "National Curriculum", text: "We follow the Rwanda national curriculum from Baby Class through P6, preparing pupils for the Primary Leaving Examination.", image: "/images/school/pupils-with-certificates.jpg" },
+  { title: "An Inclusive School", text: "We are accredited by NESA, and we work to give every learner an inclusive education in which each child can take part.", image: "/images/school/primary-pupils-group.jpg" },
 ] as const;
 
 export default function HomeExperience() {

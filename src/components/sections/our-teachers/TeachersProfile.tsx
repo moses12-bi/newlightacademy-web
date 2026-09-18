@@ -46,33 +46,33 @@ export default function TeachersProfile() {
             {/* #a07e97c — desktop and tablet only. */}
             <div className="teachers-profile__portrait max-md:hidden">
               <Image
-                src="/images/our-teachers/Woman_pic-406x1024.png"
-                alt="A portrait of a woman standing with her arms folded"
-                width={406}
-                height={1024}
+                src="/images/staff/director.webp"
+                alt={`The Director of ${site.name}`}
+                width={700}
+                height={875}
                 sizes="(max-width: 1024px) 45vw, 480px"
               />
             </div>
             {/* #48c9651 — phones only. */}
             <div className="teachers-profile__mobile-photo md:hidden">
               <Image
-                src="/images/home/parents-1.jpg"
-                alt="A portrait of a smiling woman"
-                width={680}
-                height={380}
+                src="/images/staff/director.webp"
+                alt={`The Director of ${site.name}`}
+                width={700}
+                height={875}
                 sizes="100vw"
               />
             </div>
           </div>
 
           <div className="teachers-profile__copy">
-            <h2>Our teachers</h2>
+            <h2>Our Director</h2>
             {/* The save marks the role as an h4 directly under the h2; rendered as a
                 paragraph so the page outline has no level skip. */}
-            <p className="teachers-profile__role">Nursery and primary</p>
+            <p className="teachers-profile__role">Director and Managing Director</p>
             <p className="teachers-profile__intro">
-              Our teachers work across the nursery and primary classes, following the Rwanda national
-              curriculum and keeping learning, care and character at the centre of the school day.
+              Our Director leads the school day to day, across both the nursery and the primary classes,
+              and is glad to meet families who are thinking of joining us.
             </p>
 
             {STATS_LEFT.length > 0 || STATS_RIGHT.length > 0 ? (
@@ -95,20 +95,13 @@ export default function TeachersProfile() {
               name, encouraged to try, and given the time to understand.
             </p>
 
-            <div className="teachers-profile__sign-wrap">
-              <Image
-                src="/images/our-teachers/sign-orange.svg"
-                alt=""
-                width={110}
-                height={69}
-                unoptimized
-                className="teachers-profile__sign"
-              />
-            </div>
+            {/* The theme closes this block with a decorative signature flourish.
+                Under a named role it reads as the Director's own signature, which the
+                school has not supplied, so it is left out rather than faked. */}
 
             {/* #d5049bc — hidden on phones in the save. */}
             <p className="teachers-profile__since max-md:hidden">
-              <em>The {site.name} teaching team</em>
+              <em>Director, {site.name}</em>
             </p>
           </div>
         </div>

@@ -5,19 +5,31 @@ import FlipBox from "@/components/ui/FlipBox";
 import type { RevealDelay } from "@/components/ui/PageHero";
 
 interface TeamMember {
-  name: string;
-  role: string;
+  /** Portrait under public/images/staff/. */
+  photo: string;
+  /** Set once the school confirms who may be named, and as what. */
+  name?: string;
+  role?: string;
   /** `_animation_delay` on each flip box: 0, 200, 400, 600, 800, 1000. */
   delay?: RevealDelay;
 }
 
 /**
- * Empty until the school supplies the staff it wants named and photographed.
- * The card markup below is kept intact so real teachers can be added here — one
- * entry per person, delays running 0, 200, 400, 600, 800, 1000 — without any
- * other change; while the array is empty the grid is not rendered at all.
+ * The school's teaching staff, as supplied.
+ *
+ * `name` and `role` are deliberately unset: the school sent the photographs but
+ * not who is in them, and a card captioned with a guessed name or subject would
+ * be worse than one with none. Fill them in as they are confirmed — the card
+ * already renders both — and nothing else here needs to change.
  */
-const TEAM: TeamMember[] = [];
+const TEAM: TeamMember[] = [
+  { photo: "/images/staff/teacher-1.webp" },
+  { photo: "/images/staff/teacher-2.webp", delay: "200" },
+  { photo: "/images/staff/teacher-3.webp", delay: "400" },
+  { photo: "/images/staff/teacher-4.webp", delay: "600" },
+  { photo: "/images/staff/teacher-5.webp", delay: "800" },
+  { photo: "/images/staff/teacher-6.webp", delay: "1000" },
+];
 
 /** Ported from post-1042: the back face is white, the name black, the role the deep teal. */
 const CARD_STYLE: CSSProperties = {
@@ -50,21 +62,27 @@ export default function TeachersTeam() {
       {/* #f1b0259 is `elementor-section-full_width`, so it has no content well. */}
       {TEAM.length > 0 ? (
         <section className="teachers-team" aria-label="Our teaching team">
-          {TEAM.map((member) => (
-            <div key={member.name} data-reveal="zoomIn" data-delay={member.delay}>
+          {TEAM.map((member, index) => (
+            <div key={member.photo} data-reveal="zoomIn" data-delay={member.delay}>
               <FlipBox
                 effect="slide"
                 direction="up"
                 heights={{ desktop: 634, tablet: 600, mobile: 600 }}
-                label={`${member.name}, ${member.role}`}
+                label={member.name ? `${member.name}${member.role ? `, ${member.role}` : ""}` : `Teaching staff, portrait ${index + 1} of ${TEAM.length}`}
                 style={CARD_STYLE}
-                /* The saved front face is only the teacher's photo. That file is
-                   not in the capture, so the name stands in for it rather than
-                   leaving a 634px empty panel. */
-                front={{ description: member.name }}
+                /* The front face is the portrait, as in the source theme. */
+                front={{
+                  image: {
+                    src: member.photo,
+                    alt: member.name ?? "",
+                    width: 700,
+                    height: 875,
+                    sizes: "(min-width: 1025px) 33vw, (min-width: 768px) 50vw, 100vw",
+                  },
+                }}
                 back={{
-                  title: member.name,
-                  description: member.role,
+                  title: member.name ?? "Our teaching team",
+                  description: member.role ?? "Come and meet our teachers — arrange a visit to the school.",
                 }}
               />
             </div>

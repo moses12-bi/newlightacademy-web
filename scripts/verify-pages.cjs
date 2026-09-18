@@ -23,11 +23,10 @@ const artifacts = path.join(root, "artifacts");
 const ALL_WIDTHS = [320, 390, 768, 1024, 1025, 1280, 1440];
 const CORE_WIDTHS = [390, 1024, 1440];
 
-/** The 25 converted routes, tagged with the archetype they belong to. */
+/** The converted routes, tagged with the archetype they belong to. */
 const ROUTES = [
   { route: "/admissions", archetype: "content-hero" },
   { route: "/art-program", archetype: "program" },
-  { route: "/attendance-policy", archetype: "policy" },
   { route: "/blog", archetype: "feed", sweep: true },
   { route: "/careers", archetype: "content-hero" },
   { route: "/coming-soon", archetype: "form-minimal", sweep: true },
@@ -35,7 +34,6 @@ const ROUTES = [
   { route: "/faq", archetype: "accordion", sweep: true },
   { route: "/flex-care", archetype: "program" },
   { route: "/gallery", archetype: "gallery", sweep: true },
-  { route: "/home-2", archetype: "landing", sweep: true },
   { route: "/how-to-apply", archetype: "form-long" },
   { route: "/infants", archetype: "program", sweep: true },
   { route: "/kindergarten", archetype: "program" },
@@ -658,7 +656,6 @@ async function verifyInternalLinks() {
       "/coming-soon",
       "/make-a-payment",
       "/parents",
-      "/home-2",
       "/location",
     ]) {
       if (wanted(route)) await check(`${route} form`, () => verifyForm(page, route));
@@ -667,7 +664,7 @@ async function verifyInternalLinks() {
     if (hooks.errors.length > 0) record("interaction pass", new Error(`runtime errors: ${hooks.errors.join(" | ")}`));
     await context.close();
 
-    await verifyReducedMotion(browser, ["/programs", "/our-teachers", "/home-2", "/tuition"]);
+    await verifyReducedMotion(browser, ["/programs", "/our-teachers", "/tuition"]);
     await verifyNoJs(browser, ["/faq", "/tuition", "/student-handbook", "/programs", "/gallery", "/admissions"]);
     await check("internal links", () => verifyInternalLinks());
   } finally {

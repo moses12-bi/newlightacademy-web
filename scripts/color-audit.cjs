@@ -1,6 +1,6 @@
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base='http://localhost:3000';
-const ROUTES=['/','/home-2','/about','/gallery','/our-teachers','/careers','/daily-schedule','/programs','/infants','/toddlers','/preschool','/kindergarten','/flex-care','/art-program','/admissions','/tuition','/how-to-apply','/faq','/schedule-a-tour','/coming-soon','/parents','/attendance-policy','/make-a-payment','/student-handbook','/school-calendar','/location','/blog'];
+const ROUTES=['/','/about','/gallery','/our-teachers','/careers','/daily-schedule','/programs','/infants','/toddlers','/preschool','/kindergarten','/flex-care','/art-program','/admissions','/tuition','/how-to-apply','/faq','/schedule-a-tour','/coming-soon','/parents','/make-a-payment','/student-handbook','/school-calendar','/location','/blog'];
 // retired palette, as rgb() strings
 const RETIRED={'rgb(231, 76, 37)':'#e74c25 orange','rgb(22, 114, 135)':'#167287 teal','rgb(10, 48, 58)':'#0a303a deep teal','rgb(101, 114, 174)':'#6572ae periwinkle','rgb(112, 72, 177)':'#7048b1 purple','rgb(170, 129, 237)':'#aa81ed violet','rgb(65, 155, 201)':'#419bc9 sky','rgb(17, 165, 228)':'#11a5e4 sky','rgb(32, 111, 235)':'#206feb blue','rgb(56, 188, 131)':'#38bc83 green','rgb(246, 143, 41)':'#f68f29 orange','rgb(233, 93, 58)':'#e95d3a coral','rgb(255, 219, 210)':'#ffdbd2 peach','rgb(223, 248, 255)':'#dff8ff ice','rgb(254, 192, 185)':'#fec0b9 blush','rgb(213, 230, 235)':'#d5e6eb powder','rgb(185, 216, 224)':'#b9d8e0 hairline','rgb(244, 241, 234)':'#f4f1ea old cream'};
 (async()=>{

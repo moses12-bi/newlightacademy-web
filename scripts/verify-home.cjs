@@ -30,7 +30,7 @@ const base = process.env.BASE_URL || "http://localhost:3000";
       await safetyTab.scrollIntoViewIfNeeded();
       await safetyTab.click();
       assert.equal(await safetyTab.getAttribute("aria-selected"), "true");
-      assert.match(await page.locator("#home-feature-panel img").getAttribute("src"), /h-15/);
+      assert.match(await page.locator("#home-feature-panel img").getAttribute("src"), /nursery-graduation-gowns/);
       assert.deepEqual(errors, []);
       console.log(`PASS Home 1: ${width}px`);
       await page.close();

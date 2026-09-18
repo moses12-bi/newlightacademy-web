@@ -70,7 +70,7 @@ export default function Header() {
                   >
                     {item.label}
                     {children.length > 0 ? (
-                      <ChevronDownIcon className="mt-[2px] h-[12px] w-[12px] shrink-0 transition-transform duration-300 group-focus-within:rotate-180 group-hover:rotate-180" />
+                      <ChevronDownIcon className="nav-chevron mt-[2px] h-[12px] w-[12px] shrink-0 transition-transform duration-300" />
                     ) : null}
                   </Link>
 
@@ -81,7 +81,7 @@ export default function Header() {
                   />
 
                   {children.length > 0 ? (
-                    <div className="pointer-events-none invisible absolute left-0 top-full z-50 w-[240px] pt-[10px] opacity-0 transition-opacity duration-200 group-focus-within:visible group-hover:visible group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+                    <div className="nav-dropdown absolute left-0 top-full z-50 w-[240px] pt-[10px]">
                       <ul className="rounded-[8px] bg-accent-5 py-[10px] shadow-[0_12px_34px_rgba(6,61,20,0.16)]">
                         {children.map((child) => (
                           <li key={child.href + child.label}>

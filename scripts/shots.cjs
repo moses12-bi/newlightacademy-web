@@ -2,7 +2,7 @@ const fs=require('node:fs');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const base=process.env.BASE_URL||'http://localhost:3000';
 const out=process.env.SHOT_DIR||'artifacts/shots';
-const ROUTES=['/','/home-2','/about','/gallery','/our-teachers','/careers','/daily-schedule','/programs','/infants','/toddlers','/preschool','/kindergarten','/flex-care','/art-program','/admissions','/tuition','/how-to-apply','/faq','/schedule-a-tour','/coming-soon','/parents','/attendance-policy','/make-a-payment','/student-handbook','/school-calendar','/location','/blog',process.env.BLOG_SLUG||'/blog/x'];
+const ROUTES=['/','/about','/gallery','/our-teachers','/careers','/daily-schedule','/programs','/infants','/toddlers','/preschool','/kindergarten','/flex-care','/art-program','/admissions','/tuition','/how-to-apply','/faq','/schedule-a-tour','/coming-soon','/parents','/make-a-payment','/student-handbook','/school-calendar','/location','/blog',process.env.BLOG_SLUG||'/blog/x'];
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  fs.mkdirSync(out,{recursive:true});

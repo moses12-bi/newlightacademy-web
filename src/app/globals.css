@@ -308,7 +308,7 @@ button { cursor: pointer; }
 @keyframes pulse { from, to { transform: scale(1); } 50% { transform: scale(1.05); } }
 
 /* Home 1 — recreated from the original Elementor page and its local assets. */
-.home-one-hero { position: relative; min-height: 700px; margin-top: -50px; overflow: hidden; background: var(--color-tint-ice) url("/images/home/iStock-1069933778-scaled.jpg") center / cover no-repeat; }
+.home-one-hero { position: relative; min-height: 700px; margin-top: -50px; overflow: hidden; background: var(--color-tint-ice) url("/images/school/children-in-uniform-line.jpg") center / cover no-repeat; }
 .home-one-hero::before { content: ""; position: absolute; z-index: 3; inset: 0 0 auto; height: 28px; background: radial-gradient(ellipse 58px 27px at 50% 0, #fff 98%, transparent 100%) 0 0 / 112px 28px repeat-x; pointer-events: none; }
 .home-one-hero-shade { position: absolute; inset: 0; background: rgba(0,0,0,.05); }
 .home-one-floral { position: absolute; z-index: 1; left: 50%; bottom: 12px; width: min(852px, 62vw); height: min(585px, 43vw); min-height: 490px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8%; background: url("/images/home/slider-bg-floral.svg") bottom center / contain no-repeat; }
@@ -476,6 +476,26 @@ button { cursor: pointer; }
 .site-logo-img { display: block; width: 62px; height: auto; }
 @media (min-width: 768px) { .site-logo-img { width: 64px; } }
 @media (min-width: 1025px) { .site-logo-img { width: 68px; } }
+
+/* Submenus open on hover, and on keyboard focus only.
+   They used :focus-within, which a MOUSE CLICK also satisfies — the clicked item
+   kept focus after navigating, so the panel stayed stuck open once the pointer
+   had left. :has(:focus-visible) is the focus half without the click half. */
+.nav-dropdown {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, visibility 0s linear 200ms;
+}
+.desktop-nav-item:hover > .nav-dropdown,
+.desktop-nav-item:has(:focus-visible) > .nav-dropdown {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 200ms ease;
+}
+.desktop-nav-item:hover .nav-chevron,
+.desktop-nav-item:has(:focus-visible) .nav-chevron { transform: rotate(180deg); }
 
 .desktop-nav-item[data-active="true"] > a { color: var(--nav-accent); }
 .nav-dot { position: absolute; pointer-events: none; top: 4px; left: calc(50% - 4px); width: 8px; height: 8px; border-radius: 50%; background: var(--nav-accent); opacity: 0; transform: translateY(-6px); transition: opacity 300ms, transform 300ms; }

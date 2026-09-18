@@ -14,15 +14,9 @@ export interface NavItem extends NavLink {
  * hover colours, applied to the top-level items in order (1-based in the kit).
  */
 export const mainNav: NavItem[] = [
-  {
-    label: "Home",
-    href: "/",
-    accent: "var(--color-accent-1)",
-    children: [
-      { label: "Home", href: "/" },
-      { label: "Welcome", href: "/home-2" },
-    ],
-  },
+  /* A plain link, not a dropdown: the theme's second home layout was removed,
+     so there is nothing for the Home menu to drop down to. */
+  { label: "Home", href: "/", accent: "var(--color-accent-1)" },
   {
     label: "About",
     href: "/about",
@@ -68,7 +62,6 @@ export const mainNav: NavItem[] = [
     accent: "var(--color-nav-5)",
     children: [
       { label: "For Our Parents", href: "/parents" },
-      { label: "Attendance", href: "/attendance-policy" },
       { label: "Paying School Fees", href: "/make-a-payment" },
       { label: "Pupil Handbook", href: "/student-handbook" },
       { label: "School Calendar", href: "/school-calendar" },
