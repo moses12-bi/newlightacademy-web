@@ -329,7 +329,9 @@ button { cursor: pointer; }
 .home-tabs-col { position: relative; z-index: 2; }
 .home-tabs { display: flex; flex-direction: column; gap: 5px; }
 /* WCAG 2.2.2: the five-second rotation needs a control that stops it. */
-.home-tabs-pause { margin: 14px 0 0 18px; font-size: 15px; font-weight: 700; color: var(--color-accent-3); text-decoration: underline; }
+/* A bare text button measured 137x23 — under the 24px minimum touch target.
+   Padding gives it a comfortable hit area without changing how it reads. */
+.home-tabs-pause { display: inline-flex; align-items: center; min-height: 44px; margin: 6px 0 0 12px; padding: 6px 6px; font-size: 15px; font-weight: 700; color: var(--color-accent-3); text-decoration: underline; }
 .home-tabs-pause:hover, .home-tabs-pause:focus-visible { color: var(--color-accent-1); }
 .home-tab { display: flex; align-items: center; gap: 16px; width: 100%; padding: 12px 18px; border-radius: 8px 0 0 8px; text-align: left; color: var(--color-accent-3); font-size: 20px; font-weight: 800; transition: color .25s, background .25s, transform .25s; }
 .home-tab span { display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; flex: none; border-radius: 50%; color: var(--color-accent-2); font-family: var(--font-handwritten); font-size: 24px; }
@@ -424,7 +426,12 @@ button { cursor: pointer; }
 
 @media (max-width: 767px) {
   .home-one-hero { min-height: 590px; background-position: 62% center; }
-  .home-one-floral { width: 110vw; height: 470px; min-height: 0; bottom: 18px; padding-top: 15%; }
+  /* The floral panel is , so its white circle renders
+     at width/1.4564 (the SVG is 852x585) anchored to the bottom. At 470px tall and
+     110vw wide that circle only filled the lower ~294px, leaving the headline
+     sitting on the bare photo. Tie the box height to the image ratio so the
+     backdrop covers the copy, as it already does from 768 up. */
+  .home-one-floral { width: 128vw; height: calc(128vw / 1.4564); min-height: 0; bottom: 18px; padding-top: 6%; }
   .home-one-bird { min-width: 42px; }
   .home-one-title p, .home-one-title strong { margin: 0; font-size: 6.7vw; line-height: 1.5; }
   .home-one-people { min-height: 130px; margin-top: -3%; padding-top: 8%; background-size: 70vw auto; }

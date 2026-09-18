@@ -385,6 +385,9 @@
 .tui-support__col > * { width: 100%; }
 @media (max-width: 1024px) {
   .tui-support { margin: 0 0 100px; }
+  /* Three across at tablet gave each card ~144px of text; go one per row. */
+  .tui-support__col { width: 100%; }
+  .tui-support__col + .tui-support__col { margin-top: 20px; }
 }
 @media (max-width: 767px) {
   .tui-support { margin: 0 0 30px; padding-top: 40px; }
@@ -455,6 +458,11 @@
 }
 @media (max-width: 767px) {
   .hta-steps { margin: 40px 0; }
+  /* 50% of a 320px viewport leaves ~140px of text — about 18 characters. Stack. */
+  .hta-steps__box,
+  .hta-steps__box--b,
+  .hta-steps__box--c,
+  .hta-steps__box--d { width: 100%; }
 }
 
 /* Form band — post-1064 #094b59f */
