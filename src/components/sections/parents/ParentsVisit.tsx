@@ -69,7 +69,8 @@ export default function ParentsVisit() {
               name="Family enquiry"
               fields={visitFormFields}
               submitLabel="Submit my information"
-              successMessage="Thanks — your details look complete. This demo form is not connected to a mail service, so nothing was sent, stored or charged."
+              formId="visit"
+              successMessage="Thank you — your details have reached the school office. We will be in touch soon."
             />
           </div>
         </div>

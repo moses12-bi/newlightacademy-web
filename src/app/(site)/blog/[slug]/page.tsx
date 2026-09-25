@@ -4,42 +4,41 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import Container from "@/components/ui/Container";
-import { blogPosts, formatPostDate, getPost } from "@/lib/blog-posts";
+import PostBody from "@/components/sections/blog/PostBody";
+import { formatPostDate } from "@/lib/blog-posts";
+import { publishedPost } from "@/lib/server/public-blog";
 import { site } from "@/lib/site";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams(): { slug: string }[] {
-  return blogPosts.map((post) => ({ slug: post.slug }));
-}
+/* Posts come from the staff portal's database, so each is rendered per request. */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = publishedPost(slug);
   if (!post) return { title: "Post not found" };
   return {
     title: post.title,
     description: post.excerpt || undefined,
-    robots: { index: false, follow: true },
+    openGraph: { type: "article", title: post.title, description: post.excerpt || undefined, images: [post.image.src] },
+    /* A card-only post is thin content; a full article is worth indexing. */
+    robots: post.body ? undefined : { index: false, follow: true },
   };
 }
 
 /**
  * A single blog post.
  *
- * A post carries a category, a date, a photo, a title and a short summary — a
- * full article body is not part of the data model yet, so the page shows the
- * summary and says so rather than padding it out with invented text.
- *
- * The post list is empty until the school supplies its own news, so every slug
- * currently falls through to `notFound()` and `generateStaticParams` returns an
- * empty array, which is a valid result rather than an error.
+ * A post carries a category, a date, a photo, a title, a short summary and —
+ * for posts written in the staff portal — the full article. A post with no
+ * article shows the summary and says so rather than padding it out.
  */
 export default async function BlogPostPage({ params }: PostPageProps) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = publishedPost(slug);
   if (!post) notFound();
 
   return (
@@ -64,9 +63,13 @@ export default async function BlogPostPage({ params }: PostPageProps) {
 
         {post.excerpt ? <p className="blog-post__excerpt">{post.excerpt}</p> : null}
 
-        <p className="blog-post__note">
-          This is the summary shown for this post in the {site.name} news feed.
-        </p>
+        {post.body ? (
+          <PostBody text={post.body} />
+        ) : (
+          <p className="blog-post__note">
+            This is the summary shown for this post in the {site.name} news feed.
+          </p>
+        )}
 
         <Link href="/blog" className="blog-post__back">
           ← Back to the blog

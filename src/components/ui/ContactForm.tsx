@@ -47,6 +47,11 @@ export interface ContactFormProps {
   /** Accessible name for the form, from the saved `<form aria-label>`. */
   name?: string;
   submitAlign?: "start" | "center" | "stretch";
+  /**
+   * Which inbox queue the submission lands in (`/api/forms`): "contact", "tour",
+   * "apply", "payment", "visit", "newsletter" or "review".
+   */
+  formId?: string;
 }
 
 type Values = Record<string, string | boolean>;
@@ -56,7 +61,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TEL = /^[+()\d][\d\s().-]{5,}$/;
 
 const DEFAULT_SUCCESS =
-  "Thank you — your details look complete. This form is not yet connected to the school office, so nothing has been sent or stored; please contact us directly and we will be glad to help.";
+  "Thank you — your message has reached the school office. We will be in touch soon.";
 
 function isControl(field: FormField): boolean {
   return field.type !== "heading";
@@ -82,9 +87,9 @@ function validateField(field: FormField, value: string | boolean): string {
 /**
  * The shared Elementor `form`, rebuilt as a data-driven React form.
  *
- * There is no backend in this project, so submitting only validates locally and
- * the success panel says so — it never claims a message reached the school, was
- * stored or was paid. Every control has a real `<label for>`, errors are announced through
+ * A valid submission is posted to `/api/forms`, which files it in the staff
+ * portal's Inbox and emails the school office. The success panel only appears
+ * once the server has accepted it; a failure keeps the form and says so. Every control has a real `<label for>`, errors are announced through
  * aria-describedby with aria-invalid on the control, and focus moves to the
  * first invalid control on a failed submit.
  */
@@ -95,6 +100,7 @@ export default function ContactForm({
   successMessage,
   name,
   submitAlign = "start",
+  formId = "contact",
 }: ContactFormProps) {
   const uid = useId();
   const formRef = useRef<HTMLFormElement>(null);
@@ -102,6 +108,8 @@ export default function ContactForm({
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "pending" | "success">("idle");
   const [summary, setSummary] = useState<string>("");
+  /* Honeypot, hidden from people; a bot that fills it is quietly ignored. */
+  const [company, setCompany] = useState("");
   const successRef = useRef<HTMLDivElement>(null);
 
   /* Move focus to the confirmation once, when it appears — an inline ref
@@ -127,7 +135,7 @@ export default function ContactForm({
     });
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (status === "pending") return;
 
@@ -154,8 +162,32 @@ export default function ContactForm({
 
     setSummary("");
     setStatus("pending");
-    /* No network call exists: this only simulates the round trip locally. */
-    window.setTimeout(() => setStatus("success"), 600);
+
+    /* Keyed by the visible label, so the office reads "Email", not "field_4". */
+    const payload: Record<string, string | boolean> = {};
+    for (const field of fields) {
+      if (!isControl(field)) continue;
+      payload[field.label] = values[field.name] ?? (field.type === "checkbox" ? false : "");
+    }
+
+    try {
+      const response = await fetch("/api/forms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ form: formId, values: payload, company }),
+      });
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "");
+      }
+      setStatus("success");
+    } catch (error) {
+      setStatus("idle");
+      setSummary(
+        (error instanceof Error && error.message) ||
+          "Your message could not be sent. Please check your connection and try again, or contact the school directly.",
+      );
+    }
   };
 
   return (
@@ -169,7 +201,13 @@ export default function ContactForm({
       </div>
 
       {status === "success" ? null : (
-        <form ref={formRef} aria-label={name} noValidate onSubmit={handleSubmit}>
+        <form ref={formRef} aria-label={name} noValidate onSubmit={(event) => void handleSubmit(event)}>
+          <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+            <label>
+              Company
+              <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
+            </label>
+          </div>
           {summary ? (
             <p className="w-form__summary" role="alert">
               {summary}

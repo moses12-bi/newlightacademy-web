@@ -106,6 +106,7 @@ export default function LocationMapSection() {
             fields={FIELDS}
             submitLabel="Send my details"
             name="Arrange a visit"
+            formId="visit"
             submitAlign="stretch"
           />
         </div>

@@ -16,8 +16,8 @@ import { site } from "@/lib/site";
  * about, which suits the same numeric control, and its `postal-code` autofill
  * hint is dropped so browsers no longer offer a postcode for it.
  *
- * There is no backend in this project: ContactForm validates locally and the
- * success panel says plainly that nothing was sent or booked.
+ * Submissions land in the staff portal Inbox and are emailed to the school
+ * office (see ContactForm and /api/forms).
  */
 const FIELDS: FormField[] = [
   {
@@ -123,7 +123,8 @@ export default function TourForm() {
             fields={FIELDS}
             submitLabel="Submit my information"
             submitAlign="stretch"
-            successMessage={`Thanks — your details passed validation. This form is not connected to a booking system yet, so no visit was requested and nothing was sent or stored.`}
+            formId="tour"
+            successMessage="Thank you — your visit request has reached the school office. We will contact you to confirm a date and time."
           />
         </div>
       </Container>

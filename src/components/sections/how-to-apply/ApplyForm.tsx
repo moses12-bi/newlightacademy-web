@@ -14,8 +14,8 @@ import { site } from "@/lib/site";
  * in, and the age list is cut to 3-12 — the ages this school actually teaches,
  * nursery through P6 — rather than the saved 3-16.
  *
- * There is no backend in this project: ContactForm validates locally and says
- * so, and never claims the application was sent or stored.
+ * Submissions land in the staff portal Inbox and are emailed to the school
+ * office (see ContactForm and /api/forms).
  */
 const FIELDS: FormField[] = [
   { name: "parent_details", label: "Parent or guardian", type: "heading", headingLevel: "h3", width: 50 },
@@ -53,7 +53,8 @@ export default function ApplyForm() {
           fields={FIELDS}
           submitLabel="Submit"
           submitAlign="stretch"
-          successMessage={`Thanks — your details passed validation. There is no application system behind this form yet, so nothing was sent, stored or submitted to ${site.name}.`}
+          formId="apply"
+          successMessage={`Thank you — your application enquiry has reached ${site.name}. The admissions team will contact you about the next steps.`}
         />
       </Container>
     </section>

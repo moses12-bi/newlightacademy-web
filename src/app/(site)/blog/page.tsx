@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import BlogFeed from "@/components/sections/blog/BlogFeed";
 import PageHero from "@/components/ui/PageHero";
-import { blogArchiveSlugs, getPosts } from "@/lib/blog-posts";
+import { publishedPosts } from "@/lib/server/public-blog";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     `News and updates from ${site.name} in Kinyinya, Kigali — life at school, learning and the children we care for.`,
 };
+
+/* Posts come from the staff portal's database, so the page is rendered per request. */
+export const dynamic = "force-dynamic";
 
 export default function BlogPage() {
   return (
@@ -29,7 +32,7 @@ export default function BlogPage() {
         style={{ padding: "var(--blog-hero-pad)", background: "var(--color-surface-warm)" }}
         dividerFill={{ bottom: "var(--color-accent-8)" }}
       />
-      <BlogFeed posts={getPosts(blogArchiveSlugs)} />
+      <BlogFeed posts={publishedPosts()} />
     </>
   );
 }

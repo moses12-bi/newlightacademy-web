@@ -81,7 +81,8 @@ export default function ComingSoonPanel() {
             submitLabel="Send"
             name="Subscribe for updates"
             submitAlign="stretch"
-            successMessage="Thanks — your email address passed validation. There is no mailing list behind this form yet, so nothing was sent, stored or subscribed."
+            formId="newsletter"
+            successMessage="Thank you — the school office has your email address and will send you updates."
           />
         </div>
 

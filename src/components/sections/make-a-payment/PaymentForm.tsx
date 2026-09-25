@@ -34,7 +34,8 @@ export default function PaymentForm() {
           name="Ask about school payments"
           fields={FIELDS}
           submitLabel="Send"
-          successMessage="Thanks — your question looks complete. This demo form is not connected to a mail service and takes no payment, so nothing was sent, stored or charged."
+          formId="payment"
+          successMessage="Thank you — your question has reached the school office and we will reply soon. This form takes no payment."
         />
       </Container>
     </section>

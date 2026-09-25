@@ -312,7 +312,8 @@
   text-decoration: underline;
 }
 
-/* The single-post page: the archive excerpt plus a note, never an invented body. */
+/* The single-post page: the excerpt, then the article written in the staff
+   portal — or, for a card-only post, a note, never an invented body. */
 .blog-post { padding: 60px 0 100px; }
 .blog-post__inner { max-width: 960px; }
 .blog-post__meta { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-size: 15px; }
@@ -337,6 +338,11 @@
   background: var(--color-accent-8);
   font-size: 16px;
 }
+.blog-post__body { margin-top: 30px; font-size: 18px; }
+.blog-post__body > * + * { margin-top: 18px; }
+.blog-post__body h2 { margin-top: 36px; font-size: 28px; }
+.blog-post__body ul { padding-left: 1.3em; list-style: disc; }
+.blog-post__body li + li { margin-top: 6px; }
 .blog-post__back { display: inline-block; margin-top: 30px; font-weight: 600; color: var(--color-accent-1); }
 
 @media (max-width: 1024px) {
@@ -410,3 +416,16 @@
 
   /* #5462622 at 767: `background-size: 0px auto` hides the cut-out entirely. */
 }
+
+/* /reviews: published parent reviews and the form to leave one. */
+.reviews-band { padding: 60px 0 100px; }
+.reviews-list { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.review-card { margin: 0; padding: 28px; border-radius: 14px; background: var(--color-accent-5); border: 1px solid var(--color-accent-4); }
+.review-card__stars { color: var(--color-nav-5); letter-spacing: 2px; font-size: 18px; }
+.review-card blockquote { margin: 12px 0 0; font-size: 17px; }
+.review-card figcaption { margin-top: 16px; font-weight: 800; color: var(--color-heading); }
+.review-card figcaption span { display: block; font-weight: 600; font-size: 14px; color: var(--color-muted); }
+.reviews-empty { font-size: 18px; }
+.reviews-form { max-width: 720px; margin-top: 70px; }
+.reviews-form h2 { margin-bottom: 12px; }
+.reviews-form > p { margin-bottom: 24px; }
