@@ -11,7 +11,7 @@
  * render an empty label, a bare `tel:` link or an invented value.
  */
 
-export type SocialIcon = "facebook" | "youtube" | "instagram";
+export type SocialIcon = "facebook" | "youtube" | "instagram" | "tiktok";
 
 export interface SocialLink {
   label: string;
@@ -100,17 +100,24 @@ export const site: SiteInfo = {
   ],
 };
 
+/**
+ * The fields staff can change in the portal (School details). Server
+ * components read the live values through `siteDetails()` in
+ * `src/lib/server/site-details.ts`; `site` above holds the defaults.
+ */
+export type SiteDetails = Pick<SiteInfo, "phone" | "phoneHref" | "email" | "addressLines" | "addressDetail" | "socials">;
+
 /** True when there is a number worth printing and linking. */
-export function hasPhone(): boolean {
-  return site.phone.length > 0 && site.phoneHref.length > 0;
+export function hasPhone(info: SiteDetails = site): boolean {
+  return info.phone.length > 0 && info.phoneHref.length > 0;
 }
 
-export function hasEmail(): boolean {
-  return site.email.length > 0;
+export function hasEmail(info: SiteDetails = site): boolean {
+  return info.email.length > 0;
 }
 
-export function hasAddress(): boolean {
-  return site.addressLines.length > 0;
+export function hasAddress(info: SiteDetails = site): boolean {
+  return info.addressLines.length > 0;
 }
 
 /** True once a location precise enough to put a pin on has been confirmed. */
@@ -132,6 +139,6 @@ export function mapSearchUrl(): string {
  * Look a social account up by network instead of by array position, so removing
  * an unconfirmed account cannot silently repoint another link at the wrong one.
  */
-export function socialByIcon(icon: SocialIcon): SocialLink | undefined {
-  return site.socials.find((social) => social.icon === icon);
+export function socialByIcon(icon: SocialIcon, info: SiteDetails = site): SocialLink | undefined {
+  return info.socials.find((social) => social.icon === icon);
 }

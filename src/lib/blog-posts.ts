@@ -11,8 +11,9 @@
  * helpers below are kept exactly as they are so the school can add its own
  * posts here later without any component changing.
  *
- * `body` is deliberately absent: a post is a card plus an excerpt until the
- * school decides it wants full articles.
+ * Posts written in the staff portal (/admin/blog) are stored in its database
+ * and merged in by `src/lib/server/public-blog.ts`; this list is for anything
+ * that should live in code instead.
  */
 export interface BlogPost {
   slug: string;
@@ -21,6 +22,8 @@ export interface BlogPost {
   category: string;
   /** The short summary shown on the card. */
   excerpt: string;
+  /** The full article: paragraphs split by blank lines, `## ` headings, `- ` bullets. */
+  body?: string;
   /** ISO date, e.g. "2026-01-31". */
   date: string;
   image: { src: string; width: number; height: number };

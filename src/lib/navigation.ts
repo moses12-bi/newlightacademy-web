@@ -12,6 +12,11 @@ export interface NavItem extends NavLink {
 /**
  * Primary header navigation. The `accent` values are the theme's "rainbow"
  * hover colours, applied to the top-level items in order (1-based in the kit).
+ *
+ * A group's own page is NOT repeated as its first child. The top-level label is
+ * itself a link — on desktop, and on mobile too, where the chevron that opens
+ * the submenu is a separate control beside it — so an "About Us" under "About"
+ * was a second route to the page the parent already went to.
  */
 export const mainNav: NavItem[] = [
   /* A plain link, not a dropdown: the theme's second home layout was removed,
@@ -22,7 +27,6 @@ export const mainNav: NavItem[] = [
     href: "/about",
     accent: "var(--color-accent-2)",
     children: [
-      { label: "About Us", href: "/about" },
       { label: "Gallery", href: "/gallery" },
       { label: "Our Teachers", href: "/our-teachers" },
       { label: "Careers", href: "/careers" },
@@ -34,7 +38,6 @@ export const mainNav: NavItem[] = [
     href: "/programs",
     accent: "var(--color-nav-3)",
     children: [
-      { label: "All Programs", href: "/programs" },
       { label: "Baby Class", href: "/infants" },
       { label: "Middle Class", href: "/toddlers" },
       { label: "Top Class", href: "/preschool" },
@@ -48,7 +51,6 @@ export const mainNav: NavItem[] = [
     href: "/admissions",
     accent: "var(--color-nav-4)",
     children: [
-      { label: "Admissions", href: "/admissions" },
       { label: "Fees Information", href: "/tuition" },
       { label: "How to Apply", href: "/how-to-apply" },
       { label: "FAQ", href: "/faq" },
@@ -61,7 +63,6 @@ export const mainNav: NavItem[] = [
     href: "/parents",
     accent: "var(--color-nav-5)",
     children: [
-      { label: "For Our Parents", href: "/parents" },
       { label: "Paying School Fees", href: "/make-a-payment" },
       { label: "Pupil Handbook", href: "/student-handbook" },
       { label: "School Calendar", href: "/school-calendar" },

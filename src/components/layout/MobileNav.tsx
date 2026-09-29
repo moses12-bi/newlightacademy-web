@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import { ChevronDownIcon, CloseIcon, MenuIcon, PhoneIcon } from "@/components/ui/icons";
 import { mainNav } from "@/lib/navigation";
-import { hasPhone, site } from "@/lib/site";
 
 const PANEL_ID = "mobile-nav-panel";
 
@@ -16,7 +15,7 @@ const PANEL_ID = "mobile-nav-panel";
  * The panel is absolutely positioned against the sticky `<header>`, so it drops
  * directly beneath the header bar across the full viewport width.
  */
-export default function MobileNav() {
+export default function MobileNav({ phone, phoneHref }: { phone: string; phoneHref: string }) {
   const [open, setOpen] = useState<boolean>(false);
   const [expanded, setExpanded] = useState<string[]>([]);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -214,14 +213,14 @@ export default function MobileNav() {
           </ul>
 
           <div className="flex flex-col items-start gap-4 pt-6 pb-2">
-            {hasPhone() ? (
+            {phone && phoneHref ? (
               <a
-                href={site.phoneHref}
+                href={phoneHref}
                 onClick={close}
                 className="inline-flex items-center gap-2 text-[16px] font-extrabold tracking-[0.5px] text-accent-3 transition-colors duration-200 hover:text-accent-1"
               >
                 <PhoneIcon className="h-[18px] w-[18px] text-accent-1" />
-                {site.phone}
+                {phone}
               </a>
             ) : null}
             <Button href="/schedule-a-tour" className="w-full" onClick={close}>

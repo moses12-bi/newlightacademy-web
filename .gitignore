@@ -13,3 +13,6 @@ artifacts/
 *.log
 .DS_Store
 Thumbs.db
+
+# Staff portal database (SQLite) and generated session secret.
+data/

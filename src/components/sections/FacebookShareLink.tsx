@@ -1,5 +1,6 @@
 import { FacebookIcon } from "@/components/ui/icons";
 import { site, socialByIcon } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 export interface FacebookShareLinkProps {
   className?: string;
@@ -9,11 +10,12 @@ export interface FacebookShareLinkProps {
 /**
  * The saved markup hard-coded the original host's own Facebook address. No
  * Facebook page has been confirmed as this school's, so the link is looked up
- * in `site.socials` instead: when there is no confirmed account the component
+ * in `info.socials` instead: when there is no confirmed account the component
  * renders nothing rather than send families to somebody else's page.
  */
 export default function FacebookShareLink({ className, label }: FacebookShareLinkProps) {
-  const account = socialByIcon("facebook");
+  const info = siteDetails();
+  const account = socialByIcon("facebook", info);
   if (!account) return null;
 
   return (

@@ -33,7 +33,9 @@ WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
-    HOSTNAME=0.0.0.0
+    HOSTNAME=0.0.0.0 \
+    DATA_DIR=/app/data \
+    NODE_OPTIONS=--disable-warning=ExperimentalWarning
 
 RUN addgroup -g 10001 -S nodejs \
     && adduser -u 10001 -S -G nodejs -s /sbin/nologin nextjs
@@ -42,6 +44,11 @@ RUN addgroup -g 10001 -S nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Staff portal database (blog posts, inbox, reviews, connected accounts).
+# MOUNT A VOLUME HERE — anything written inside the container is lost on deploy.
+RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+VOLUME ["/app/data"]
 
 USER nextjs
 EXPOSE 3000

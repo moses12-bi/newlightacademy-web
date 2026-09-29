@@ -9,7 +9,7 @@ import MobileNav from "@/components/layout/MobileNav";
 import Button from "@/components/ui/Button";
 import { ChevronDownIcon, PhoneIcon } from "@/components/ui/icons";
 import { mainNav } from "@/lib/navigation";
-import { hasPhone, site } from "@/lib/site";
+import { site } from "@/lib/site";
 
 /**
  * The "rainbow" hover colours live in the navigation data, not in the theme, so
@@ -23,7 +23,13 @@ const FALLBACK_ACCENT = "var(--color-accent-1)";
  * Sticky white site header: logo, desktop rainbow nav with hover/focus dropdowns,
  * phone + "Book a Visit" cluster, and the mobile hamburger below `lg`.
  */
-export default function Header() {
+export interface HeaderProps {
+  /** From the portal's School details; empty hides the number. */
+  phone: string;
+  phoneHref: string;
+}
+
+export default function Header({ phone, phoneHref }: HeaderProps) {
   const pathname = usePathname();
   return (
     <header className="sticky top-0 z-50 w-full bg-accent-5">
@@ -105,13 +111,13 @@ export default function Header() {
         <div className="ml-auto hidden items-center gap-6 min-[1025px]:flex" data-reveal="pulse">
           {/* Drops out entirely when no number is configured, rather than
               rendering an empty `tel:` link. */}
-          {hasPhone() ? (
+          {phone && phoneHref ? (
             <a
-              href={site.phoneHref}
+              href={phoneHref}
               className="hidden items-center gap-2 text-[16px] font-extrabold tracking-[0.5px] whitespace-nowrap text-accent-3 transition-colors duration-300 hover:text-accent-1 xl:inline-flex"
             >
               <PhoneIcon className="h-[18px] w-[18px] shrink-0 text-accent-1" />
-              {site.phone}
+              {phone}
             </a>
           ) : null}
           <Button href="/schedule-a-tour" className="whitespace-nowrap">
@@ -119,7 +125,7 @@ export default function Header() {
           </Button>
         </div>
 
-        <div className="ml-auto min-[1025px]:hidden"><MobileNav /></div>
+        <div className="ml-auto min-[1025px]:hidden"><MobileNav phone={phone} phoneHref={phoneHref} /></div>
       </div>
     </header>
   );

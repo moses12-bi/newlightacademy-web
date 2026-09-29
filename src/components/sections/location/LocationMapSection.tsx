@@ -7,14 +7,6 @@ import type { FormField } from "@/components/ui/ContactForm";
 import Container from "@/components/ui/Container";
 import { site } from "@/lib/site";
 
-/* The address comes from `site.addressLines` rather than being typed here, and
-   the map is a search for that address, not a pin at coordinates of our own
-   choosing: nobody has confirmed a map marker for the school, so none is placed. */
-const PLACE = site.addressLines.join(", ");
-
-/* Built only after the visitor asks for it, so nothing reaches Google on load. */
-const EMBED_SRC = `https://maps.google.com/maps?q=${encodeURIComponent(PLACE)}&t=m&z=15&output=embed&iwloc=near`;
-const OPEN_IN_MAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(PLACE)}`;
 
 const FIELDS: FormField[] = [
   { name: "name", label: "First Name", type: "text", required: true, placeholder: "First Name", labelHidden: true, width: 50, autoComplete: "given-name" },
@@ -60,7 +52,21 @@ const FIELDS: FormField[] = [
  * everyone navigates by — instead of dropping a pin, because the exact marker
  * has not been confirmed on the ground.
  */
-export default function LocationMapSection() {
+export default function LocationMapSection({
+  addressLines = site.addressLines,
+  addressDetail = site.addressDetail,
+}: {
+  addressLines?: string[];
+  addressDetail?: string;
+}) {
+  /* The address comes from School details rather than being typed here, and
+     the map is a search for that address, not a pin at coordinates of our own
+     choosing: nobody has confirmed a map marker for the school, so none is placed. */
+  const PLACE = addressLines.join(", ");
+  /* Built only after the visitor asks for it, so nothing reaches Google on load. */
+  const EMBED_SRC = `https://maps.google.com/maps?q=${encodeURIComponent(PLACE)}&t=m&z=15&output=embed&iwloc=near`;
+  const OPEN_IN_MAPS = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(PLACE)}`;
+
   const [showMap, setShowMap] = useState(false);
 
   return (
@@ -79,7 +85,7 @@ export default function LocationMapSection() {
             <div className="location-map__facade">
               <p className="location-map__place">{PLACE}</p>
               <p className="location-map__note">
-                We are in Kinyinya sector, Gasabo district, Kigali — {site.addressDetail}. The map is
+                We are in Kinyinya sector, Gasabo district, Kigali — {addressDetail}. The map is
                 loaded from Google: press the button to load it, or open the address in a new tab
                 instead.
               </p>
@@ -106,6 +112,7 @@ export default function LocationMapSection() {
             fields={FIELDS}
             submitLabel="Send my details"
             name="Arrange a visit"
+            formId="visit"
             submitAlign="stretch"
           />
         </div>
