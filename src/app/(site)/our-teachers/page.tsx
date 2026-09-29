@@ -4,6 +4,7 @@ import TeachersClosing from "@/components/sections/our-teachers/TeachersClosing"
 import TeachersProfile from "@/components/sections/our-teachers/TeachersProfile";
 import TeachersTeam from "@/components/sections/our-teachers/TeachersTeam";
 import PageHero from "@/components/ui/PageHero";
+import { publicTeam } from "@/lib/server/staff";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function TeachersPage() {
         }}
       />
       <TeachersProfile />
-      <TeachersTeam />
+      <TeachersTeam members={publicTeam()} />
       <TeachersClosing />
     </>
   );

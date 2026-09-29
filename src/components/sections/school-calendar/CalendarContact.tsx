@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Container from "@/components/ui/Container";
 import { displayPhone, hasAddress, hasEmail, hasPhone, site } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 /**
  * post-1095 #7d669c8 — the four-up address row that closes the page, with the
@@ -9,6 +10,7 @@ import { displayPhone, hasAddress, hasEmail, hasPhone, site } from "@/lib/site";
  * lose the heading role.
  */
 export default function CalendarContact() {
+  const info = siteDetails();
   return (
     <section className="calendar-contact" aria-label="Contact details">
       <Container>
@@ -16,10 +18,10 @@ export default function CalendarContact() {
           <div>
             <p>{site.name}</p>
           </div>
-          {hasAddress() ? (
+          {hasAddress(info) ? (
             <div>
               <p>
-                {site.addressLines.map((line) => (
+                {info.addressLines.map((line) => (
                   <Fragment key={line}>
                     {line}
                     <br />
@@ -28,21 +30,21 @@ export default function CalendarContact() {
               </p>
             </div>
           ) : null}
-          {hasPhone() ? (
+          {hasPhone(info) ? (
             <div>
               <p>
                 Phone:
                 <br />
-                <a href={site.phoneHref}>{displayPhone()}</a>
+                <a href={info.phoneHref}>{displayPhone(info.phone)}</a>
               </p>
             </div>
           ) : null}
-          {hasEmail() ? (
+          {hasEmail(info) ? (
             <div>
               <p>
                 Email:
                 <br />
-                <a href={`mailto:${site.email}`}>{site.email}</a>
+                <a href={`mailto:${info.email}`}>{info.email}</a>
               </p>
             </div>
           ) : null}

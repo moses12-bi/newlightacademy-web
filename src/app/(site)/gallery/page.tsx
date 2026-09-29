@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
 import GalleryJustified from "@/components/sections/gallery/GalleryJustified";
-import { galleryPhotos } from "@/components/sections/gallery/photos";
 import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
 import { hasEmail, hasPhone, site } from "@/lib/site";
+import { publicGallery } from "@/lib/server/gallery";
+import { siteDetails } from "@/lib/server/site-details";
 
 export const metadata: Metadata = {
   title: "Gallery",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryPage() {
+  const info = siteDetails();
   return (
     <>
       {/* #355e47b5 — a plain white title band; the second column is empty. */}
@@ -31,27 +33,27 @@ export default function GalleryPage() {
           <div className="gallery-section__inner" data-reveal="fadeIn" data-delay="500">
             {/* #5f571d4: fadeIn on desktop and tablet, no reveal on phones. */}
             <div data-reveal="fadeIn" data-reveal-mobile="none">
-              <GalleryJustified photos={galleryPhotos} />
+              <GalleryJustified photos={publicGallery()} />
             </div>
 
             {/* Rwanda's Law 058/2021 requires a way to withdraw consent for a
                 child's image, not only to give it. The school confirmed it holds
                 parental consent for these photographs; this is the other half. */}
-            {hasPhone() || hasEmail() ? (
+            {hasPhone(info) || hasEmail(info) ? (
               <p className="gallery-consent" data-reveal="fadeIn" data-delay="200">
                 If you would like a photograph of your child removed from this page, please
                 contact the school office
-                {hasPhone() ? (
+                {hasPhone(info) ? (
                   <>
                     {" "}
-                    on <a href={site.phoneHref}>{site.phone}</a>
+                    on <a href={info.phoneHref}>{info.phone}</a>
                   </>
                 ) : null}
-                {hasPhone() && hasEmail() ? " or" : null}
-                {hasEmail() ? (
+                {hasPhone(info) && hasEmail(info) ? " or" : null}
+                {hasEmail(info) ? (
                   <>
                     {" "}
-                    at <a href={`mailto:${site.email}`}>{site.email}</a>
+                    at <a href={`mailto:${info.email}`}>{info.email}</a>
                   </>
                 ) : null}
                 , and we will take it down.

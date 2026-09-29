@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { uploadToCloudinary } from "@/lib/admin/upload";
+
 export interface MediaValue {
   url: string;
   type: "none" | "image" | "video";
@@ -10,9 +12,9 @@ export interface MediaValue {
 }
 
 /**
- * Uploads a photo or video straight from the browser to Cloudinary using a
- * signature from `/api/admin/upload-signature`, then exposes the result to the
- * surrounding form as hidden inputs: `<name>_url`, `<name>_type`,
+ * Uploads a photo or video straight from the browser to Cloudinary (see
+ * `lib/admin/upload.ts`), then exposes the result to the surrounding form as
+ * hidden inputs: `<name>_url`, `<name>_type`,
  * `<name>_width`, `<name>_height`.
  */
 export default function MediaField({
@@ -44,41 +46,7 @@ export default function MediaField({
     setError("");
     setProgress(0);
     try {
-      const signResponse = await fetch("/api/admin/upload-signature", { method: "POST" });
-      const sign = await signResponse.json();
-      if (!signResponse.ok) throw new Error(sign.error ?? "Could not start the upload.");
-
-      const body = new FormData();
-      body.set("file", file);
-      body.set("api_key", sign.apiKey);
-      body.set("timestamp", String(sign.timestamp));
-      body.set("folder", sign.folder);
-      body.set("signature", sign.signature);
-
-      /* XHR rather than fetch, for upload progress on large videos. */
-      const result = await new Promise<{ secure_url: string; resource_type: string; width?: number; height?: number }>(
-        (resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", `https://api.cloudinary.com/v1_1/${sign.cloudName}/auto/upload`);
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) setProgress(Math.round((event.loaded / event.total) * 100));
-          };
-          xhr.onload = () => {
-            const data = JSON.parse(xhr.responseText || "{}");
-            if (xhr.status >= 200 && xhr.status < 300) resolve(data);
-            else reject(new Error(data.error?.message ?? `Upload failed (${xhr.status})`));
-          };
-          xhr.onerror = () => reject(new Error("Network error during upload."));
-          xhr.send(body);
-        },
-      );
-
-      update({
-        url: result.secure_url,
-        type: result.resource_type === "video" ? "video" : "image",
-        width: result.width ?? 0,
-        height: result.height ?? 0,
-      });
+      update(await uploadToCloudinary(file, setProgress));
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : String(uploadError));
     } finally {

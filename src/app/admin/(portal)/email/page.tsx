@@ -5,6 +5,7 @@ import Flash from "@/components/admin/Flash";
 import { formatDateTime } from "@/lib/admin/format";
 import { mailConfigured, mailFrom } from "@/lib/server/mail";
 import { listSentEmails } from "@/lib/server/messages";
+import { siteDetails } from "@/lib/server/site-details";
 import { site } from "@/lib/site";
 
 import { composeEmailAction } from "../../actions";
@@ -35,7 +36,7 @@ export default async function EmailPage({ searchParams }: PageProps<"/admin/emai
         <section className="adm-card">
           <h2 style={{ marginBottom: 12 }}>New email</h2>
           <ActionForm action={composeEmailAction} submitLabel="Send" pendingLabel="Sending…">
-            <p className="adm-small adm-muted">From {ready ? mailFrom() : site.email}</p>
+            <p className="adm-small adm-muted">From {ready ? mailFrom() : siteDetails().email}</p>
             <label className="adm-field">
               <span>To</span>
               <input type="text" name="to" placeholder="parent@example.com, another@example.com" required />
@@ -47,7 +48,7 @@ export default async function EmailPage({ searchParams }: PageProps<"/admin/emai
             </label>
             <label className="adm-field">
               <span>Message</span>
-              <textarea name="body" rows={12} defaultValue={`\n\nKind regards,\n${site.name}\n${site.phone}`} required />
+              <textarea name="body" rows={12} defaultValue={`\n\nKind regards,\n${site.name}\n${siteDetails().phone}`} required />
             </label>
           </ActionForm>
         </section>

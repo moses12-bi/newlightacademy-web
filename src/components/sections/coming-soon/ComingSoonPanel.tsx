@@ -4,14 +4,16 @@ import Link from "next/link";
 import Container from "@/components/ui/Container";
 import ContactForm from "@/components/ui/ContactForm";
 import type { FormField } from "@/components/ui/ContactForm";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/icons";
+import { FacebookIcon, InstagramIcon, TiktokIcon, YoutubeIcon } from "@/components/ui/icons";
 import { site, type SocialIcon } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 /** Network -> mark, so the list is keyed by account rather than by position. */
 const comingSoonSocialIcons: Record<SocialIcon, typeof FacebookIcon> = {
   facebook: FacebookIcon,
   youtube: YoutubeIcon,
   instagram: InstagramIcon,
+  tiktok: TiktokIcon,
 };
 
 /* The dots illustration scales as the page scrolls (post-1942 #4170f5d:
@@ -42,6 +44,7 @@ const FIELDS: FormField[] = [
  * scenery row and the social links.
  */
 export default function ComingSoonPanel() {
+  const info = siteDetails();
   return (
     <section className="coming-panel">
       <Container className="coming-shell">
@@ -173,9 +176,9 @@ export default function ComingSoonPanel() {
 
         {/* Driven by the configured accounts rather than by position, so an
             account the school has not confirmed simply is not listed. */}
-        {site.socials.length > 0 ? (
+        {info.socials.length > 0 ? (
           <ul className="coming-socials">
-            {site.socials.map((social) => {
+            {info.socials.map((social) => {
               const Icon = comingSoonSocialIcons[social.icon];
               return (
                 <li key={social.href}>

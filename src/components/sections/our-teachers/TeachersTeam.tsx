@@ -4,46 +4,10 @@ import Container from "@/components/ui/Container";
 import FlipBox from "@/components/ui/FlipBox";
 import type { RevealDelay } from "@/components/ui/PageHero";
 
-interface TeamMember {
-  /** Portrait under public/images/staff/. */
-  photo: string;
-  /** Set once the school confirms who may be named, and as what. */
-  name?: string;
-  role?: string;
-  /** `_animation_delay` on each flip box: 0, 200, 400, 600, 800, 1000. */
-  delay?: RevealDelay;
-}
+import { DEFAULT_TEAM, type TeamMember } from "./team-data";
 
-/**
- * The school's teaching staff, as supplied.
- *
- * `name` and `role` are deliberately unset: the school sent the photographs but
- * not who is in them, and a card captioned with a guessed name or subject would
- * be worse than one with none. Fill them in as they are confirmed — the card
- * already renders both — and nothing else here needs to change.
- */
-/**
- * The Head Teacher runs the school day to day and is the person NESA
- * corresponds with — a distinct role from the Founder and Managing Director,
- * who leads the school overall and appears in the profile band above.
- *
- * The school has confirmed the Head Teacher is a separate person but has not
- * yet sent a name or a photograph. Fill this in and the card renders first in
- * the grid, ahead of the teaching team; leave it null and the grid is unchanged.
- */
-const HEAD_TEACHER: TeamMember | null = null;
-
-const TEAM: TeamMember[] = [
-  { photo: "/images/staff/teacher-1.webp" },
-  { photo: "/images/staff/teacher-2.webp", delay: "200" },
-  { photo: "/images/staff/teacher-3.webp", delay: "400" },
-  { photo: "/images/staff/teacher-4.webp", delay: "600" },
-  { photo: "/images/staff/teacher-5.webp", delay: "800" },
-  { photo: "/images/staff/teacher-6.webp", delay: "1000" },
-];
-
-/** What the grid renders: the Head Teacher first, when there is one. */
-const MEMBERS: TeamMember[] = HEAD_TEACHER ? [HEAD_TEACHER, ...TEAM] : TEAM;
+/* `_animation_delay` on each flip box: 0, 200 … 1000, repeating for longer teams. */
+const DELAYS: (RevealDelay | undefined)[] = [undefined, "200", "400", "600", "800", "1000"];
 
 /** Ported from post-1042: the back face is white, the name black, the role the deep teal. */
 const CARD_STYLE: CSSProperties = {
@@ -54,11 +18,14 @@ const CARD_STYLE: CSSProperties = {
 /**
  * #25b79f4 + #f1b0259 — the introduction band and the flip boxes.
  *
+ * `members` comes from the staff portal (Staff), Head Teacher first; a card
+ * with no confirmed name shows a generic caption rather than a guessed one.
+ *
  * The six front faces are `teacher-01.jpg` … `teacher-06.jpg` background
  * images in the save. None of them downloaded, so the fronts render as the
  * theme's cream panel and each card carries an accessible name instead.
  */
-export default function TeachersTeam() {
+export default function TeachersTeam({ members = DEFAULT_TEAM }: { members?: TeamMember[] }) {
   return (
     <>
       <section className="teachers-band">
@@ -74,15 +41,15 @@ export default function TeachersTeam() {
       </section>
 
       {/* #f1b0259 is `elementor-section-full_width`, so it has no content well. */}
-      {MEMBERS.length > 0 ? (
+      {members.length > 0 ? (
         <section className="teachers-team" aria-label="Our teaching team">
-          {MEMBERS.map((member, index) => (
-            <div key={member.photo} data-reveal="zoomIn" data-delay={member.delay}>
+          {members.map((member, index) => (
+            <div key={`${member.photo}-${index}`} data-reveal="zoomIn" data-delay={DELAYS[index % DELAYS.length]}>
               <FlipBox
                 effect="slide"
                 direction="up"
                 heights={{ desktop: 634, tablet: 600, mobile: 600 }}
-                label={member.name ? `${member.name}${member.role ? `, ${member.role}` : ""}` : `Teaching staff, portrait ${index + 1} of ${MEMBERS.length}`}
+                label={member.name ? `${member.name}${member.role ? `, ${member.role}` : ""}` : `Teaching staff, portrait ${index + 1} of ${members.length}`}
                 style={CARD_STYLE}
                 /* The front face is the portrait, as in the source theme. */
                 front={{

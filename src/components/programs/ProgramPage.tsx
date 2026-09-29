@@ -18,7 +18,8 @@ import Container from "@/components/ui/Container";
 import IconList from "@/components/ui/IconList";
 import PageHero from "@/components/ui/PageHero";
 import ShapeDivider from "@/components/ui/ShapeDivider";
-import { hasPhone, site } from "@/lib/site";
+import { hasPhone } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 /** Elementor's scroll effects, transcribed from each widget's data-settings. */
 const SENSEI_FX = '{"scale":{"direction":"in-out","speed":2,"range":{"start":0,"end":40}}}';
@@ -41,6 +42,7 @@ export interface ProgramPageProps {
  * "<program> program", "How we teach", then the four age cards.
  */
 export default function ProgramPage({ program }: ProgramPageProps) {
+  const info = siteDetails();
   return (
     <>
       {/*
@@ -84,7 +86,7 @@ export default function ProgramPage({ program }: ProgramPageProps) {
               </div>
               <p>{ABOUT_INVITE}</p>
               <div className="program-about__actions">
-                {hasPhone() ? <Button href={site.phoneHref}>Call us</Button> : null}
+                {hasPhone(info) ? <Button href={info.phoneHref}>Call us</Button> : null}
                 <Button href="/location" variant="outline">
                   Directions
                 </Button>

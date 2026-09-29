@@ -41,7 +41,7 @@ provenance for an icon set, which is a code comment rather than anything a visit
 
 | | |
 |---|---|
-| `src/lib/site.ts` | **School identity.** Name, tagline, motto, contacts, address, coordinates, social accounts. Nothing school-editable belongs in a component — it belongs here. |
+| `src/lib/site.ts` | **School identity.** Name, tagline, motto, coordinates — and the *defaults* for contacts, address and social accounts, which staff override in the portal (School details). |
 | `src/lib/server/` | Portal back end: SQLite (`node:sqlite`), auth, settings, mail, social connectors. |
 | `src/app/admin/` | Portal pages and Server Actions (`actions.ts`). Public site pages are in `src/app/(site)/`. |
 | `src/lib/navigation.ts` | Header and footer menus. Labels may change; `href`s may not. |
@@ -57,6 +57,9 @@ An internal portal for the school office, served by the same app at `newlight-ac
 | Section | What it does |
 |---|---|
 | **Blog** | Write, schedule (future date) and publish posts with a cover photo and full article. `/blog` reads them live. "Save & share" hands the post to the social composer. |
+| **Gallery** | Upload several photos at once, write descriptions, reorder and remove. `/gallery` starts from the photos that shipped in code. |
+| **Staff** | Teacher cards on `/our-teachers`: portrait (cropped to 4:5 around the face), name, role, order, and the Head Teacher shown first. |
+| **School details** | Phone, email, address, directions and the Facebook / Instagram / YouTube / TikTok links used in the header, footer and contact sections. |
 | **Social media** | One composer for Facebook Page, Instagram, YouTube and TikTok — publish now or schedule (Kigali time). Per-network result, error and link; retry failed networks. |
 | **Reviews** | Parents submit at `/reviews`; nothing shows until staff publish it. Staff can also add reviews received elsewhere. |
 | **Inbox** | Every website form (tour, application, payment question, visit, newsletter, review) is stored here and emailed to the office. Reply by email from the message. |
@@ -82,6 +85,10 @@ An internal portal for the school office, served by the same app at `newlight-ac
   Photo posts need `newlight-academy.rw` verified as a URL prefix in the TikTok portal (photos are served from
   `/social-media/…` for that reason); videos don't.
 - **Uploads** go browser → Cloudinary directly, so large videos never pass through this server.
+
+Public pages are prerendered and refreshed every five minutes, and immediately when staff change the gallery,
+staff or school details — so those edits reach the site without a redeploy. The school name, motto and page
+text are still edited in code (`src/lib/site.ts` and the page components).
 
 Scheduled social posts are published by a one-minute timer inside the server process (`src/instrumentation.ts`).
 

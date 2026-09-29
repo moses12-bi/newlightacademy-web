@@ -4,9 +4,10 @@ import { Fragment } from "react";
 
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/ui/icons";
+import { FacebookIcon, InstagramIcon, TiktokIcon, YoutubeIcon } from "@/components/ui/icons";
 import { footerNavPrimary, footerNavSecondary, type NavLink } from "@/lib/navigation";
 import { displayPhone, hasAddress, hasEmail, hasPhone, site } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 /* --------------------------------------------------------------------------
    Shared bits
@@ -20,6 +21,7 @@ const socialIcons = {
   facebook: FacebookIcon,
   youtube: YoutubeIcon,
   instagram: InstagramIcon,
+  tiktok: TiktokIcon,
 } as const;
 
 interface FooterNavProps {
@@ -49,6 +51,7 @@ function FooterNav({ label, items }: FooterNavProps) {
 -------------------------------------------------------------------------- */
 
 export default function Footer() {
+  const info = siteDetails();
   return (
     <footer className="site-footer">
       {/* --- Band A: decorative row, bottom-aligned and overlapping the cream band --- */}
@@ -117,8 +120,8 @@ export default function Footer() {
 
             <address className="footer-contact text-center text-base font-semibold leading-[1.5] text-accent-3 not-italic md:text-start">
               <p>
-                {hasAddress()
-                  ? site.addressLines.map((line) => (
+                {hasAddress(info)
+                  ? info.addressLines.map((line) => (
                       <Fragment key={line}>
                         {line}
                         <br />
@@ -129,20 +132,20 @@ export default function Footer() {
                   Find us
                 </Link>
               </p>
-              {hasPhone() || hasEmail() ? (
+              {hasPhone(info) || hasEmail(info) ? (
                 <p className="mt-[1.25em]">
-                  {hasPhone() ? (
+                  {hasPhone(info) ? (
                     <>
                       Phone:{" "}
-                      <a href={site.phoneHref} className={footerLink}>
-                        {displayPhone()}
+                      <a href={info.phoneHref} className={footerLink}>
+                        {displayPhone(info.phone)}
                       </a>
                     </>
                   ) : null}
-                  {hasPhone() && hasEmail() ? <br /> : null}
-                  {hasEmail() ? (
-                    <a href={`mailto:${site.email}`} className={footerLink}>
-                      {site.email}
+                  {hasPhone(info) && hasEmail(info) ? <br /> : null}
+                  {hasEmail(info) ? (
+                    <a href={`mailto:${info.email}`} className={footerLink}>
+                      {info.email}
                     </a>
                   ) : null}
                 </p>
@@ -152,7 +155,7 @@ export default function Footer() {
             <div className="footer-actions flex flex-col items-center md:items-end">
               <Button href="/schedule-a-tour">Book a Visit</Button>
               <ul className="mt-5 flex items-center gap-3 min-[1025px]:gap-[3px]">
-                {site.socials.map((social) => {
+                {info.socials.map((social) => {
                   const Icon = socialIcons[social.icon];
                   return (
                     <li key={social.href}>

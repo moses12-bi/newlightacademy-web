@@ -8,6 +8,7 @@ import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
 import VideoFrame from "@/components/ui/VideoFrame";
 import { displayPhone, site } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 export const metadata: Metadata = {
   title: "Welcome",
@@ -28,6 +29,7 @@ const posts = [
 ] as const;
 
 export default function HomePage() {
+  const info = siteDetails();
   return (
     <>
       <section className="home-one-hero">
@@ -84,7 +86,7 @@ export default function HomePage() {
       </section>
 
       <section className="home-contact"><Container className="home-contact-grid">
-        <div><h4>{site.addressLines[0]}</h4><p>{site.addressLines[1]}</p></div><div><h4>Find us at:</h4><p>{site.addressDetail}</p></div><div><h4>Phone:</h4><a href={site.phoneHref}>{displayPhone()}</a></div><div><h4>Email:</h4><a href={`mailto:${site.email}`}>{site.email}</a></div>
+        <div><h4>{info.addressLines[0]}</h4><p>{info.addressLines[1]}</p></div><div><h4>Find us at:</h4><p>{info.addressDetail}</p></div><div><h4>Phone:</h4><a href={info.phoneHref}>{displayPhone(info.phone)}</a></div><div><h4>Email:</h4><a href={`mailto:${info.email}`}>{info.email}</a></div>
       </Container></section>
 
       <section className="home-news">

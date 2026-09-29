@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import BlogFeed from "@/components/sections/blog/BlogFeed";
 import PageHero from "@/components/ui/PageHero";
 import { publishedPosts } from "@/lib/server/public-blog";
-import { site } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
+import { site, socialByIcon } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -32,7 +33,7 @@ export default function BlogPage() {
         style={{ padding: "var(--blog-hero-pad)", background: "var(--color-surface-warm)" }}
         dividerFill={{ bottom: "var(--color-accent-8)" }}
       />
-      <BlogFeed posts={publishedPosts()} />
+      <BlogFeed posts={publishedPosts()} facebookHref={socialByIcon("facebook", siteDetails())?.href} />
     </>
   );
 }

@@ -125,6 +125,33 @@ const MIGRATIONS: string[] = [
   CREATE INDEX messages_status ON messages(status, created_at);
   CREATE INDEX social_posts_due ON social_posts(status, scheduled_at);
   `,
+  `
+  CREATE TABLE content (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE TABLE gallery_photos (
+    id INTEGER PRIMARY KEY,
+    src TEXT NOT NULL,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    alt TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE TABLE staff (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL DEFAULT '',
+    photo TEXT NOT NULL,
+    width INTEGER NOT NULL DEFAULT 700,
+    height INTEGER NOT NULL DEFAULT 875,
+    is_head INTEGER NOT NULL DEFAULT 0,
+    position INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  `,
 ];
 
 function migrate(db: DatabaseSync): void {
@@ -154,6 +181,29 @@ export function db(): DatabaseSync {
     globalForDb.__nlaDb = handle;
   }
   return globalForDb.__nlaDb;
+}
+
+/**
+ * True while `next build` prerenders pages. Public pages read portal content
+ * through helpers that return the code defaults at build time, so the image
+ * never needs a database and the build never writes one.
+ */
+export function isBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
+
+/** Small JSON documents the portal edits: school details, seed markers. */
+export function getContent<T>(key: string): T | undefined {
+  const row = db().prepare("SELECT value FROM content WHERE key = ?").get(key) as { value: string } | undefined;
+  return row ? (JSON.parse(row.value) as T) : undefined;
+}
+
+export function setContent(key: string, value: unknown): void {
+  db()
+    .prepare(
+      "INSERT INTO content (key, value, updated_at) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at",
+    )
+    .run(key, JSON.stringify(value), now());
 }
 
 export function now(): string {

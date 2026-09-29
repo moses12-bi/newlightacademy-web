@@ -5,6 +5,7 @@ import Container from "@/components/ui/Container";
 import ContactForm from "@/components/ui/ContactForm";
 import { visitFormFields } from "@/components/ui/visit-form-fields";
 import { displayPhone, hasAddress, hasEmail, hasPhone, site } from "@/lib/site";
+import { siteDetails } from "@/lib/server/site-details";
 
 /**
  * post-3216 #a7c3a39 — the oversized "Come" lettering over a 900px well that
@@ -12,6 +13,7 @@ import { displayPhone, hasAddress, hasEmail, hasPhone, site } from "@/lib/site";
  * `elementor-reverse-mobile`, so on phones the form comes first.
  */
 export default function ParentsVisit() {
+  const info = siteDetails();
   return (
     <section className="parents-visit">
       <Container>
@@ -32,9 +34,9 @@ export default function ParentsVisit() {
             />
             <h3>{site.name}</h3>
             <div className="parents-visit__address">
-              {hasAddress() ? (
+              {hasAddress(info) ? (
                 <p>
-                  {site.addressLines.map((line) => (
+                  {info.addressLines.map((line) => (
                     <Fragment key={line}>
                       {line}
                       <br />
@@ -42,18 +44,18 @@ export default function ParentsVisit() {
                   ))}
                 </p>
               ) : null}
-              {hasPhone() ? (
+              {hasPhone(info) ? (
                 <p>
                   <strong>Phone:</strong>
                   <br />
-                  <a href={site.phoneHref}>{displayPhone()}</a>
+                  <a href={info.phoneHref}>{displayPhone(info.phone)}</a>
                 </p>
               ) : null}
-              {hasEmail() ? (
+              {hasEmail(info) ? (
                 <p>
                   <strong>Email:</strong>
                   <br />
-                  <a href={`mailto:${site.email}`}>{site.email}</a>
+                  <a href={`mailto:${info.email}`}>{info.email}</a>
                 </p>
               ) : null}
             </div>

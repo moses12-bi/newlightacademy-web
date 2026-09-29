@@ -26,7 +26,11 @@ import { sendMail, verifyMail } from "@/lib/server/mail";
 import { getMessage, setMessageStatus, type MessageStatus } from "@/lib/server/messages";
 import { createPost, deletePost, updatePost, type PostInput } from "@/lib/server/posts";
 import { createReview, deleteReview, setReviewStatus, type ReviewStatus } from "@/lib/server/reviews";
+import { addGalleryPhotos, moveGalleryPhoto, removeGalleryPhoto, updateGalleryAlt } from "@/lib/server/gallery";
+import { cloudinaryCloud, withTransform } from "@/lib/server/media";
 import { SETTINGS, setSetting, siteUrl } from "@/lib/server/settings";
+import { saveSiteDetails, SOCIAL_NETWORKS } from "@/lib/server/site-details";
+import { addStaff, moveStaff, removeStaff, updateStaff, type StaffInput } from "@/lib/server/staff";
 import {
   cancelSocialPost,
   PLATFORMS,
@@ -69,6 +73,120 @@ export async function loginAction(_prev: string | null, form: FormData): Promise
 export async function logoutAction(): Promise<void> {
   await signOut();
   redirect("/admin/login");
+}
+
+/** Every public page may show school details, gallery or staff: refresh them all. */
+function refreshSite() {
+  revalidatePath("/", "layout");
+}
+
+/** Only images uploaded to the school's own Cloudinary account are accepted. */
+function isOwnUpload(url: string): boolean {
+  const cloud = cloudinaryCloud();
+  return !!cloud && url.startsWith(`https://res.cloudinary.com/${cloud}/image/upload/`);
+}
+
+/* ------------------------------------------------------- school details -- */
+
+export async function saveSiteDetailsAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const email = str(form, "email");
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "The email address does not look right.";
+  const phone = str(form, "phone");
+  if (phone && !/^[+()\d][\d\s().-]{5,}$/.test(phone)) return "Use digits, spaces, brackets, + or - in the phone number.";
+  const socials: Record<string, string> = {};
+  for (const { icon, label } of SOCIAL_NETWORKS) {
+    const href = str(form, `social_${icon}`);
+    if (href && !/^https:\/\/\S+$/.test(href)) return `The ${label} link must start with https://`;
+    socials[icon] = href;
+  }
+  saveSiteDetails({
+    phone,
+    email,
+    addressLines: [str(form, "address1"), str(form, "address2")],
+    addressDetail: str(form, "addressDetail"),
+    socials,
+  });
+  logActivity(user.id, "updated school details");
+  refreshSite();
+  redirect(withFlash("/admin/site", "ok", "Saved. The website shows the new details within a moment."));
+}
+
+/* -------------------------------------------------------------- gallery -- */
+
+export async function addGalleryPhotosAction(
+  photos: { url: string; width: number; height: number; alt: string }[],
+  atStart: boolean,
+): Promise<string | null> {
+  const user = await requireUser();
+  const clean = photos.slice(0, 50).filter((photo) => isOwnUpload(photo.url) && photo.width > 0 && photo.height > 0);
+  if (clean.length === 0) return "No uploaded photos to add.";
+  addGalleryPhotos(
+    clean.map((photo) => ({ src: photo.url, width: photo.width, height: photo.height, alt: photo.alt.slice(0, 300) })),
+    atStart,
+  );
+  logActivity(user.id, "added gallery photos", String(clean.length));
+  refreshSite();
+  return null;
+}
+
+export async function galleryPhotoAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = Number(str(form, "id"));
+  const op = str(form, "op");
+  if (op === "alt") updateGalleryAlt(id, str(form, "alt").slice(0, 300));
+  else if (op === "up" || op === "down") moveGalleryPhoto(id, op === "up" ? -1 : 1);
+  else if (op === "remove") {
+    removeGalleryPhoto(id);
+    logActivity(user.id, "removed gallery photo", String(id));
+  }
+  refreshSite();
+  redirect(withFlash(`/admin/gallery#photo-${id}`, "ok", op === "remove" ? "Photo removed from the gallery." : "Saved."));
+}
+
+/* ---------------------------------------------------------------- staff -- */
+
+function staffInput(form: FormData): StaffInput | string {
+  const photo = str(form, "photo_url");
+  if (!photo) return "Add a portrait photo.";
+  const uploaded = isOwnUpload(photo);
+  if (!uploaded && !photo.startsWith("/images/staff/") && !photo.startsWith("https://res.cloudinary.com/")) {
+    return "Upload the portrait with the Upload button.";
+  }
+  return {
+    name: str(form, "name").slice(0, 120),
+    role: str(form, "role").slice(0, 120),
+    /* Every card is the same 4:5 portrait: new uploads are cropped around the face. */
+    photo: uploaded && !photo.includes("/c_fill,") ? withTransform(photo, "c_fill,g_face,w_700,h_875,q_auto") : photo,
+    width: 700,
+    height: 875,
+    isHead: form.get("is_head") === "on",
+  };
+}
+
+export async function saveStaffAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = staffInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id"));
+  if (id) updateStaff(id, input);
+  else addStaff(input);
+  logActivity(user.id, id ? "updated staff card" : "added staff card", input.name || "(unnamed)");
+  refreshSite();
+  redirect(withFlash(id ? `/admin/staff#staff-${id}` : "/admin/staff", "ok", id ? "Saved." : "Staff member added."));
+}
+
+export async function staffOrderAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = Number(str(form, "id"));
+  const op = str(form, "op");
+  if (op === "up" || op === "down") moveStaff(id, op === "up" ? -1 : 1);
+  else if (op === "remove") {
+    removeStaff(id);
+    logActivity(user.id, "removed staff card", String(id));
+  }
+  refreshSite();
+  redirect(withFlash("/admin/staff", "ok", op === "remove" ? "Removed from the Our Teachers page." : "Order saved."));
 }
 
 /* ---------------------------------------------------------------- blog -- */

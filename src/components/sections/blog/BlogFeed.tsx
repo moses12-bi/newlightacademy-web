@@ -8,10 +8,12 @@ import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
 import { FacebookIcon, TwitterIcon } from "@/components/ui/icons";
 import type { BlogPost } from "@/lib/blog-posts";
-import { site, socialByIcon } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export interface BlogFeedProps {
   posts: BlogPost[];
+  /** The school's Facebook page from School details; no card when unset. */
+  facebookHref?: string;
 }
 
 /** Hand-drawn share glyph: this project has no icon package, and this one is
@@ -48,9 +50,8 @@ function matches(post: BlogPost, query: string): boolean {
  * server to query — and the result count is announced politely. The Facebook
  * widget is a local link-out card: Facebook's SDK is never loaded.
  */
-export default function BlogFeed({ posts }: BlogFeedProps) {
+export default function BlogFeed({ posts, facebookHref }: BlogFeedProps) {
   const searchId = useId();
-  const facebook = socialByIcon("facebook");
   const [query, setQuery] = useState("");
   const [shareUrl, setShareUrl] = useState("");
 
@@ -168,7 +169,7 @@ export default function BlogFeed({ posts }: BlogFeedProps) {
           {/* Links out rather than embedding Facebook's page plugin, so no
               third-party SDK runs here. The card renders only once a Facebook
               page has been confirmed as the school's. */}
-          {facebook ? (
+          {facebookHref ? (
             <div className="blog-facebook" data-reveal="fadeIn" data-delay="200">
               <p className="blog-facebook__title">
                 {site.name} on Facebook
@@ -176,7 +177,7 @@ export default function BlogFeed({ posts }: BlogFeedProps) {
               <p className="blog-facebook__body">
                 Follow us on Facebook for news, photos and updates from the school.
               </p>
-              <a className="blog-facebook__link" href={facebook.href} target="_blank" rel="noreferrer">
+              <a className="blog-facebook__link" href={facebookHref} target="_blank" rel="noreferrer">
                 <FacebookIcon className="h-[18px] w-[18px]" />
                 Open our Facebook page
               </a>

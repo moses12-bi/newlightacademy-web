@@ -8,6 +8,7 @@ import { site } from "@/lib/site";
 
 import { db, now } from "./db";
 import { getSetting } from "./settings";
+import { siteDetails } from "./site-details";
 
 export function mailConfigured(): boolean {
   return !!(getSetting("SMTP_HOST") && getSetting("SMTP_USER") && getSetting("SMTP_PASS"));
@@ -24,11 +25,11 @@ function transport() {
 }
 
 export function mailFrom(): string {
-  return getSetting("MAIL_FROM") || `${site.name} <${getSetting("SMTP_USER") || site.email}>`;
+  return getSetting("MAIL_FROM") || `${site.name} <${getSetting("SMTP_USER") || siteDetails().email}>`;
 }
 
 export function officeRecipients(): string {
-  return getSetting("MAIL_TO") || site.email;
+  return getSetting("MAIL_TO") || siteDetails().email;
 }
 
 export interface OutgoingMail {

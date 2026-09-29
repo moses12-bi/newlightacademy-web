@@ -6,6 +6,7 @@ import Flash from "@/components/admin/Flash";
 import { formatDateTime } from "@/lib/admin/format";
 import { mailConfigured } from "@/lib/server/mail";
 import { emailsForMessage, formLabel, getMessage, setMessageStatus } from "@/lib/server/messages";
+import { siteDetails } from "@/lib/server/site-details";
 import { site } from "@/lib/site";
 
 import { messageStatusAction, replyAction } from "../../../actions";
@@ -120,7 +121,7 @@ export default async function MessagePage({ params, searchParams }: PageProps<"/
                   <textarea
                     name="body"
                     rows={10}
-                    defaultValue={`Dear ${firstName || "parent"},\n\nThank you for contacting ${site.name}.\n\n\n\nKind regards,\n${site.name}\n${site.phone}`}
+                    defaultValue={`Dear ${firstName || "parent"},\n\nThank you for contacting ${site.name}.\n\n\n\nKind regards,\n${site.name}\n${siteDetails().phone}`}
                   />
                 </label>
               </ActionForm>

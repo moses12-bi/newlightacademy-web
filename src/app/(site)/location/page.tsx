@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import LocationFaq from "@/components/sections/location/LocationFaq";
 import LocationMapSection from "@/components/sections/location/LocationMapSection";
 import PageHero from "@/components/ui/PageHero";
+import { siteDetails } from "@/lib/server/site-details";
 
 export const metadata: Metadata = {
   title: "Location",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function LocationPage() {
+  const details = siteDetails();
   return (
     <>
       <PageHero
@@ -25,7 +27,7 @@ export default function LocationPage() {
           reveal: "bounceInUp",
         }}
       />
-      <LocationMapSection />
+      <LocationMapSection addressLines={details.addressLines} addressDetail={details.addressDetail} />
       <LocationFaq />
     </>
   );

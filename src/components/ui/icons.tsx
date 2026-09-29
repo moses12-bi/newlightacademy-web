@@ -127,3 +127,11 @@ export function InstagramIcon(props: IconProps): React.JSX.Element {
     </svg>
   );
 }
+
+export function TiktokIcon(props: IconProps): React.JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" width={24} height={24} fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M16.6 2h-3.3v13.2a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.3 6.3 0 1 0 5.3 6.2V8.6a7.9 7.9 0 0 0 4.6 1.5V6.8a4.6 4.6 0 0 1-4.6-4.6Z" />
+    </svg>
+  );
+}
