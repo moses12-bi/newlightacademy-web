@@ -4,10 +4,12 @@ import { SOCIAL_NETWORKS, siteDetails } from "@/lib/server/site-details";
 import { socialByIcon } from "@/lib/site";
 
 import { saveSiteDetailsAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "School details" };
 
 export default async function SiteDetailsPage({ searchParams }: PageProps<"/admin/site">) {
+  await requireUser();
   const params = await searchParams;
   const info = siteDetails();
 

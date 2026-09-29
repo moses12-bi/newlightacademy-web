@@ -3,10 +3,12 @@ import Link from "next/link";
 import Flash from "@/components/admin/Flash";
 import { formatDate } from "@/lib/admin/format";
 import { isAccepting, listJobs } from "@/lib/server/jobs";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Careers" };
 
 export default async function CareersAdmin({ searchParams }: PageProps<"/admin/careers">) {
+  await requireUser();
   const params = await searchParams;
   const jobs = listJobs();
 

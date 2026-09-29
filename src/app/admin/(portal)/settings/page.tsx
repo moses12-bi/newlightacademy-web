@@ -4,12 +4,14 @@ import Flash from "@/components/admin/Flash";
 import { SETTING_GROUPS, SETTINGS, getSetting, settingSource } from "@/lib/server/settings";
 
 import { saveSettingsAction, testEmailAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Settings" };
 
 const SOURCE_TEXT = { portal: "set here", env: "from server environment", unset: "not set" } as const;
 
 export default async function SettingsPage({ searchParams }: PageProps<"/admin/settings">) {
+  await requireUser();
   const params = await searchParams;
 
   return (

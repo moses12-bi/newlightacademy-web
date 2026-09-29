@@ -8,6 +8,7 @@ import { mediaConfigured } from "@/lib/server/media";
 import { listStaff, type StaffRow } from "@/lib/server/staff";
 
 import { saveStaffAction, staffOrderAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Staff" };
 
@@ -50,6 +51,7 @@ function StaffFields({ member }: { member?: StaffRow }) {
 }
 
 export default async function StaffAdmin({ searchParams }: PageProps<"/admin/staff">) {
+  await requireUser();
   const params = await searchParams;
   const staff = listStaff();
   const others = staff.filter((member) => !member.is_head);

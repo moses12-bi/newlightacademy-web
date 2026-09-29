@@ -5,10 +5,12 @@ import JobFields from "@/components/admin/JobFields";
 import { JOB_CATEGORIES, JOB_TYPES } from "@/lib/server/jobs";
 
 import { saveJobAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "New vacancy" };
 
-export default function NewJob() {
+export default async function NewJob() {
+  await requireUser();
   return (
     <>
       <div className="adm-head">

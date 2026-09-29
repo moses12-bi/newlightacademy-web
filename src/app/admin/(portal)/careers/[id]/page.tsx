@@ -9,10 +9,12 @@ import { getJob, isAccepting, JOB_CATEGORIES, JOB_TYPES } from "@/lib/server/job
 import { listMessages } from "@/lib/server/messages";
 
 import { deleteJobAction, saveJobAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Edit vacancy" };
 
 export default async function EditJob({ params, searchParams }: PageProps<"/admin/careers/[id]">) {
+  await requireUser();
   const { id } = await params;
   const flash = await searchParams;
   const job = getJob(Number(id));

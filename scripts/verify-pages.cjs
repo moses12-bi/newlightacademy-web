@@ -89,7 +89,16 @@ function watch(page) {
     if (!url.startsWith(base)) return;
     /* Dev-server HMR sockets abort on navigation; they are not page assets. */
     if (/\/_next\/(webpack-hmr|static\/webpack)/.test(url)) return;
-    badRequests.push(`${url} (${request.failure() ? request.failure().errorText : "failed"})`);
+    const reason = request.failure() ? request.failure().errorText : "failed";
+    /* The router prefetches linked routes as RSC payloads (`?_rsc=`). A prefetch
+       for a DYNAMIC route is a real server render and may still be in flight
+       when the test moves to the next page, so the browser cancels it with
+       ERR_ABORTED. That is the browser working as intended, not a broken asset.
+       Only that exact combination is excused: a prefetch that fails any other
+       way, and any RSC response with an HTTP error status (caught below), still
+       fails the check. */
+    if (reason === "net::ERR_ABORTED" && /[?&]_rsc=/.test(url)) return;
+    badRequests.push(`${url} (${reason})`);
   });
   page.on("response", (response) => {
     const url = response.url();
@@ -224,6 +233,9 @@ async function fillFormValidly(scope) {
       await control.check();
       continue;
     }
+    /* Document uploads on the admissions form are optional, and a file input
+       cannot be filled with text. Submitting without one is a valid path. */
+    if (shape.type === "file") continue;
     if (shape.tag === "select") {
       const value = await control.evaluate((node) => {
         const option = [...node.options].find((entry) => entry.value !== "");
@@ -262,15 +274,31 @@ async function verifyForm(page, route) {
   const form = page.locator("form.w-form, .w-form form").first();
   await form.waitFor();
 
-  /* Empty submit must report errors and must not claim anything was sent. */
+  /* Empty submit must be blocked, must report errors, and must not claim
+     anything was sent. The theme's forms opt out of the browser's own
+     validation (`noValidate`) and render an accessible summary with per-field
+     messages and aria-invalid. A form that leaves native constraint validation
+     on is blocked by the browser before the app's handler runs, so none of that
+     markup appears — it is checked instead through the Constraint Validation
+     API, which is what the browser's own error tooltips report from. */
+  const usesNativeValidation = await form.evaluate((node) => !node.noValidate);
   await form.locator(".w-form__submit").click();
-  await page.locator(".w-form__summary").first().waitFor({ state: "visible", timeout: 5000 });
-  const errorCount = await page.locator(".w-form__error").count();
-  assert.ok(errorCount > 0, "empty submit produced no per-field error messages");
-  assert.equal(await page.locator(".w-form__success").count(), 0, "empty submit reached the success state");
 
-  const invalidControls = await page.locator("[aria-invalid='true']").count();
-  assert.ok(invalidControls > 0, "no control was marked aria-invalid after an empty submit");
+  if (usesNativeValidation) {
+    const native = await form.evaluate((node) => ({
+      valid: node.checkValidity(),
+      invalidFields: [...node.elements].filter((el) => el.willValidate && !el.checkValidity()).length,
+    }));
+    assert.equal(native.valid, false, "empty submit passed native validation");
+    assert.ok(native.invalidFields > 0, "native validation flagged no field on an empty submit");
+  } else {
+    await page.locator(".w-form__summary").first().waitFor({ state: "visible", timeout: 5000 });
+    const errorCount = await page.locator(".w-form__error").count();
+    assert.ok(errorCount > 0, "empty submit produced no per-field error messages");
+    const invalidControls = await page.locator("[aria-invalid='true']").count();
+    assert.ok(invalidControls > 0, "no control was marked aria-invalid after an empty submit");
+  }
+  assert.equal(await page.locator(".w-form__success").count(), 0, "empty submit reached the success state");
 
   const bodyAfterFailure = await page.locator("main").innerText();
   assert.ok(!claimsDelivery(bodyAfterFailure), "the page claims something was sent after a failed submit");
@@ -287,17 +315,55 @@ async function verifyForm(page, route) {
   );
   assert.deepEqual(unlabelled, [], "form controls without a <label for>");
 
+  /* Forms now really submit to the school office. Record every same-origin API
+     POST made during the valid submission, so a success message that claims
+     delivery can be held to it. */
+  const submissions = [];
+  const onResponse = (response) => {
+    const request = response.request();
+    if (request.method() !== "POST") return;
+    if (!response.url().startsWith(`${base}/api/`)) return;
+    submissions.push({ url: response.url(), status: response.status() });
+  };
+  page.on("response", onResponse);
+
   await fillFormValidly(page.locator(".w-form").first());
   await page.locator(".w-form__submit").first().click();
   const success = page.locator(".w-form__success").first();
   await success.waitFor({ state: "visible", timeout: 8000 });
+  page.off("response", onResponse);
+
   const text = await success.innerText();
   assert.ok(text.trim().length > 0, "the success panel is empty");
-  assert.ok(
-    /nothing was sent|nothing has been sent|no tour was requested|not (yet )?connected|demo/i.test(text),
-    `the success message must not imply delivery: ${text}`,
+
+  /* The network is the source of truth, not the wording. The property that
+     matters: a thank-you panel is honest only when the submission it implies
+     actually happened. The failure this guards against is a form that reassures
+     a parent their application arrived when the request never left, or errored —
+     the school then never hears from a family who believes they applied. */
+  const localOnly = /nothing was sent|nothing has been sent|no tour was requested|not (yet )?connected|demo/i.test(text);
+  const failedPosts = submissions.filter((s) => s.status < 200 || s.status >= 300);
+  assert.deepEqual(
+    failedPosts,
+    [],
+    `the success panel appeared but a submission failed: ${JSON.stringify(failedPosts)} — ${text}`,
   );
-  assert.ok(!claimsDelivery(text), `the success message claims delivery: ${text}`);
+
+  if (submissions.length === 0) {
+    /* No request was made, so the panel must say so plainly rather than imply
+       the details were received. */
+    assert.ok(
+      localOnly,
+      `the success panel appeared but nothing was submitted, and the message does not say so: ${text}`,
+    );
+  } else {
+    /* A real submission succeeded, so the thank-you is truthful; it must not
+       still carry the old "nothing was sent" demo wording. */
+    assert.ok(
+      !localOnly,
+      `a submission succeeded but the message claims nothing was sent: ${text}`,
+    );
+  }
 }
 
 /* ------------------------------------------------------- route interactions */

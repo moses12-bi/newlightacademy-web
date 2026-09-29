@@ -29,7 +29,7 @@ export interface AdmissionsSettings {
   note: string;
 }
 
-const DEFAULTS: AdmissionsSettings = { open: true, intake: "", note: "" };
+const DEFAULTS: AdmissionsSettings = { open: false, intake: "", note: "" };
 
 export function admissionsSettings(): AdmissionsSettings {
   if (isBuildPhase()) return DEFAULTS;

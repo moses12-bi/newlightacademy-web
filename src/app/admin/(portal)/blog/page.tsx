@@ -3,10 +3,12 @@ import Link from "next/link";
 import Flash from "@/components/admin/Flash";
 import { formatDate } from "@/lib/admin/format";
 import { listPosts } from "@/lib/server/posts";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Blog" };
 
 export default async function BlogAdmin({ searchParams }: PageProps<"/admin/blog">) {
+  await requireUser();
   const params = await searchParams;
   const posts = listPosts();
 

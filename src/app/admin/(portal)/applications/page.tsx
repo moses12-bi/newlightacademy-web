@@ -9,6 +9,7 @@ import { db } from "@/lib/server/db";
 import { listApplications } from "@/lib/server/messages";
 
 import { saveAdmissionsAction, setStageAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Applications" };
 
@@ -23,6 +24,7 @@ const STAGE_PILL: Record<string, string> = {
 };
 
 export default async function ApplicationsPage({ searchParams }: PageProps<"/admin/applications">) {
+  await requireUser();
   const params = await searchParams;
   const tab = params.type === "jobs" ? "jobs" : "students";
   const stageFilter = typeof params.stage === "string" ? params.stage : "";

@@ -4,10 +4,12 @@ import Flash from "@/components/admin/Flash";
 import { formatDateTime } from "@/lib/admin/format";
 import { getJob } from "@/lib/server/jobs";
 import { formLabel, listMessages } from "@/lib/server/messages";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Inbox" };
 
 export default async function InboxPage({ searchParams }: PageProps<"/admin/inbox">) {
+  await requireUser();
   const params = await searchParams;
   const view = params.view === "archived" ? "archived" : "open";
   const job = typeof params.job === "string" ? getJob(Number(params.job)) : undefined;

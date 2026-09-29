@@ -8,6 +8,7 @@ import { siteUrl } from "@/lib/server/settings";
 import { describeAccounts, PLATFORM_LABELS, PLATFORMS, platformStatus } from "@/lib/server/social";
 
 import { disconnectAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Social accounts" };
 
@@ -18,6 +19,7 @@ const PROVIDER_TEXT = {
 } as const;
 
 export default async function AccountsPage({ searchParams }: PageProps<"/admin/social/accounts">) {
+  await requireUser();
   const params = await searchParams;
   const host = (await headers()).get("host");
   const origin = siteUrl(host ? `${host.startsWith("localhost") ? "http" : "https"}://${host}` : undefined);

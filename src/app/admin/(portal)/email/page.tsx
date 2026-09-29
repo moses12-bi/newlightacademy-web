@@ -9,10 +9,12 @@ import { siteDetails } from "@/lib/server/site-details";
 import { site } from "@/lib/site";
 
 import { composeEmailAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Email" };
 
 export default async function EmailPage({ searchParams }: PageProps<"/admin/email">) {
+  await requireUser();
   const params = await searchParams;
   const ready = mailConfigured();
   const sent = listSentEmails();

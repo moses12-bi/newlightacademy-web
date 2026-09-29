@@ -14,6 +14,7 @@ import { siteDetails } from "@/lib/server/site-details";
 import { site } from "@/lib/site";
 
 import { deleteMessageAction, messageStatusAction, replyAction, setStageAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Message" };
 
@@ -31,6 +32,7 @@ function StatusButton({ id, status, label }: { id: number; status: string; label
 }
 
 export default async function MessagePage({ params, searchParams }: PageProps<"/admin/inbox/[id]">) {
+  await requireUser();
   const { id } = await params;
   const flash = await searchParams;
   const message = getMessage(Number(id));

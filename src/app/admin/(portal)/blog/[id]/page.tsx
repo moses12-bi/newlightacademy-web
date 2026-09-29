@@ -8,10 +8,12 @@ import { isoToKigaliDate } from "@/lib/admin/format";
 import { getPostById } from "@/lib/server/posts";
 
 import { deletePostAction, savePostAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Edit post" };
 
 export default async function EditPost({ params, searchParams }: PageProps<"/admin/blog/[id]">) {
+  await requireUser();
   const { id } = await params;
   const flash = await searchParams;
   const post = getPostById(Number(id));

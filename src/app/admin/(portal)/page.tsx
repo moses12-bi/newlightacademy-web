@@ -5,6 +5,7 @@ import { db } from "@/lib/server/db";
 import { mailConfigured } from "@/lib/server/mail";
 import { mediaConfigured } from "@/lib/server/media";
 import { PLATFORM_LABELS, PLATFORMS, platformStatus } from "@/lib/server/social";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Dashboard" };
 
@@ -13,6 +14,7 @@ function count(sql: string): number {
 }
 
 export default async function Dashboard() {
+  await requireUser();
   const stats = [
     { label: "New enquiries", value: count("SELECT COUNT(*) AS n FROM messages WHERE status = 'new'"), href: "/admin/inbox" },
     {

@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/admin/format";
 import { listReviews, type ReviewRow } from "@/lib/server/reviews";
 
 import { addReviewAction, reviewStatusAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Reviews" };
 
@@ -21,6 +22,7 @@ function StatusButton({ review, status, label }: { review: ReviewRow; status: st
 }
 
 export default async function ReviewsPage({ searchParams }: PageProps<"/admin/reviews">) {
+  await requireUser();
   const params = await searchParams;
   const reviews = listReviews();
   const pending = reviews.filter((review) => review.status === "pending");

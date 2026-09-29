@@ -3,10 +3,12 @@ import Link from "next/link";
 import PostEditor from "@/components/admin/PostEditor";
 
 import { savePostAction } from "../../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "New post" };
 
-export default function NewPost() {
+export default async function NewPost() {
+  await requireUser();
   return (
     <>
       <div className="adm-head">

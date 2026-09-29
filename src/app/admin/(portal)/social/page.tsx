@@ -10,6 +10,7 @@ import { siteUrl } from "@/lib/server/settings";
 import { listSocialPosts, PLATFORM_LABELS, PLATFORM_MEDIA, PLATFORMS, platformStatus } from "@/lib/server/social";
 
 import { cancelSocialPostAction, createSocialPostAction, retrySocialPostAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Social media" };
 
@@ -26,6 +27,7 @@ const STATUS_PILL: Record<string, string> = {
 };
 
 export default async function SocialPage({ searchParams }: PageProps<"/admin/social">) {
+  await requireUser();
   const params = await searchParams;
   const platforms = PLATFORMS.map((id) => ({
     id,

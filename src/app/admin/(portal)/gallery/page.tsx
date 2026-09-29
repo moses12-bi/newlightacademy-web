@@ -7,6 +7,7 @@ import { listGallery } from "@/lib/server/gallery";
 import { mediaConfigured } from "@/lib/server/media";
 
 import { addGalleryPhotosAction, galleryPhotoAction } from "../../actions";
+import { requireUser } from "@/lib/server/auth";
 
 export const metadata = { title: "Gallery" };
 
@@ -23,6 +24,7 @@ function OpButton({ id, op, label, disabled }: { id: number; op: string; label: 
 }
 
 export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/gallery">) {
+  await requireUser();
   const params = await searchParams;
   const photos = listGallery();
 
