@@ -13,6 +13,7 @@ export interface PostEditorValues {
   image_url: string;
   image_width: number;
   image_height: number;
+  image_focus: string;
   status: "draft" | "published";
   published_at: string;
 }
@@ -84,6 +85,7 @@ export default function PostEditor({ action, post }: { action: FormAction; post:
             label="Cover photo"
             accept="image/*"
             initial={post.image_url ? { url: post.image_url, type: "image", width: post.image_width, height: post.image_height } : undefined}
+            focus={post.image_focus}
           />
         </div>
       </div>

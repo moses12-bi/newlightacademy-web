@@ -23,7 +23,12 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   return {
     title: post.title,
     description: post.excerpt || undefined,
-    openGraph: { type: "article", title: post.title, description: post.excerpt || undefined, images: [post.image.src] },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: post.image ? [post.image.src] : undefined,
+    },
     /* A card-only post is thin content; a full article is worth indexing. */
     robots: post.body ? undefined : { index: false, follow: true },
   };
@@ -50,16 +55,20 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </p>
         <h1 className="blog-post__title">{post.title}</h1>
 
-        <div className="blog-post__photo">
-          <Image
-            src={post.image.src}
-            alt=""
-            width={post.image.width}
-            height={post.image.height}
-            sizes="(min-width: 1025px) 960px, 100vw"
-            priority
-          />
-        </div>
+        {post.image ? (
+          /* A fixed landscape frame, so a tall phone photo does not fill several
+             screens; the focus point chosen in the portal stays in view. */
+          <div className="blog-post__photo">
+            <Image
+              src={post.image.src}
+              alt=""
+              fill
+              sizes="(min-width: 1025px) 960px, 100vw"
+              style={{ objectPosition: post.image.focus }}
+              priority
+            />
+          </div>
+        ) : null}
 
         {post.excerpt ? <p className="blog-post__excerpt">{post.excerpt}</p> : null}
 

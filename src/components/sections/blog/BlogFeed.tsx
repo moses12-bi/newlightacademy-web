@@ -77,14 +77,20 @@ export default function BlogFeed({ posts, facebookHref }: BlogFeedProps) {
                   {/* The saved markup wraps the thumbnail in a second link to the
                       same post; here it is decorative, so the card exposes one
                       link per destination instead of three. */}
-                  <div className="blog-card__thumb">
-                    <Image
-                      src={post.image.src}
-                      alt=""
-                      fill
-                      sizes="(min-width: 768px) 60vw, 100vw"
-                      className="blog-card__image"
-                    />
+                  <div className={`blog-card__thumb${post.image ? "" : " blog-card__thumb--empty"}`}>
+                    {post.image ? (
+                      <Image
+                        src={post.image.src}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1025px) 700px, (min-width: 768px) 60vw, 100vw"
+                        className="blog-card__image"
+                        /* The part staff marked in the portal stays in view, whatever the card's shape. */
+                        style={{ objectPosition: post.image.focus }}
+                      />
+                    ) : (
+                      <Image src="/images/logo-nla.png" alt="" width={160} height={160} className="blog-card__crest" />
+                    )}
                   </div>
                   <p className="blog-card__badge">{post.category}</p>
                   <div className="blog-card__text">

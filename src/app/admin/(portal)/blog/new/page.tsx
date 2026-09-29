@@ -30,6 +30,7 @@ export default async function NewPost() {
           image_url: "",
           image_width: 0,
           image_height: 0,
+          image_focus: "",
           status: "draft",
           published_at: "",
         }}

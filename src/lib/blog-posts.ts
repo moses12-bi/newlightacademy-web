@@ -26,7 +26,8 @@ export interface BlogPost {
   body?: string;
   /** ISO date, e.g. "2026-01-31". */
   date: string;
-  image: { src: string; width: number; height: number };
+  /** Absent when the post has no cover photo; `focus` is a CSS object-position. */
+  image?: { src: string; width: number; height: number; focus?: string };
 }
 
 /** Empty until the school supplies its own news. */
