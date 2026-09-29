@@ -21,7 +21,7 @@ const base = process.env.BASE_URL || 'http://localhost:3000';
    if (width <= 1024) {
     await page.getByRole('button',{name:'Open menu',exact:true}).click();
     await page.getByRole('button',{name:'Show About submenu',exact:true}).click();
-    assert.ok(await page.getByRole('dialog').getByRole('link',{name:'About Us',exact:true}).isVisible());
+    assert.ok(await page.getByRole('dialog').getByRole('link',{name:'Our Teachers',exact:true}).isVisible());
     await page.keyboard.press('Escape');
     assert.equal(await page.getByRole('button',{name:'Open menu',exact:true}).getAttribute('aria-expanded'),'false');
     assert.equal(await page.evaluate(()=>document.body.style.overflow),'');
@@ -29,7 +29,7 @@ const base = process.env.BASE_URL || 'http://localhost:3000';
     assert.equal(await page.getByRole('button',{name:'Open menu',exact:true}).isVisible(),false);
     const about=page.locator('header nav').getByRole('link',{name:'About',exact:true});
     await about.hover();
-    assert.ok(await page.locator('header nav').getByRole('link',{name:'About Us',exact:true}).isVisible());
+    assert.ok(await page.locator('header nav').getByRole('link',{name:'Our Teachers',exact:true}).isVisible());
     await page.mouse.move(width-1,800);
    }
    if(width<768) {
