@@ -152,6 +152,42 @@ const MIGRATIONS: string[] = [
     created_at TEXT NOT NULL
   );
   `,
+  `
+  CREATE TABLE jobs (
+    id INTEGER PRIMARY KEY,
+    slug TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    job_type TEXT NOT NULL DEFAULT 'Full-time',
+    category TEXT NOT NULL DEFAULT 'Teaching',
+    department TEXT NOT NULL DEFAULT '',
+    location TEXT NOT NULL DEFAULT '',
+    salary TEXT NOT NULL DEFAULT '',
+    start_date TEXT NOT NULL DEFAULT '',
+    closing_date TEXT NOT NULL DEFAULT '',
+    summary TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    responsibilities TEXT NOT NULL DEFAULT '',
+    requirements TEXT NOT NULL DEFAULT '',
+    how_to_apply TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'draft',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  ALTER TABLE messages ADD COLUMN ref TEXT NOT NULL DEFAULT '';
+  CREATE TABLE attachments (
+    id INTEGER PRIMARY KEY,
+    message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    filename TEXT NOT NULL,
+    stored_name TEXT NOT NULL,
+    mime TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX messages_ref ON messages(ref);
+  `,
+  `
+  ALTER TABLE messages ADD COLUMN stage TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrate(db: DatabaseSync): void {

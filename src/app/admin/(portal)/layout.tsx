@@ -12,6 +12,11 @@ import { logoutAction } from "../actions";
 
 export default async function PortalLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
+  const newApplications = (
+    db()
+      .prepare("SELECT COUNT(*) AS n FROM messages WHERE form IN ('student-application', 'job-application') AND stage IN ('', 'New')")
+      .get() as { n: number }
+  ).n;
   const pendingReviews = (db().prepare("SELECT COUNT(*) AS n FROM reviews WHERE status = 'pending'").get() as { n: number }).n;
 
   return (
@@ -24,7 +29,7 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <small>Staff portal</small>
           </span>
         </Link>
-        <AdminNav counts={{ inbox: countNewMessages(), reviews: pendingReviews }} />
+        <AdminNav counts={{ inbox: countNewMessages(), reviews: pendingReviews, applications: newApplications }} />
         <div className="adm-side-foot">
           <span>
             Signed in as <b>{user.name}</b>

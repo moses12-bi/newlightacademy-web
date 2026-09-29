@@ -4,6 +4,7 @@ import ConfirmSubmit from "@/components/admin/ConfirmSubmit";
 import Flash from "@/components/admin/Flash";
 import SocialComposer, { type ComposerDraft } from "@/components/admin/SocialComposer";
 import { formatDateTime } from "@/lib/admin/format";
+import { getJob } from "@/lib/server/jobs";
 import { getPostById } from "@/lib/server/posts";
 import { siteUrl } from "@/lib/server/settings";
 import { listSocialPosts, PLATFORM_LABELS, PLATFORM_MEDIA, PLATFORMS, platformStatus } from "@/lib/server/social";
@@ -48,6 +49,15 @@ export default async function SocialPage({ searchParams }: PageProps<"/admin/soc
     };
   }
 
+  const fromJob = typeof params.from_job === "string" ? getJob(Number(params.from_job)) : undefined;
+  if (fromJob) {
+    draft = {
+      caption: [`We're hiring: ${fromJob.title} (${fromJob.job_type})`, fromJob.summary, "Apply on our website:"].filter(Boolean).join("\n\n"),
+      title: `We're hiring: ${fromJob.title}`,
+      link: `${siteUrl()}/careers/${fromJob.slug}`,
+    };
+  }
+
   const history = listSocialPosts();
   const anyConnected = platforms.some((platform) => platform.connected);
 
@@ -64,6 +74,11 @@ export default async function SocialPage({ searchParams }: PageProps<"/admin/soc
       </div>
       <Flash ok={params.ok} error={params.error} />
       {fromPost ? <p className="adm-flash adm-flash--ok">Blog post saved. Choose where to share it.</p> : null}
+      {fromJob ? (
+        <p className="adm-flash adm-flash--ok">
+          Vacancy saved. Instagram and TikTok need a picture — add one, or post to Facebook with the link alone.
+        </p>
+      ) : null}
       {!anyConnected ? (
         <p className="adm-flash adm-flash--warn">
           No network is connected yet. <Link href="/admin/social/accounts">Connect the school&apos;s accounts</Link> to start

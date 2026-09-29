@@ -2,14 +2,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import ActionForm from "@/components/admin/ActionForm";
+import ConfirmSubmit from "@/components/admin/ConfirmSubmit";
+import StageSelect from "@/components/admin/StageSelect";
+import { JOB_STAGES, STUDENT_STAGES } from "@/lib/server/admissions";
 import Flash from "@/components/admin/Flash";
 import { formatDateTime } from "@/lib/admin/format";
+import { attachmentsFor } from "@/lib/server/files";
 import { mailConfigured } from "@/lib/server/mail";
 import { emailsForMessage, formLabel, getMessage, setMessageStatus } from "@/lib/server/messages";
 import { siteDetails } from "@/lib/server/site-details";
 import { site } from "@/lib/site";
 
-import { messageStatusAction, replyAction } from "../../../actions";
+import { deleteMessageAction, messageStatusAction, replyAction, setStageAction } from "../../../actions";
 
 export const metadata = { title: "Message" };
 
@@ -36,6 +40,7 @@ export default async function MessagePage({ params, searchParams }: PageProps<"/
 
   const fields = JSON.parse(message.fields_json) as Record<string, string>;
   const emails = emailsForMessage(message.id);
+  const files = attachmentsFor(message.id);
   const firstName = message.name.split(" ")[0];
 
   return (
@@ -58,12 +63,39 @@ export default async function MessagePage({ params, searchParams }: PageProps<"/
           ) : (
             <StatusButton id={message.id} status="archived" label="Archive" />
           )}
+          <form action={deleteMessageAction}>
+            <input type="hidden" name="id" value={message.id} />
+            <ConfirmSubmit
+              message={files.length ? "Delete this message and its attached files permanently?" : "Delete this message permanently?"}
+              className="adm-btn adm-btn--danger adm-btn--sm"
+            >
+              Delete
+            </ConfirmSubmit>
+          </form>
         </div>
       </div>
       <Flash ok={flash.ok} error={flash.error} />
 
       <div className="adm-grid-2">
         <div className="adm-stack">
+          {message.form === "student-application" || message.form === "job-application" ? (
+            <section className="adm-card adm-actions" style={{ justifyContent: "space-between" }}>
+              <div>
+                <b>Application stage</b>
+                <div className="adm-small adm-muted">
+                  <Link href={`/admin/applications?type=${message.form === "job-application" ? "jobs" : "students"}`}>All applications →</Link>
+                </div>
+              </div>
+              <StageSelect
+                action={setStageAction}
+                id={message.id}
+                stage={message.stage}
+                stages={message.form === "job-application" ? JOB_STAGES : STUDENT_STAGES}
+                back={`/admin/inbox/${message.id}`}
+                label="Application stage"
+              />
+            </section>
+          ) : null}
           <section className="adm-card">
             <dl className="adm-kv">
               {Object.entries(fields).map(([key, value]) => (
@@ -74,6 +106,22 @@ export default async function MessagePage({ params, searchParams }: PageProps<"/
               ))}
             </dl>
           </section>
+          {files.length ? (
+            <section className="adm-card adm-stack">
+              <h2>Attached files</h2>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 6 }}>
+                {files.map((file) => (
+                  <li key={file.id}>
+                    <a href={`/api/admin/files/${file.id}`}>{file.filename}</a>{" "}
+                    <span className="adm-muted adm-small">{Math.max(1, Math.round(file.size / 1024))} KB</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="adm-small adm-muted">
+                CVs are personal data. Delete the application once the post is filled and you no longer need it.
+              </p>
+            </section>
+          ) : null}
           {emails.length ? (
             <section className="adm-card adm-stack">
               <h2>Emails</h2>

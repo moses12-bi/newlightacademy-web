@@ -57,6 +57,8 @@ An internal portal for the school office, served by the same app at `newlight-ac
 | Section | What it does |
 |---|---|
 | **Blog** | Write, schedule (future date) and publish posts with a cover photo and full article. `/blog` reads them live. "Save & share" hands the post to the social composer. |
+| **Applications** | Student applications from `/how-to-apply` (child, class, parent, documents) and job applications from `/careers`, each moved through stages (e.g. New → Visit or assessment → Offered a place → Enrolled). Open/close online admissions and set the intake. |
+| **Careers** | Publish vacancies with type of work, category, class, closing date, responsibilities and requirements. Each gets a page at `/careers/<slug>` with an application form that takes a CV. "Save & share" posts it to social media. |
 | **Gallery** | Upload several photos at once, write descriptions, reorder and remove. `/gallery` starts from the photos that shipped in code. |
 | **Staff** | Teacher cards on `/our-teachers`: portrait (cropped to 4:5 around the face), name, role, order, and the Head Teacher shown first. |
 | **School details** | Phone, email, address, directions and the Facebook / Instagram / YouTube / TikTok links used in the header, footer and contact sections. |
@@ -89,6 +91,10 @@ An internal portal for the school office, served by the same app at `newlight-ac
 Public pages are prerendered and refreshed every five minutes, and immediately when staff change the gallery,
 staff or school details — so those edits reach the site without a redeploy. The school name, motto and page
 text are still edited in code (`src/lib/site.ts` and the page components).
+
+CVs and admission documents are stored privately in `DATA_DIR/uploads` (PDF, Word, JPG or PNG, checked by content,
+5 MB each) and can only be downloaded by signed-in staff. They are personal data: delete an application from its
+Inbox page once it is no longer needed, and its files go with it.
 
 Scheduled social posts are published by a one-minute timer inside the server process (`src/instrumentation.ts`).
 

@@ -12,6 +12,10 @@ export interface MessageRow {
   fields_json: string;
   status: MessageStatus;
   ip: string;
+  /** What the message is about, e.g. `job:12` for an application to vacancy 12. */
+  ref: string;
+  /** Where an application stands (Applications screen); empty for ordinary enquiries. */
+  stage: string;
   created_at: string;
 }
 
@@ -35,6 +39,8 @@ export const FORM_LABELS: Record<string, string> = {
   visit: "Visit request",
   newsletter: "Newsletter sign-up",
   review: "Review",
+  "job-application": "Job application",
+  "student-application": "Student application",
 };
 
 export function formLabel(form: string): string {
@@ -48,16 +54,25 @@ export function createMessage(input: {
   phone: string;
   fields: Record<string, string>;
   ip: string;
+  ref?: string;
+  stage?: string;
 }): number {
   const result = db()
-    .prepare("INSERT INTO messages (form, name, email, phone, fields_json, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
-    .run(input.form, input.name, input.email, input.phone, JSON.stringify(input.fields), input.ip, now());
+    .prepare("INSERT INTO messages (form, name, email, phone, fields_json, ip, ref, stage, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+    .run(input.form, input.name, input.email, input.phone, JSON.stringify(input.fields), input.ip, input.ref ?? "", input.stage ?? "", now());
   return Number(result.lastInsertRowid);
 }
 
-export function listMessages(filter: "open" | "archived" | "all" = "open"): MessageRow[] {
-  const where = filter === "open" ? "WHERE status != 'archived'" : filter === "archived" ? "WHERE status = 'archived'" : "";
-  return db().prepare(`SELECT * FROM messages ${where} ORDER BY created_at DESC LIMIT 500`).all() as unknown as MessageRow[];
+export function listMessages(filter: "open" | "archived" | "all" = "open", ref = ""): MessageRow[] {
+  const conditions = [filter === "open" ? "status != 'archived'" : filter === "archived" ? "status = 'archived'" : "1 = 1"];
+  if (ref) conditions.push("ref = ?");
+  return db()
+    .prepare(`SELECT * FROM messages WHERE ${conditions.join(" AND ")} ORDER BY created_at DESC LIMIT 500`)
+    .all(...(ref ? [ref] : [])) as unknown as MessageRow[];
+}
+
+export function deleteMessage(id: number): void {
+  db().prepare("DELETE FROM messages WHERE id = ?").run(id);
 }
 
 export function getMessage(id: number): MessageRow | undefined {
@@ -78,4 +93,14 @@ export function listSentEmails(limit = 100): EmailRow[] {
 
 export function countNewMessages(): number {
   return (db().prepare("SELECT COUNT(*) AS n FROM messages WHERE status = 'new'").get() as { n: number }).n;
+}
+
+export function setMessageStage(id: number, stage: string): void {
+  db().prepare("UPDATE messages SET stage = ? WHERE id = ?").run(stage, id);
+}
+
+export function listApplications(form: "student-application" | "job-application"): MessageRow[] {
+  return db()
+    .prepare("SELECT * FROM messages WHERE form = ? ORDER BY created_at DESC LIMIT 1000")
+    .all(form) as unknown as MessageRow[];
 }

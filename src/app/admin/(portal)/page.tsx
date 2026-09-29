@@ -15,6 +15,11 @@ function count(sql: string): number {
 export default async function Dashboard() {
   const stats = [
     { label: "New enquiries", value: count("SELECT COUNT(*) AS n FROM messages WHERE status = 'new'"), href: "/admin/inbox" },
+    {
+      label: "New applications",
+      value: count("SELECT COUNT(*) AS n FROM messages WHERE form IN ('student-application', 'job-application') AND stage IN ('', 'New')"),
+      href: "/admin/applications",
+    },
     { label: "Reviews to moderate", value: count("SELECT COUNT(*) AS n FROM reviews WHERE status = 'pending'"), href: "/admin/reviews" },
     { label: "Published blog posts", value: count("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'"), href: "/admin/blog" },
     {

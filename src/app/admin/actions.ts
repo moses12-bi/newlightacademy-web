@@ -23,7 +23,10 @@ import {
 import { verifyPassword } from "@/lib/server/crypto";
 import { db, logActivity } from "@/lib/server/db";
 import { sendMail, verifyMail } from "@/lib/server/mail";
-import { getMessage, setMessageStatus, type MessageStatus } from "@/lib/server/messages";
+import { deleteAttachmentFiles } from "@/lib/server/files";
+import { deleteJob, JOB_CATEGORIES, JOB_TYPES, saveJob, type JobInput } from "@/lib/server/jobs";
+import { JOB_STAGES, saveAdmissionsSettings, STUDENT_STAGES } from "@/lib/server/admissions";
+import { deleteMessage, getMessage, setMessageStage, setMessageStatus, type MessageStatus } from "@/lib/server/messages";
 import { createPost, deletePost, updatePost, type PostInput } from "@/lib/server/posts";
 import { createReview, deleteReview, setReviewStatus, type ReviewStatus } from "@/lib/server/reviews";
 import { addGalleryPhotos, moveGalleryPhoto, removeGalleryPhoto, updateGalleryAlt } from "@/lib/server/gallery";
@@ -110,6 +113,87 @@ export async function saveSiteDetailsAction(_prev: string | null, form: FormData
   logActivity(user.id, "updated school details");
   refreshSite();
   redirect(withFlash("/admin/site", "ok", "Saved. The website shows the new details within a moment."));
+}
+
+/* --------------------------------------------------------- applications -- */
+
+export async function setStageAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = Number(str(form, "id"));
+  const message = getMessage(id);
+  const stages = message?.form === "job-application" ? JOB_STAGES : STUDENT_STAGES;
+  const stage = str(form, "stage");
+  if (message && stages.includes(stage)) {
+    setMessageStage(id, stage);
+    if (message.status === "new") setMessageStatus(id, "read");
+    logActivity(user.id, `application → ${stage}`, message.name);
+  }
+  const back = str(form, "back");
+  redirect(withFlash(back.startsWith("/admin/") ? back : `/admin/inbox/${id}`, "ok", `Moved to “${stage}”.`));
+}
+
+export async function saveAdmissionsAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  saveAdmissionsSettings({
+    open: form.get("open") === "on",
+    intake: str(form, "intake").slice(0, 80),
+    note: str(form, "note").slice(0, 1000),
+  });
+  logActivity(user.id, "updated admissions settings");
+  revalidatePath("/how-to-apply");
+  redirect(withFlash("/admin/applications", "ok", "Admissions settings saved."));
+}
+
+/* -------------------------------------------------------------- careers -- */
+
+function jobInput(form: FormData): JobInput | string {
+  const title = str(form, "title");
+  if (!title) return "A job title is required.";
+  const status = (["draft", "open", "closed"].includes(str(form, "status")) ? str(form, "status") : "draft") as JobInput["status"];
+  const closing = str(form, "closing_date");
+  if (closing && !/^\d{4}-\d{2}-\d{2}$/.test(closing)) return "The closing date is not valid.";
+  const requirements = str(form, "requirements");
+  if (status === "open" && !requirements) return "List the requirements before publishing the vacancy.";
+  const jobType = str(form, "job_type");
+  const category = str(form, "category");
+  return {
+    slug: str(form, "slug"),
+    title: title.slice(0, 160),
+    job_type: (JOB_TYPES as readonly string[]).includes(jobType) ? jobType : "Full-time",
+    category: (JOB_CATEGORIES as readonly string[]).includes(category) ? category : "Other",
+    department: str(form, "department").slice(0, 120),
+    location: str(form, "location").slice(0, 160),
+    salary: str(form, "salary").slice(0, 120),
+    start_date: str(form, "start_date").slice(0, 60),
+    closing_date: closing,
+    summary: str(form, "summary").slice(0, 600),
+    description: str(form, "description").slice(0, 20_000),
+    responsibilities: str(form, "responsibilities").slice(0, 10_000),
+    requirements: requirements.slice(0, 10_000),
+    how_to_apply: str(form, "how_to_apply").slice(0, 4_000),
+    status,
+  };
+}
+
+export async function saveJobAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = jobInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id")) || undefined;
+  const job = saveJob(input, id);
+  logActivity(user.id, id ? "updated vacancy" : "created vacancy", job.title);
+  revalidatePath("/careers");
+  if (str(form, "share") === "1" && job.status === "open") redirect(`/admin/social?from_job=${job.id}`);
+  redirect(withFlash(`/admin/careers/${job.id}`, "ok", job.status === "open" ? "Saved and published on /careers." : "Saved."));
+}
+
+export async function deleteJobAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = Number(str(form, "id"));
+  deleteJob(id);
+  logActivity(user.id, "deleted vacancy", String(id));
+  revalidatePath("/careers");
+  redirect(withFlash("/admin/careers", "ok", "Vacancy deleted. Applications already received stay in the Inbox."));
 }
 
 /* -------------------------------------------------------------- gallery -- */
@@ -349,6 +433,19 @@ export async function messageStatusAction(form: FormData): Promise<void> {
   const status = str(form, "status") as MessageStatus;
   if (["new", "read", "replied", "archived"].includes(status)) setMessageStatus(id, status);
   redirect(str(form, "back") === "list" ? "/admin/inbox" : `/admin/inbox/${id}`);
+}
+
+/** Deletes an enquiry and any files that came with it — e.g. an applicant's CV. */
+export async function deleteMessageAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = Number(str(form, "id"));
+  const message = getMessage(id);
+  if (message) {
+    deleteAttachmentFiles(id);
+    deleteMessage(id);
+    logActivity(user.id, "deleted enquiry", `${message.form} ${message.name}`.trim());
+  }
+  redirect(withFlash("/admin/inbox", "ok", "Deleted, with any attached files."));
 }
 
 export async function replyAction(_prev: string | null, form: FormData): Promise<string | null> {

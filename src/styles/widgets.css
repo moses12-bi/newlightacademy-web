@@ -421,3 +421,5 @@ textarea.w-form__control { min-height: 120px; resize: vertical; }
   .w-form__control { font-size: 16px; }
   .w-form__field { width: 100%; }
 }
+.w-form__hint { display: block; margin-top: 6px; font-size: 14px; color: var(--color-muted); }
+input[type="file"].w-form__control { padding: 12px; }

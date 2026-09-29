@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import CareersBenefits from "@/components/sections/careers/CareersBenefits";
 import CareersCta from "@/components/sections/careers/CareersCta";
 import CareersPerks from "@/components/sections/careers/CareersPerks";
+import CareersVacancies from "@/components/sections/careers/CareersVacancies";
 import PageHero from "@/components/ui/PageHero";
+import { openJobs } from "@/lib/server/jobs";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -18,7 +20,7 @@ export default function CareersPage() {
       <PageHero
         className="careers-hero"
         title="Careers"
-        lead="We would be glad to hear from teachers who would like to join our nursery and primary classes."
+        lead="See our open positions below, and apply online."
         dividerFill={{ top: "var(--color-accent-5)", bottom: "var(--color-tint-powder)" }}
         image={{
           src: "/images/fox-color.svg",
@@ -30,6 +32,7 @@ export default function CareersPage() {
         }}
       />
       <CareersPerks />
+      <CareersVacancies jobs={openJobs()} />
       <CareersBenefits />
       <CareersCta />
     </>

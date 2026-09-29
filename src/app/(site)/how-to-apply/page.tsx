@@ -5,6 +5,8 @@ import ApplyChoices from "@/components/sections/how-to-apply/ApplyChoices";
 import ApplyForm from "@/components/sections/how-to-apply/ApplyForm";
 import ApplySteps from "@/components/sections/how-to-apply/ApplySteps";
 import PageHero from "@/components/ui/PageHero";
+import { admissionsSettings, CLASSES } from "@/lib/server/admissions";
+import { ACCEPTED_EXTENSIONS } from "@/lib/server/files";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -46,7 +48,7 @@ export default function HowToApplyPage() {
 
       <ApplyChoices />
       <ApplySteps />
-      <ApplyForm />
+      <ApplyForm admissions={admissionsSettings()} classes={CLASSES} accept={ACCEPTED_EXTENSIONS} />
     </>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import Flash from "@/components/admin/Flash";
 import { formatDateTime } from "@/lib/admin/format";
+import { getJob } from "@/lib/server/jobs";
 import { formLabel, listMessages } from "@/lib/server/messages";
 
 export const metadata = { title: "Inbox" };
@@ -9,7 +10,8 @@ export const metadata = { title: "Inbox" };
 export default async function InboxPage({ searchParams }: PageProps<"/admin/inbox">) {
   const params = await searchParams;
   const view = params.view === "archived" ? "archived" : "open";
-  const messages = listMessages(view);
+  const job = typeof params.job === "string" ? getJob(Number(params.job)) : undefined;
+  const messages = listMessages(job ? "all" : view, job ? `job:${job.id}` : "");
 
   return (
     <>
@@ -28,6 +30,11 @@ export default async function InboxPage({ searchParams }: PageProps<"/admin/inbo
         </div>
       </div>
       <Flash ok={params.ok} error={params.error} />
+      {job ? (
+        <p className="adm-flash adm-flash--ok">
+          Applications for <b>{job.title}</b> (including archived). <Link href="/admin/inbox">Show everything</Link>
+        </p>
+      ) : null}
       {messages.length === 0 ? (
         <div className="adm-card adm-empty">No messages here.</div>
       ) : (

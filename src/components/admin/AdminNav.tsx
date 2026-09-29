@@ -7,6 +7,8 @@ const ITEMS = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/social", label: "Social media" },
+  { href: "/admin/applications", label: "Applications", countKey: "applications" },
+  { href: "/admin/careers", label: "Careers" },
   { href: "/admin/gallery", label: "Gallery" },
   { href: "/admin/staff", label: "Staff" },
   { href: "/admin/site", label: "School details" },
@@ -16,7 +18,7 @@ const ITEMS = [
   { href: "/admin/settings", label: "Settings" },
 ] as const;
 
-export default function AdminNav({ counts }: { counts: { inbox: number; reviews: number } }) {
+export default function AdminNav({ counts }: { counts: { inbox: number; reviews: number; applications: number } }) {
   const pathname = usePathname();
   return (
     <nav className="adm-nav" aria-label="Portal">

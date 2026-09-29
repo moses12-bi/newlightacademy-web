@@ -39,6 +39,7 @@ export interface OutgoingMail {
   replyTo?: string;
   messageId?: number | null;
   sentBy?: number | null;
+  attachments?: { filename: string; content: Buffer; contentType: string }[];
 }
 
 export async function sendMail(mail: OutgoingMail): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -61,6 +62,7 @@ export async function sendMail(mail: OutgoingMail): Promise<{ ok: true } | { ok:
       replyTo: mail.replyTo,
       subject: mail.subject,
       text: mail.text,
+      attachments: mail.attachments,
     });
     record("sent");
     return { ok: true };

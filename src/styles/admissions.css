@@ -543,3 +543,5 @@
 @media (max-width: 767px) {
   .tour-formband { margin-bottom: 70px; padding: 50px 0 70px; }
 }
+.hta-formband__title { margin-bottom: 12px; }
+.hta-formband__note { margin-bottom: 24px; font-size: 17px; }
