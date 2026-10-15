@@ -282,8 +282,7 @@ function postInput(form: FormData): PostInput | string {
   const date = str(form, "published_at");
   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return "The date is not valid.";
   const imageUrl = str(form, "image_url");
-  if (imageUrl && !/^https:\/\//.test(imageUrl)) return "The image must be an https:// address.";
-  if (status === "published" && !imageUrl) return "Add a cover photo before publishing — the blog cards need one.";
+  if (imageUrl && !/^(https:\/\/|\/images\/)/.test(imageUrl)) return "The image must be an https:// address.";
   return {
     title: title.slice(0, 200),
     slug: str(form, "slug"),
@@ -293,6 +292,7 @@ function postInput(form: FormData): PostInput | string {
     image_url: imageUrl,
     image_width: Number(str(form, "image_width")) || 1200,
     image_height: Number(str(form, "image_height")) || 800,
+    image_focus: /^\d{1,3}% \d{1,3}%$/.test(str(form, "image_focus")) && imageUrl ? str(form, "image_focus") : "",
     status,
     published_at: date,
   };

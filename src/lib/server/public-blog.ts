@@ -6,6 +6,16 @@ import { blogArchiveSlugs, getPost as getStaticPost, getPosts as getStaticPosts,
 
 import { getPublishedPostBySlug, listPublishedPosts, type PostRow } from "./posts";
 
+/**
+ * Where the crop centres. Staff can set it by clicking the photo in the editor;
+ * otherwise a portrait photo is framed from near the top — where faces usually
+ * are — rather than from its middle.
+ */
+function coverFocus(row: PostRow): string {
+  if (row.image_focus) return row.image_focus;
+  return row.image_height > row.image_width ? "50% 20%" : "50% 50%";
+}
+
 function toBlogPost(row: PostRow): BlogPost {
   return {
     slug: row.slug,
@@ -14,7 +24,9 @@ function toBlogPost(row: PostRow): BlogPost {
     excerpt: row.excerpt,
     body: row.body,
     date: (row.published_at ?? row.created_at).slice(0, 10),
-    image: { src: row.image_url, width: row.image_width || 1200, height: row.image_height || 800 },
+    image: row.image_url
+      ? { src: row.image_url, width: row.image_width || 1200, height: row.image_height || 800, focus: coverFocus(row) }
+      : undefined,
   };
 }
 
