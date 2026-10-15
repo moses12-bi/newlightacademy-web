@@ -161,8 +161,14 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
               alt={photo.alt ?? `Gallery photo ${index + 1} of ${total}`}
               width={photo.width}
               height={photo.height}
-              sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 620px"
+              sizes="(max-width: 420px) 100vw, (max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
             />
+            {/* A dark gradient foot carries the short label and keeps it legible
+                over any photograph. The whole tile is the link, so the overlay
+                is decorative and hidden from assistive tech. */}
+            <span className="gallery-item__overlay" aria-hidden="true">
+              {photo.label ? <span className="gallery-item__label">{photo.label}</span> : null}
+            </span>
           </a>
         ))}
       </div>
@@ -179,7 +185,8 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
         >
           <div className="gallery-lightbox__bar">
             <p id={titleId} className="gallery-lightbox__count">
-              {`Gallery photo ${openIndex + 1} of ${total}`}
+              {current.label ? <span className="gallery-lightbox__label">{current.label}</span> : null}
+              <span className="gallery-lightbox__index">{`${openIndex + 1} of ${total}`}</span>
             </p>
             <button ref={closeRef} type="button" className="gallery-lightbox__button" onClick={close}>
               <CloseIcon />

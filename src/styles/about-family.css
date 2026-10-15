@@ -55,42 +55,122 @@
    the image that overruns a row when doing so lands nearer the ideal height).
    Counts verified at 320/390/768/1024/1025/1280/1440 = 1/2/3/4/2/2/2; once the
    count matches, the row geometry matches the original exactly. */
+/* A precise masonry: CSS columns let each photograph keep its own aspect ratio
+   and stack into balanced columns, like a photo album laid out by hand. Each
+   tile carries a dark gradient foot with a short label, rounded corners and a
+   lift-and-zoom on hover. `--gallery-ar` (set per item in the markup) drives the
+   tile's height from its own ratio. The `margin-bottom` matches `column-gap`,
+   so the vertical and horizontal gutters are identical. */
 .gallery-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gallery-gap, 30px);
-  --gallery-row: 271px;
+  columns: 4;
+  column-gap: var(--gallery-gap, 18px);
 }
 .gallery-item {
   position: relative;
-  flex: var(--gallery-ar) 1 calc(var(--gallery-ar) * var(--gallery-row));
-  min-width: 0;
+  display: block;
+  width: 100%;
+  margin: 0 0 var(--gallery-gap, 18px);
+  break-inside: avoid;
   aspect-ratio: var(--gallery-ar);
   overflow: hidden;
-  border: var(--image-border-width, 10px) solid var(--color-accent-5);
-  border-radius: 46px;
-  background: var(--color-accent-5);
-  transition: border-radius 300ms;
+  border-radius: 16px;
+  background: var(--color-accent-7);
+  box-shadow: 0 1px 3px rgba(6, 61, 20, 0.08);
+  transform: translateZ(0);
+  transition: transform 350ms cubic-bezier(0.2, 0.6, 0.2, 1), box-shadow 350ms ease;
 }
 .gallery-item:hover,
 .gallery-item:focus-visible {
-  border-radius: 26px;
+  transform: translateY(-5px);
+  box-shadow: 0 18px 38px rgba(6, 61, 20, 0.24);
+}
+.gallery-item:focus-visible {
+  outline: 3px solid var(--color-nav-7);
+  outline-offset: 3px;
 }
 .gallery-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* `image_hover_animation: shrink-contained` — the widget's own stylesheet is
-     not in the capture, so the scale step here is a reconstruction; the
-     300ms duration and the hover filter are ported from post-1039. */
-  transform: scale(1.12);
-  filter: contrast(100%) saturate(100%);
-  transition: transform 300ms, filter 300ms;
+  display: block;
+  transition: transform 600ms cubic-bezier(0.2, 0.6, 0.2, 1), filter 350ms ease;
 }
 .gallery-item:hover img,
 .gallery-item:focus-visible img {
-  transform: scale(1);
-  filter: contrast(97%) saturate(150%);
+  transform: scale(1.06);
+  filter: saturate(108%);
+}
+/* The gradient foot: dark enough at the base to carry white text, fading to
+   clear by two-thirds up so the photograph is barely touched. It deepens on
+   hover and the label rises a touch, the only motion in the overlay. */
+.gallery-item__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px 18px;
+  background: linear-gradient(
+    to top,
+    rgba(6, 61, 20, 0.78) 0%,
+    rgba(6, 61, 20, 0.34) 30%,
+    rgba(6, 61, 20, 0) 62%
+  );
+  transition: background 350ms ease;
+  pointer-events: none;
+}
+.gallery-item:hover .gallery-item__overlay,
+.gallery-item:focus-visible .gallery-item__overlay {
+  background: linear-gradient(
+    to top,
+    rgba(6, 61, 20, 0.86) 0%,
+    rgba(6, 61, 20, 0.44) 40%,
+    rgba(6, 61, 20, 0.04) 72%
+  );
+}
+.gallery-item__label {
+  position: relative;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  padding-left: 12px;
+  transform: translateY(3px);
+  transition: transform 350ms ease;
+}
+/* A short gold tick to the left of the label — the one brand accent on the tile,
+   growing from a dot to a bar as the tile is hovered. */
+.gallery-item__label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  bottom: 0.18em;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--color-nav-7);
+  transform: scaleY(0.4);
+  transform-origin: center;
+  transition: transform 350ms ease;
+}
+.gallery-item:hover .gallery-item__label,
+.gallery-item:focus-visible .gallery-item__label {
+  transform: translateY(0);
+}
+.gallery-item:hover .gallery-item__label::before,
+.gallery-item:focus-visible .gallery-item__label::before {
+  transform: scaleY(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-item,
+  .gallery-item img,
+  .gallery-item__overlay,
+  .gallery-item__label,
+  .gallery-item__label::before {
+    transition: none;
+  }
 }
 
 /* Lightbox */
@@ -111,7 +191,19 @@
   color: var(--color-accent-5);
 }
 .gallery-lightbox__count {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
   font-size: 16px;
+  font-weight: 600;
+}
+.gallery-lightbox__label {
+  font-weight: 800;
+  font-size: 18px;
+}
+.gallery-lightbox__index {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
   font-weight: 600;
 }
 .gallery-lightbox__stage {
@@ -170,8 +262,8 @@
     padding: 50px 0;
   }
   .gallery-grid {
-    --gallery-row: 123px;
-    --gallery-gap: 20px;
+    columns: 3;
+    --gallery-gap: 16px;
   }
 }
 @media (max-width: 767px) {
@@ -182,16 +274,21 @@
     width: 100%;
   }
   .gallery-grid {
-    --gallery-row: 92px;
+    columns: 2;
+    --gallery-gap: 12px;
   }
-  /* The rows are only ~100px tall here, so the frame is scaled with them. */
   .gallery-item {
-    border-width: 6px;
-    border-radius: 30px;
+    border-radius: 12px;
   }
-  .gallery-item:hover,
-  .gallery-item:focus-visible {
-    border-radius: 18px;
+  .gallery-item__overlay {
+    padding: 12px 13px;
+  }
+  .gallery-item__label {
+    font-size: 14px;
+    padding-left: 10px;
+  }
+  .gallery-item__label::before {
+    width: 3px;
   }
 }
 

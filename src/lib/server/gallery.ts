@@ -31,6 +31,11 @@ export function listGallery(): GalleryRow[] {
 /** What the public gallery renders. Falls back to the code list if the database is unavailable. */
 export function publicGallery(): GalleryPhoto[] {
   if (isBuildPhase()) return defaultPhotos;
+  /* Short tile labels live in code, not in the gallery table, so the schema is
+     untouched: match each stored row back to its seed photo by `src` and carry
+     the label across. A staff-uploaded photo with no code match simply has no
+     label, which the grid renders as a plain tile. */
+  const labelBySrc = new Map(defaultPhotos.map((photo) => [photo.src, photo.label]));
   try {
     return listGallery().map((row) => ({
       src: row.src,
@@ -38,6 +43,7 @@ export function publicGallery(): GalleryPhoto[] {
       height: row.height,
       ratio: row.width / row.height,
       alt: row.alt,
+      label: labelBySrc.get(row.src),
     }));
   } catch (error) {
     console.warn("[gallery] portal database unavailable, using defaults:", error);
