@@ -38,10 +38,10 @@ export default function OurGraduates() {
               wider to the left instead of just shifting and leaving a gap */}
           <div data-motion="photo" className="photo-motion">
             <Image
-              src="/images/h-02.jpg"
-              alt="A smiling girl in denim dungarees shading her eyes with one hand while playing outdoors"
-              width={1000}
-              height={650}
+              src="/images/school/graduates.webp"
+              alt="Pupils in red graduation gowns and caps standing together in front of the school building"
+              width={1600}
+              height={1040}
               sizes="(min-width: 1320px) 670px, (min-width: 1025px) 50vw, 100vw"
               className="h-auto w-full rounded-[7px]"
             />
