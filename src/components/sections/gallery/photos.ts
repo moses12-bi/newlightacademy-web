@@ -25,9 +25,7 @@ export interface GalleryPhoto {
  * scripts/photo-picks.cjs and re-run it, so the dimensions stay tied to the
  * files on disk.
  *
- * The school has confirmed it holds parental consent for these images. The
- * gallery page carries a route for a parent to ask for a photograph of their
- * child to be removed, which Rwanda's Law 058/2021 requires alongside consent.
+ * The school has confirmed it holds parental consent for these images.
  */
 export const galleryPhotos: GalleryPhoto[] = [
   {
