@@ -6,6 +6,17 @@ import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, MouseEvent as 
 
 import { CloseIcon } from "@/components/ui/icons";
 import type { GalleryPhoto } from "@/components/sections/gallery/photos";
+import { cloudinaryUrlLoader, isCloudinaryUrl } from "@/lib/cloudinary";
+
+/** Photos hosted on Cloudinary are resized there; local files go through next/image. */
+function loaderFor(src: string) {
+  return isCloudinaryUrl(src) ? cloudinaryUrlLoader : undefined;
+}
+
+/** The tile's own link (the no-JavaScript view): a large copy, never a 6000px original. */
+function fullSizeHref(src: string): string {
+  return isCloudinaryUrl(src) ? cloudinaryUrlLoader({ src, width: 1920 }) : src;
+}
 
 export interface GalleryJustifiedProps {
   photos: GalleryPhoto[];
@@ -150,7 +161,7 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
             ref={(node) => {
               triggersRef.current[index] = node;
             }}
-            href={photo.src}
+            href={fullSizeHref(photo.src)}
             className="gallery-item"
             style={{ "--gallery-ar": photo.ratio } as CSSProperties}
             onClick={(event) => handleThumbClick(event, index)}
@@ -158,6 +169,7 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
           >
             <Image
               src={photo.src}
+              loader={loaderFor(photo.src)}
               alt={photo.alt ?? `Gallery photo ${index + 1} of ${total}`}
               width={photo.width}
               height={photo.height}
@@ -199,6 +211,7 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
               <Image
                 key={current.src}
                 src={current.src}
+                loader={loaderFor(current.src)}
                 alt={current.alt ?? `Gallery photo ${openIndex + 1} of ${total}`}
                 width={current.width}
                 height={current.height}

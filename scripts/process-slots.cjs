@@ -14,6 +14,8 @@ const path = require("node:path");
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 
 const ARCHIVE = process.env.PHOTO_ARCHIVE || "C:/Users/moses/Downloads/school_theme/newlight-accademy_images";
+/* The "new light" folder: the school's second batch of photographs. */
+const NEW_LIGHT = process.env.NEW_LIGHT_SRC || "C:/Users/moses/Downloads/new light";
 const OUT = path.join(__dirname, "..", "public", "images", "school");
 
 const JOBS = [
@@ -25,6 +27,46 @@ const JOBS = [
     to: "graduates",
     crop: { x: 0, y: 0.025, w: 1, h: 0.975 },
     maxW: 1600,
+  },
+  /* /about, "Health and safety" (HealthAndSafety.tsx, 1000x800 = 5:4): a
+     teacher helping a child in the nursery room. */
+  {
+    from: path.join(NEW_LIGHT, "KARISIMBI im(12).jpg.jpeg"),
+    to: "nursery-classroom-help",
+    crop: { x: 0.1683, y: 0, w: 0.8317, h: 1 },
+    maxW: 1400,
+  },
+  /* /about, "Our community" (OurCommunity.tsx, 1000x650 = 20:13): the campus
+     and its court. */
+  {
+    from: path.join(NEW_LIGHT, "KARISIMBI im(5).jpg.jpeg"),
+    to: "campus-and-court",
+    crop: { x: 0, y: 0, w: 1, h: 0.9769 },
+    maxW: 1600,
+  },
+  /* /make-a-payment, intro (PaymentIntro.tsx, 1000x650 = 20:13): a lesson,
+     trimmed of the orange door frame at the right. */
+  {
+    from: path.join(NEW_LIGHT, "KARISIMBI im(3).jpg.jpeg"),
+    to: "classroom-lesson",
+    crop: { x: 0, y: 0.07, w: 0.82, h: 0.8011 },
+    maxW: 1600,
+  },
+  /* /make-a-payment, paying online (PaymentOnline.tsx, 800x800 = 1:1): pupils
+     waving from the school bus. */
+  {
+    from: path.join(NEW_LIGHT, "KARISIMBI im(14).jpg.jpeg"),
+    to: "pupils-on-the-bus",
+    crop: { x: 0.1, y: 0, w: 0.6653, h: 1 },
+    maxW: 1200,
+  },
+  /* /student-handbook, intro (HandbookIntro.tsx, 1000x550 = 20:11): a class
+     lined up in front of the building with the map murals. */
+  {
+    from: path.join(NEW_LIGHT, "KARISIMBI im(6).jpg.jpeg"),
+    to: "line-up-by-the-murals",
+    crop: { x: 0, y: 0.1, w: 1, h: 0.8266 },
+    maxW: 1800,
   },
 ];
 

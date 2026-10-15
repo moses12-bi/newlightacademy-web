@@ -15,10 +15,10 @@ export default function PaymentIntro() {
         <div className="payment-split">
           <div className="payment-photo payment-photo--left">
             <Image
-              src="/images/make-a-payment/h-15-pj0d3vs1788ldqqw29xrngp02odru7vhbabp90m7hg.jpg"
-              alt="Three children crouching on a woodland path, examining the ground through magnifying glasses"
-              width={1000}
-              height={650}
+              src="/images/school/classroom-lesson.webp"
+              alt="A teacher in a white coat talks to a class of young pupils seated at shared wooden desks, with charts on the classroom wall"
+              width={1600}
+              height={1040}
               sizes="(max-width: 1024px) 100vw, 50vw"
               data-fx='{"translateY":{"speed":4,"affectedRange":{"start":0,"end":100}}}'
               data-fx-range="page"

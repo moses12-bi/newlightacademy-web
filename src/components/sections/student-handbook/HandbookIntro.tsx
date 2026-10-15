@@ -15,10 +15,10 @@ export default function HandbookIntro() {
         <div className="handbook-split">
           <div className="handbook-photo">
             <Image
-              src="/images/student-handbook/h-09-pj0d5ajbga5ic3cvht75v01vrmze3zhsws234zzz3w.jpg"
-              alt="Six women of different ages sitting together on a sofa, smiling at the camera"
-              width={1000}
-              height={550}
+              src="/images/school/line-up-by-the-murals.webp"
+              alt="Pupils in yellow and green shirts line up on an outdoor court in front of a brick school building with world-map murals and palm trees"
+              width={1800}
+              height={990}
               sizes="(max-width: 1024px) 100vw, 50vw"
               data-fx='{"translateY":{"speed":2,"affectedRange":{"start":0,"end":100}}}'
               data-fx-devices="desktop,tablet"

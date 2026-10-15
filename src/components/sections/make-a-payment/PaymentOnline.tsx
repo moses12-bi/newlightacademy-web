@@ -55,10 +55,10 @@ export default function PaymentOnline() {
 
           <div className="payment-photo payment-photo--right">
             <Image
-              src="/images/make-a-payment/h-17-pj0d456cnv2kzwqrvtnaz41xab8w4aei06wmuc48cg.jpg"
-              alt="A toddler in dungarees kneeling on a rug, pushing a wooden train around a track"
-              width={800}
-              height={800}
+              src="/images/school/pupils-on-the-bus.webp"
+              alt="Smiling pupils in yellow and green school shirts pose and wave inside a bus with green seats"
+              width={1200}
+              height={1200}
               sizes="(max-width: 1024px) 100vw, 50vw"
               data-fx='{"translateY":{"speed":4,"affectedRange":{"start":0,"end":100}}}'
               data-fx-range="page"

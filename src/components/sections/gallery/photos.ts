@@ -1,5 +1,5 @@
 export interface GalleryPhoto {
-  /** Local file under public/images/school/. */
+  /** A file under public/images/school/, or a full Cloudinary delivery URL. */
   src: string;
   width: number;
   height: number;

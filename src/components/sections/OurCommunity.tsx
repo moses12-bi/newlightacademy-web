@@ -16,10 +16,10 @@ export default function OurCommunity() {
               the right rather than shifting and leaving a gap on the left */}
           <div data-motion="photo" className="photo-motion">
             <Image
-              src="/images/h-09.jpg"
-              alt="Six women of different ages sitting close together on a sofa, laughing"
-              width={1000}
-              height={650}
+              src="/images/school/campus-and-court.webp"
+              alt="Colourful two-storey school buildings and landscaped gardens, with pupils gathered on an outdoor court under the trees"
+              width={1600}
+              height={1040}
               sizes="(min-width: 1320px) 670px, (min-width: 1025px) 50vw, 100vw"
               className="h-auto w-full rounded-[7px]"
             />

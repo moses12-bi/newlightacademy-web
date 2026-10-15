@@ -45,10 +45,10 @@ export default function HealthAndSafety() {
               left instead of just shifting and leaving a gap */}
           <div data-motion="photo" className="photo-motion">
             <Image
-              src="/images/h-07.jpg"
-              alt="A girl lying on the floor writing in a notebook, with shelves of books behind her"
-              width={1000}
-              height={800}
+              src="/images/school/nursery-classroom-help.webp"
+              alt="Nursery children sit on colourful plastic chairs in a classroom decorated with word and picture cards, while a teacher in a white coat bends to help a child"
+              width={1400}
+              height={1120}
               sizes="(min-width: 1320px) 670px, (min-width: 1025px) 50vw, 100vw"
               className="h-auto w-full rounded-[7px]"
             />
