@@ -1,6 +1,7 @@
 import VideoLightbox from "@/components/programs/VideoLightbox";
 import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
+import { schoolVideo } from "@/lib/site";
 
 /**
  * post-46 #f948bec: a full-width band whose Elementor background is a YouTube
@@ -16,7 +17,7 @@ export default function ProgramsVideoBand() {
       <ShapeDivider position="bottom" />
       <Container>
         <div className="programs-video__inner">
-          <VideoLightbox videoId="67ouh2PgUfk" label="Play the video" />
+          <VideoLightbox videoId={schoolVideo.id} label="Play the video" />
         </div>
       </Container>
     </section>

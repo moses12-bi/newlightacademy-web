@@ -3,9 +3,16 @@
  * code; after that staff manage names, roles, portraits, order and the Head
  * Teacher (always shown first) in the portal.
  */
-import { DEFAULT_TEAM, type TeamMember } from "@/components/sections/our-teachers/team-data";
+import { DEFAULT_TEAM, RETIRED_DEFAULT_PHOTOS, type TeamMember } from "@/components/sections/our-teachers/team-data";
 
 import { db, getContent, isBuildPhase, now, setContent } from "./db";
+
+/**
+ * Bump when DEFAULT_TEAM changes in a way a live site should pick up.
+ *   1 — the first six portraits (teacher-1 … teacher-6)
+ *   2 — the school's studio portraits (staff-01 … staff-07)
+ */
+const STAFF_SEED_VERSION = 2;
 
 export interface StaffRow {
   id: number;
@@ -18,11 +25,43 @@ export interface StaffRow {
   position: number;
 }
 
+/**
+ * Seeds the grid on first use, and brings a database seeded by an earlier
+ * DEFAULT_TEAM up to date.
+ *
+ * The live site was seeded before the school's studio portraits arrived, and a
+ * seeded database ignores later changes to DEFAULT_TEAM. So an upgrade retires
+ * the old placeholder rows — but ONLY rows staff have not touched: no name, no
+ * role, not the Head Teacher, still on one of the retired photos. Anything a
+ * member of staff named, re-photographed, promoted or added in the portal is
+ * theirs and is kept, and the new portraits are appended after it.
+ */
 function seed(): void {
-  if (getContent<boolean>("staff_seeded")) return;
-  const insert = db().prepare("INSERT INTO staff (name, role, photo, position, created_at) VALUES (?, ?, ?, ?, ?)");
-  DEFAULT_TEAM.forEach((member, index) => insert.run(member.name ?? "", member.role ?? "", member.photo, index, now()));
+  const recorded = getContent<number>("staff_seed_version");
+  const version = recorded ?? (getContent<boolean>("staff_seeded") ? 1 : 0);
+  if (version >= STAFF_SEED_VERSION) return;
+
+  const handle = db();
+  if (version >= 1 && RETIRED_DEFAULT_PHOTOS.length > 0) {
+    const placeholders = RETIRED_DEFAULT_PHOTOS.map(() => "?").join(", ");
+    handle
+      .prepare(
+        `DELETE FROM staff WHERE name = '' AND role = '' AND is_head = 0 AND photo IN (${placeholders})`,
+      )
+      .run(...RETIRED_DEFAULT_PHOTOS);
+  }
+
+  const max = handle.prepare("SELECT MAX(position) AS hi FROM staff").get() as { hi: number | null };
+  let position = (max.hi ?? -1) + 1;
+  const insert = handle.prepare(
+    "INSERT INTO staff (name, role, photo, width, height, position, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  );
+  for (const member of DEFAULT_TEAM) {
+    insert.run(member.name ?? "", member.role ?? "", member.photo, 800, 1000, position, now());
+    position += 1;
+  }
   setContent("staff_seeded", true);
+  setContent("staff_seed_version", STAFF_SEED_VERSION);
 }
 
 /** Head Teacher first, then everyone else in the order staff set. */

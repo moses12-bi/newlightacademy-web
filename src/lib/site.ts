@@ -142,3 +142,14 @@ export function mapSearchUrl(): string {
 export function socialByIcon(icon: SocialIcon, info: SiteDetails = site): SocialLink | undefined {
   return info.socials.find((social) => social.icon === icon);
 }
+
+/**
+ * The school's own introduction video, from its YouTube channel
+ * (@NewLightAcademy-x7v). Every video slot on the site plays this one, so a new
+ * film is a one-line change here. `title` is the video's own YouTube title; it
+ * names the iframe and the play button.
+ */
+export const schoolVideo = {
+  id: "fEIQgX3muMQ",
+  title: "New Light Academy where the better future begins",
+} as const;

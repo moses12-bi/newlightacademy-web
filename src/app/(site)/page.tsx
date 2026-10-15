@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import ShapeDivider from "@/components/ui/ShapeDivider";
 import VideoFrame from "@/components/ui/VideoFrame";
-import { displayPhone, site } from "@/lib/site";
+import { displayPhone, schoolVideo, site } from "@/lib/site";
 import { siteDetails } from "@/lib/server/site-details";
 
 export const metadata: Metadata = {
@@ -101,7 +101,7 @@ export default function HomePage() {
       </section>
 
       <section className="home-testimonials"><Container className="home-testimonial-layout">
-        <div className="home-testimonial-tv" data-reveal="jello"><Image src="/images/tv-top.svg" alt="" width={266} height={129} unoptimized className="home-tv-top" /><div className="home-tv-screen"><VideoFrame videoId="SXNboPPEQKI" title="A short video about early learning" poster="/images/school/graduation-assembly.jpg" /></div><Image src="/images/tv-bottom.svg" alt="" width={205} height={53} unoptimized className="home-tv-bottom" /></div>
+        <div className="home-testimonial-tv" data-reveal="jello"><Image src="/images/tv-top.svg" alt="" width={266} height={129} unoptimized className="home-tv-top" /><div className="home-tv-screen"><VideoFrame videoId={schoolVideo.id} title={schoolVideo.title} poster="/images/school/graduation-assembly.jpg" /></div><Image src="/images/tv-bottom.svg" alt="" width={205} height={53} unoptimized className="home-tv-bottom" /></div>
         <div className="home-testimonial-copy"><div className="home-section-heading"><span>Happy</span><h2>children. That is what we<br />hope for every child.</h2></div><p>Learning begins early, and it begins with feeling safe and cared for. That is the work we set ourselves at {site.name}: curiosity, kindness and steady progress, day after day.</p><Button href="/about" variant="outline">More About Our School</Button></div>
         <Image src="/images/home/illustration-people-3.svg" alt="" width={320} height={250} unoptimized className="home-testimonial-people" />
       </Container></section>

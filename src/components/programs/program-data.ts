@@ -1,4 +1,4 @@
-import { site } from "@/lib/site";
+import { schoolVideo, site } from "@/lib/site";
 /**
  * The six program detail pages are one Elementor template with six sets of
  * copy. post-1050 / 1054 / 1056 / 1058 / 1060 / 1062 were diffed against each
@@ -40,7 +40,7 @@ export interface Program {
 }
 
 /** The YouTube id every one of the six hero play buttons opens. */
-export const HERO_VIDEO_ID = "67ouh2PgUfk";
+export const HERO_VIDEO_ID = schoolVideo.id;
 
 /** "About" band, identical on all six pages. */
 export const ABOUT_PARAGRAPHS: readonly string[] = [

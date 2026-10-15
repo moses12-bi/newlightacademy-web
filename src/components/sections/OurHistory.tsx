@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import IconList from "@/components/ui/IconList";
 import VideoFrame from "@/components/ui/VideoFrame";
-import { site } from "@/lib/site";
+import { schoolVideo, site } from "@/lib/site";
 
 const STATS: string[] = [
   "Nursery and primary in one school, from Baby Class through to P6",
@@ -26,7 +26,7 @@ export default function OurHistory() {
             className="mx-auto block h-auto w-[266px] max-w-full"
           />
           <div className="-my-px overflow-hidden rounded-[36px] border-[20px] border-solid border-accent-3">
-            <VideoFrame videoId="67ouh2PgUfk" title="Introductory video" poster="/images/school/campus-courtyard.jpg" />
+            <VideoFrame videoId={schoolVideo.id} title={schoolVideo.title} poster="/images/school/campus-courtyard.jpg" />
           </div>
           <Image
             src="/images/tv-bottom.svg"

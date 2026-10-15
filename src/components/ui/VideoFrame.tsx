@@ -23,7 +23,9 @@ const IFRAME_ALLOW =
 export default function VideoFrame({ videoId, title, poster }: VideoFrameProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const posterSrc = poster ?? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  /* Full-HD frame (1280x720) when no local poster is given; the 480px
+     `hqdefault` looked soft at the sizes this player is shown. */
+  const posterSrc = poster ?? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 
   /* Starting playback unmounts the focused play button, which would otherwise drop
      focus back to <body>. Hand it to the player that replaced it instead. */

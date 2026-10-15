@@ -389,18 +389,94 @@
   padding: 0 10% 0 20%;
 }
 
-/* #f1b0259: a full-width row of six flip boxes. */
+/* #f1b0259: the teaching team — the whole staff together, then a portrait card
+   for each member. The cards are static on purpose: the theme's flip boxes
+   swapped each photograph for a blank panel of text on hover. */
 .teachers-team {
-  overflow: hidden;
-  margin: 50px 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  margin: 60px 0 40px;
 }
-/* The shared `slide` flip box parks its hidden face outside the card, so on the
-   wrapped tablet/phone grids it would draw over the row above. Clipped here
-   only for this page; the widget layer owns the general fix. */
-.teachers-team .w-flipbox {
+
+/* The group photograph, captioned in the same style as the gallery tiles. */
+.team-group {
+  position: relative;
+  margin: 0 0 48px;
+  border-radius: 20px;
   overflow: hidden;
+  background: var(--color-accent-7);
+  box-shadow: 0 10px 30px rgba(6, 61, 20, 0.14);
+}
+.team-group img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.team-group__caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 70px 26px 22px 40px;
+  background: linear-gradient(to top, rgba(6, 61, 20, 0.78), rgba(6, 61, 20, 0));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.team-group__caption::before {
+  content: "";
+  position: absolute;
+  left: 26px;
+  bottom: 24px;
+  width: 4px;
+  height: 1.1em;
+  border-radius: 2px;
+  background: var(--color-nav-7);
+}
+
+/* Portrait cards: four to a row, a short last row centred under the rest. */
+.team-grid {
+  --team-gap: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--team-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.team-card {
+  width: calc((100% - 3 * var(--team-gap)) / 4);
+}
+.team-card__photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-accent-7);
+  box-shadow: 0 6px 18px rgba(6, 61, 20, 0.12);
+}
+.team-card__photo img {
+  object-fit: cover;
+  /* Every portrait has the face in the upper half; anchor there so a tighter
+     crop on narrow screens trims the chest, never the head. */
+  object-position: center 22%;
+}
+.team-card__caption {
+  padding-top: 14px;
+  text-align: center;
+}
+.team-card__name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.25;
+  color: var(--color-heading);
+}
+.team-card__role {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
 }
 
 /* #5d7977a */
@@ -475,8 +551,14 @@
   .teachers-band h2 {
     padding: 0;
   }
-  .teachers-team {
-    grid-template-columns: repeat(3, 1fr);
+  .team-grid {
+    --team-gap: 20px;
+  }
+  .team-card {
+    width: calc((100% - 2 * var(--team-gap)) / 3);
+  }
+  .team-group {
+    margin-bottom: 36px;
   }
   .teachers-closing {
     margin: 70px 0 100px;
@@ -525,8 +607,29 @@
     margin-top: 50px;
   }
   .teachers-team {
-    grid-template-columns: repeat(2, 1fr);
-    margin: 50px 0 70px;
+    margin: 40px 0 60px;
+  }
+  .team-grid {
+    --team-gap: 14px;
+  }
+  .team-card {
+    width: calc((100% - var(--team-gap)) / 2);
+  }
+  .team-card__photo {
+    border-radius: 12px;
+  }
+  .team-group {
+    margin-bottom: 26px;
+    border-radius: 14px;
+  }
+  .team-group__caption {
+    padding: 44px 16px 14px 28px;
+    font-size: 17px;
+  }
+  .team-group__caption::before {
+    left: 16px;
+    bottom: 16px;
+    width: 3px;
   }
   .teachers-closing {
     margin: 0 0 50px;
