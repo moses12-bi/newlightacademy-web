@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   description: `Photographs of nursery and primary school life at ${site.name}.`,
 };
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const photos = await publicGallery();
   return (
     <>
       {/* #355e47b5 — a plain white title band; the second column is empty. */}
@@ -31,7 +32,7 @@ export default function GalleryPage() {
           <div className="gallery-section__inner" data-reveal="fadeIn" data-delay="500">
             {/* #5f571d4: fadeIn on desktop and tablet, no reveal on phones. */}
             <div data-reveal="fadeIn" data-reveal-mobile="none">
-              <GalleryJustified photos={publicGallery()} />
+              <GalleryJustified photos={photos} />
             </div>
           </div>
         </Container>

@@ -44,9 +44,18 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
  * With JavaScript off every thumbnail is still a plain link to its full-size
  * image, which is what Elementor's `link_to: file` falls back to; the lightbox
  * only takes over once this component has hydrated.
+ *
+ * The library runs to a couple of hundred photographs, so the grid shows them
+ * forty at a time behind a "Show more photos" button. The lightbox steps
+ * through all of them, revealing the tiles it reaches so that focus can always
+ * return to the photo it came from.
  */
+/** Tiles shown at first, and added by each "Show more photos". */
+const BATCH = 40;
+
 export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [shown, setShown] = useState(BATCH);
   const triggersRef = useRef<Array<HTMLAnchorElement | null>>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -55,6 +64,7 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
 
   const total = photos.length;
   const isOpen = openIndex !== null;
+  const visible = photos.slice(0, shown);
 
   const open = useCallback((index: number) => {
     returnIndexRef.current = index;
@@ -65,11 +75,16 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
     setOpenIndex(null);
   }, []);
 
+  /* The lightbox steps through every photo; the grid grows to include the one
+     on show, so closing the lightbox can return focus to its tile. */
   const step = useCallback(
     (delta: number) => {
-      setOpenIndex((current) => (current === null ? current : (current + delta + total) % total));
+      if (openIndex === null) return;
+      const next = (openIndex + delta + total) % total;
+      setOpenIndex(next);
+      setShown((current) => (next < current ? current : Math.ceil((next + 1) / BATCH) * BATCH));
     },
-    [total],
+    [openIndex, total],
   );
 
   /* Move focus into the dialog when it opens and back to the thumbnail that
@@ -155,7 +170,7 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
   return (
     <>
       <div className="gallery-grid">
-        {photos.map((photo, index) => (
+        {visible.map((photo, index) => (
           <a
             key={`${photo.src}-${index}`}
             ref={(node) => {
@@ -184,6 +199,19 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
           </a>
         ))}
       </div>
+
+      {shown < total ? (
+        <div className="gallery-more">
+          <button
+            type="button"
+            className="theme-button inline-flex items-center justify-center gap-2 rounded-[4px] border border-accent-1 bg-transparent px-6 py-3 text-[15px] leading-tight text-accent-1 transition-[color,background-color,border-color,transform] duration-300 hover:scale-110 hover:border-accent-3 hover:bg-accent-3 hover:text-accent-5 focus-visible:scale-110"
+            onClick={() => setShown((current) => Math.min(total, current + BATCH))}
+          >
+            Show more photos
+          </button>
+          <p className="gallery-more__count" aria-live="polite">{`Showing ${shown} of ${total} photos`}</p>
+        </div>
+      ) : null}
 
       {current && openIndex !== null ? (
         <div

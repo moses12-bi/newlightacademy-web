@@ -1,32 +1,26 @@
 import Link from "next/link";
 
-import ConfirmSubmit from "@/components/admin/ConfirmSubmit";
 import Flash from "@/components/admin/Flash";
 import GalleryUploader from "@/components/admin/GalleryUploader";
-import { listGallery } from "@/lib/server/gallery";
-import { mediaConfigured } from "@/lib/server/media";
-
-import { addGalleryPhotosAction, galleryPhotoAction } from "../../actions";
 import { requireUser } from "@/lib/server/auth";
+import { galleryLibrary, HIDE_TAG, libraryKey } from "@/lib/server/gallery";
+import { mediaConfigured, withTransform } from "@/lib/server/media";
+
+import { galleryPhotoAction, galleryUploadedAction } from "../../actions";
 
 export const metadata = { title: "Gallery" };
 
-function OpButton({ id, op, label, disabled }: { id: number; op: string; label: string; disabled?: boolean }) {
-  return (
-    <form action={galleryPhotoAction}>
-      <input type="hidden" name="id" value={id} />
-      <input type="hidden" name="op" value={op} />
-      <button type="submit" className="adm-btn adm-btn--ghost adm-btn--sm" disabled={disabled} aria-label={label}>
-        {op === "up" ? "↑" : "↓"}
-      </button>
-    </form>
-  );
-}
-
+/**
+ * The gallery follows the school's Cloudinary library: this page lists it,
+ * puts photos into it, and hides or describes them there.
+ */
 export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/gallery">) {
   await requireUser();
   const params = await searchParams;
-  const photos = listGallery();
+  const configured = mediaConfigured();
+  const library = configured ? await galleryLibrary() : null;
+  const onSite = library?.filter((photo) => !photo.hidden).length ?? 0;
+  const hidden = (library?.length ?? 0) - onSite;
 
   return (
     <>
@@ -34,7 +28,11 @@ export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/g
         <div>
           <h1>Gallery</h1>
           <p>
-            The photographs on <a href="/gallery" target="_blank" rel="noreferrer">/gallery</a>, in this order.
+            <a href="/gallery" target="_blank" rel="noreferrer">
+              /gallery
+            </a>{" "}
+            shows every photo in the school&apos;s Cloudinary library, newest uploads first. Photos added in the
+            Cloudinary console appear within five minutes; changes made here show straight away.
           </p>
         </div>
       </div>
@@ -44,54 +42,78 @@ export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/g
         <h2>Add photos</h2>
         <p className="adm-flash adm-flash--warn">
           Only publish photographs of children whose parents have given consent. If a parent asks for a photo to be
-          taken down, remove it here — the website updates straight away.
+          taken down, hide it here — the website updates straight away.
         </p>
-        {mediaConfigured() ? (
-          <GalleryUploader addPhotos={addGalleryPhotosAction} />
+        {configured ? (
+          <GalleryUploader uploaded={galleryUploadedAction} />
         ) : (
           <p className="adm-muted">
-            Photo uploads need Cloudinary — add it under <Link href="/admin/settings#cloudinary">Settings → Integrations</Link>.
+            The gallery needs Cloudinary — add it under{" "}
+            <Link href="/admin/settings#cloudinary">Settings → Integrations</Link>.
           </p>
         )}
       </section>
 
-      <p className="adm-muted adm-small" style={{ margin: "16px 0" }}>
-        {photos.length} photo{photos.length === 1 ? "" : "s"}. The description is read aloud to visitors who cannot see the
-        picture: say what is in it, without naming children.
-      </p>
-      <div className="adm-gallery">
-        {photos.map((photo, index) => (
-          <article key={photo.id} id={`photo-${photo.id}`} className="adm-card adm-gallery__item">
-            {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail of an arbitrary source */}
-            <img src={photo.src} alt="" loading="lazy" />
-            <form action={galleryPhotoAction} className="adm-form">
-              <input type="hidden" name="id" value={photo.id} />
-              <input type="hidden" name="op" value="alt" />
-              <label className="adm-field">
-                <span className="adm-small">Description</span>
-                <textarea name="alt" rows={2} defaultValue={photo.alt} maxLength={300} style={{ minHeight: 0 }} />
-              </label>
-              <button type="submit" className="adm-btn adm-btn--ghost adm-btn--sm">
-                Save description
-              </button>
-            </form>
-            <div className="adm-actions" style={{ justifyContent: "space-between" }}>
-              <div className="adm-actions">
-                <OpButton id={photo.id} op="up" label="Move earlier" disabled={index === 0} />
-                <OpButton id={photo.id} op="down" label="Move later" disabled={index === photos.length - 1} />
-                <span className="adm-muted adm-small">#{index + 1}</span>
-              </div>
-              <form action={galleryPhotoAction}>
-                <input type="hidden" name="id" value={photo.id} />
-                <input type="hidden" name="op" value="remove" />
-                <ConfirmSubmit message="Remove this photo from the gallery?" className="adm-btn adm-btn--danger adm-btn--sm">
-                  Remove
-                </ConfirmSubmit>
-              </form>
-            </div>
-          </article>
-        ))}
-      </div>
+      {configured && !library ? (
+        <p className="adm-flash adm-flash--error" style={{ margin: "16px 0" }}>
+          Cloudinary could not be reached, so the library cannot be shown. The public gallery shows its built-in photos
+          until it can. Try again in a moment.
+        </p>
+      ) : null}
+
+      {library ? (
+        <>
+          <p className="adm-muted adm-small" style={{ margin: "16px 0" }}>
+            {onSite} photo{onSite === 1 ? "" : "s"} on the website, {hidden} hidden. Hide keeps a photo in Cloudinary
+            but off the website (it is tagged <code>{HIDE_TAG}</code>, which also works from the Cloudinary console).
+            The description is read aloud to visitors who cannot see the picture: say what is in it, without naming
+            children. The label is the short caption on the tile.
+          </p>
+          <div className="adm-gallery">
+            {library.map((photo) => (
+              <article
+                key={photo.publicId}
+                id={`photo-${libraryKey(photo.publicId)}`}
+                className="adm-card adm-gallery__item"
+                style={photo.hidden ? { opacity: 0.6 } : undefined}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- admin thumbnail, resized by Cloudinary */}
+                <img src={withTransform(photo.src, "c_limit,w_480,f_auto,q_auto")} alt="" loading="lazy" />
+                <div className="adm-actions" style={{ justifyContent: "space-between" }}>
+                  <span className={photo.hidden ? "adm-pill adm-pill--warn" : "adm-pill adm-pill--ok"}>
+                    {photo.hidden ? "Hidden" : "On the website"}
+                  </span>
+                  <form action={galleryPhotoAction}>
+                    <input type="hidden" name="id" value={photo.publicId} />
+                    <input type="hidden" name="op" value={photo.hidden ? "show" : "hide"} />
+                    <button
+                      type="submit"
+                      className={photo.hidden ? "adm-btn adm-btn--sm" : "adm-btn adm-btn--ghost adm-btn--sm"}
+                    >
+                      {photo.hidden ? "Show" : "Hide"}
+                    </button>
+                  </form>
+                </div>
+                <form action={galleryPhotoAction} className="adm-form">
+                  <input type="hidden" name="id" value={photo.publicId} />
+                  <input type="hidden" name="op" value="describe" />
+                  <label className="adm-field">
+                    <span className="adm-small">Label</span>
+                    <input name="label" defaultValue={photo.label ?? ""} maxLength={40} />
+                  </label>
+                  <label className="adm-field">
+                    <span className="adm-small">Description</span>
+                    <textarea name="alt" rows={2} defaultValue={photo.alt} maxLength={300} style={{ minHeight: 0 }} />
+                  </label>
+                  <button type="submit" className="adm-btn adm-btn--ghost adm-btn--sm">
+                    Save
+                  </button>
+                </form>
+              </article>
+            ))}
+          </div>
+        </>
+      ) : null}
     </>
   );
 }

@@ -13,6 +13,10 @@ import type { GalleryPhoto } from "./photos";
  *
  * They follow the photos in photos.ts, in this order, so that no two
  * neighbouring tiles come from the same set.
+ *
+ * The live gallery now follows the whole Cloudinary library (src/lib/server/
+ * gallery.ts); these two lists are what it shows while the site is being built
+ * and whenever the library cannot be read.
  */
 export const cloudinaryGalleryPhotos: GalleryPhoto[] = [
   {

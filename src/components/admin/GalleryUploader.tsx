@@ -5,45 +5,39 @@ import { useRef, useState } from "react";
 
 import { uploadToCloudinary } from "@/lib/admin/upload";
 
-type AddPhotos = (
-  photos: { url: string; width: number; height: number; alt: string }[],
-  atStart: boolean,
-) => Promise<string | null>;
-
 /**
- * Pick several photos at once; each goes straight to Cloudinary, then the batch
- * is added to the gallery in one Server Action.
+ * Pick several photos at once; each goes straight to Cloudinary, into the
+ * gallery's folder. The gallery follows the library, so there is nothing to
+ * add afterwards: one Server Action just refreshes the site so the new photos
+ * show straight away (first, as the newest uploads).
  */
-export default function GalleryUploader({ addPhotos }: { addPhotos: AddPhotos }) {
+export default function GalleryUploader({ uploaded }: { uploaded: (count: number) => Promise<void> }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [atStart, setAtStart] = useState(true);
 
   const run = async (files: File[]) => {
     setBusy(true);
     setError("");
-    const done: { url: string; width: number; height: number; alt: string }[] = [];
+    let added = 0;
     const failed: string[] = [];
     for (const [index, file] of files.entries()) {
       try {
-        const result = await uploadToCloudinary(file, (percent) =>
-          setStatus(`Uploading ${index + 1} of ${files.length} — ${percent}%`),
+        const result = await uploadToCloudinary(
+          file,
+          (percent) => setStatus(`Uploading ${index + 1} of ${files.length} — ${percent}%`),
+          "gallery",
         );
-        if (result.type === "image") done.push({ url: result.url, width: result.width, height: result.height, alt: "" });
+        if (result.type === "image") added += 1;
         else failed.push(`${file.name} (not a photo)`);
       } catch (uploadError) {
         failed.push(`${file.name}: ${uploadError instanceof Error ? uploadError.message : String(uploadError)}`);
       }
     }
-    if (done.length) {
-      setStatus("Adding to the gallery…");
-      const problem = await addPhotos(done, atStart);
-      if (problem) failed.push(problem);
-    }
-    setStatus(done.length ? `${done.length} photo${done.length === 1 ? "" : "s"} added. Add a description to each below.` : "");
+    if (added) await uploaded(added);
+    setStatus(added ? `${added} photo${added === 1 ? "" : "s"} added. Add a description to each below.` : "");
     setError(failed.join(" · "));
     setBusy(false);
     if (input.current) input.current.value = "";
@@ -67,9 +61,6 @@ export default function GalleryUploader({ addPhotos }: { addPhotos: AddPhotos })
               if (files.length) void run(files);
             }}
           />
-        </label>
-        <label className="adm-check adm-small">
-          <input type="checkbox" checked={atStart} onChange={(event) => setAtStart(event.target.checked)} /> Put new photos first
         </label>
       </div>
       {status ? (

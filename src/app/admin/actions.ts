@@ -5,7 +5,7 @@
  * `requireUser()` — Server Actions are public HTTP endpoints, and the layout's
  * check does not protect them.
  */
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
@@ -29,7 +29,8 @@ import { JOB_STAGES, saveAdmissionsSettings, STUDENT_STAGES } from "@/lib/server
 import { deleteMessage, getMessage, setMessageStage, setMessageStatus, type MessageStatus } from "@/lib/server/messages";
 import { createPost, deletePost, updatePost, type PostInput } from "@/lib/server/posts";
 import { createReview, deleteReview, setReviewStatus, type ReviewStatus } from "@/lib/server/reviews";
-import { addGalleryPhotos, moveGalleryPhoto, removeGalleryPhoto, updateGalleryAlt } from "@/lib/server/gallery";
+import { LIBRARY_CACHE_TAG, setDescription, setTag } from "@/lib/server/cloudinary-library";
+import { copiesOf, galleryLibrary, HIDE_TAG, libraryKey } from "@/lib/server/gallery";
 import { cloudinaryCloud, withTransform } from "@/lib/server/media";
 import { SETTINGS, setSetting, siteUrl } from "@/lib/server/settings";
 import { saveSiteDetails, SOCIAL_NETWORKS } from "@/lib/server/site-details";
@@ -198,34 +199,45 @@ export async function deleteJobAction(form: FormData): Promise<void> {
 
 /* -------------------------------------------------------------- gallery -- */
 
-export async function addGalleryPhotosAction(
-  photos: { url: string; width: number; height: number; alt: string }[],
-  atStart: boolean,
-): Promise<string | null> {
-  const user = await requireUser();
-  const clean = photos.slice(0, 50).filter((photo) => isOwnUpload(photo.url) && photo.width > 0 && photo.height > 0);
-  if (clean.length === 0) return "No uploaded photos to add.";
-  addGalleryPhotos(
-    clean.map((photo) => ({ src: photo.url, width: photo.width, height: photo.height, alt: photo.alt.slice(0, 300) })),
-    atStart,
-  );
-  logActivity(user.id, "added gallery photos", String(clean.length));
+/* The gallery follows the Cloudinary library (src/lib/server/gallery.ts), so these
+   change the library itself: the nla-hide tag, and the photo's alt and caption. */
+
+function refreshGallery() {
+  updateTag(LIBRARY_CACHE_TAG);
   refreshSite();
-  return null;
+}
+
+/** After the uploader has put photos straight into the gallery's folder. */
+export async function galleryUploadedAction(count: number): Promise<void> {
+  const user = await requireUser();
+  logActivity(user.id, "added gallery photos", String(count));
+  refreshGallery();
 }
 
 export async function galleryPhotoAction(form: FormData): Promise<void> {
   const user = await requireUser();
-  const id = Number(str(form, "id"));
+  const publicId = str(form, "id");
   const op = str(form, "op");
-  if (op === "alt") updateGalleryAlt(id, str(form, "alt").slice(0, 300));
-  else if (op === "up" || op === "down") moveGalleryPhoto(id, op === "up" ? -1 : 1);
-  else if (op === "remove") {
-    removeGalleryPhoto(id);
-    logActivity(user.id, "removed gallery photo", String(id));
+  const library = await galleryLibrary();
+  if (!library) redirect(withFlash("/admin/gallery", "error", "Cloudinary could not be reached. Try again in a moment."));
+  if (!library.some((photo) => photo.publicId === publicId)) {
+    redirect(withFlash("/admin/gallery", "error", "That photo is no longer in the library."));
   }
-  refreshSite();
-  redirect(withFlash(`/admin/gallery#photo-${id}`, "ok", op === "remove" ? "Photo removed from the gallery." : "Saved."));
+  const back = `/admin/gallery#photo-${libraryKey(publicId)}`;
+  try {
+    if (op === "hide" || op === "show") {
+      await setTag(await copiesOf(publicId), HIDE_TAG, op === "hide");
+      logActivity(user.id, op === "hide" ? "hid gallery photo" : "showed gallery photo", publicId);
+    } else if (op === "describe") {
+      await setDescription(publicId, str(form, "alt").slice(0, 300), str(form, "label").slice(0, 40));
+    }
+  } catch (error) {
+    redirect(withFlash(back, "error", error instanceof Error ? error.message : "Cloudinary refused the change."));
+  }
+  refreshGallery();
+  redirect(
+    withFlash(back, "ok", op === "hide" ? "Hidden from the gallery." : op === "show" ? "Back in the gallery." : "Saved."),
+  );
 }
 
 /* ---------------------------------------------------------------- staff -- */

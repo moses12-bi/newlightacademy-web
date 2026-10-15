@@ -7,7 +7,12 @@ import crypto from "node:crypto";
 
 import { getSetting } from "./settings";
 
+/** Portraits, blog covers and social media posts. The gallery never shows this folder. */
 export const UPLOAD_FOLDER = "new-light-academy/portal";
+/** Photos added on the portal's Gallery page; they appear in the gallery like any other library photo. */
+export const GALLERY_FOLDER = "new-light-academy/gallery";
+
+export type UploadPurpose = "media" | "gallery";
 
 export function cloudinaryCloud(): string {
   return getSetting("CLOUDINARY_CLOUD_NAME") || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
@@ -17,9 +22,11 @@ export function mediaConfigured(): boolean {
   return !!(cloudinaryCloud() && getSetting("CLOUDINARY_API_KEY") && getSetting("CLOUDINARY_API_SECRET"));
 }
 
-export function signUpload(): { cloudName: string; apiKey: string; timestamp: number; folder: string; signature: string } {
+export function signUpload(
+  purpose: UploadPurpose = "media",
+): { cloudName: string; apiKey: string; timestamp: number; folder: string; signature: string } {
   const timestamp = Math.floor(Date.now() / 1000);
-  const folder = UPLOAD_FOLDER;
+  const folder = purpose === "gallery" ? GALLERY_FOLDER : UPLOAD_FOLDER;
   const toSign = `folder=${folder}&timestamp=${timestamp}`;
   const signature = crypto
     .createHash("sha1")

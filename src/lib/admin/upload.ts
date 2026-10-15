@@ -10,8 +10,16 @@ export interface UploadResult {
   height: number;
 }
 
-export async function uploadToCloudinary(file: File, onProgress?: (percent: number) => void): Promise<UploadResult> {
-  const signResponse = await fetch("/api/admin/upload-signature", { method: "POST" });
+export async function uploadToCloudinary(
+  file: File,
+  onProgress?: (percent: number) => void,
+  purpose: "media" | "gallery" = "media",
+): Promise<UploadResult> {
+  const signResponse = await fetch("/api/admin/upload-signature", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ purpose }),
+  });
   const sign = await signResponse.json();
   if (!signResponse.ok) throw new Error(sign.error ?? "Could not start the upload.");
 

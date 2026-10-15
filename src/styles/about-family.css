@@ -65,6 +65,18 @@
   columns: 4;
   column-gap: var(--gallery-gap, 18px);
 }
+/* "Show more photos": the library is shown forty tiles at a time. */
+.gallery-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+.gallery-more__count {
+  font-size: 15px;
+  color: var(--color-muted);
+}
 .gallery-item {
   position: relative;
   display: block;

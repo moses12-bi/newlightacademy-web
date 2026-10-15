@@ -432,6 +432,25 @@ async function verifyGallery(page) {
   assert.equal(returnedTwo, 3, "focus did not return after a keyboard open");
 }
 
+/** The gallery shows forty tiles at a time; "Show more photos" adds the next forty. */
+async function verifyGalleryMore(page) {
+  await page.goto(`${base}/gallery`, { waitUntil: "load", timeout: 90000 });
+  const more = page.getByRole("button", { name: "Show more photos" });
+  if ((await more.count()) === 0) {
+    console.log("SKIP show more: every photo already fits (the built-in list, or a small library)");
+    return;
+  }
+  const before = await page.locator(".gallery-item").count();
+  const total = Number((await page.locator(".gallery-more__count").innerText()).match(/of (\d+)/)[1]);
+  await more.click();
+  await page.waitForFunction((n) => document.querySelectorAll(".gallery-item").length > n, before);
+  const after = await page.locator(".gallery-item").count();
+  assert.equal(after, Math.min(total, before + 40), `Show more added ${after - before} tiles`);
+  if (after < total) {
+    assert.equal(await page.locator(".gallery-more__count").innerText(), `Showing ${after} of ${total} photos`);
+  }
+}
+
 async function verifyAccordion(page, route) {
   await page.goto(`${base}${route}`, { waitUntil: "load", timeout: 90000 });
   const triggers = page.locator(".w-accordion__trigger");
@@ -810,6 +829,7 @@ async function verifyClassAnchors(page) {
       await collectLinks(page, "/");
     });
     await check("/gallery lightbox", () => verifyGallery(page));
+    await check("/gallery show more", () => verifyGalleryMore(page));
     await check("/faq accordion", () => verifyAccordion(page, "/faq"));
     await check("/faq table of contents", () => verifyFaqToc(page));
     await check("/location accordion", () => verifyAccordion(page, "/location"));
