@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 };
 
 const programs = [
-  { title: "Baby Class", image: "/images/school/baby-class.jpg", text: "Our youngest children settle in gently, learning to play, to share and to explore with confidence.", meta: "Ages 3–4 years", href: "/infants" },
-  { title: "Middle Class", image: "/images/school/nursery-group-small.jpg", text: "Children grow in language, curiosity and early number sense through guided play.", meta: "Ages 4–5 years", href: "/toddlers" },
-  { title: "Top Class", image: "/images/school/nursery-pupils-outdoors.jpg", text: "Children prepare for Primary 1 with early reading, writing and counting.", meta: "Ages 5–6 years", href: "/preschool" },
-  { title: "Primary", image: "/images/school/primary-pupils-group.jpg", text: "Pupils follow the Rwanda national curriculum and work towards the Primary Leaving Examination.", meta: "P1 to P6", href: "/kindergarten" },
+  { title: "Baby Class", image: "/images/school/baby-class.jpg", text: "Our youngest children settle in gently, learning to play, to share and to explore with confidence.", meta: "Ages 3–4 years", href: "/programs#baby-class" },
+  { title: "Middle Class", image: "/images/school/nursery-group-small.jpg", text: "Children grow in language, curiosity and early number sense through guided play.", meta: "Ages 4–5 years", href: "/programs#middle-class" },
+  { title: "Top Class", image: "/images/school/nursery-pupils-outdoors.jpg", text: "Children prepare for Primary 1 with early reading, writing and counting.", meta: "Ages 5–6 years", href: "/programs#top-class" },
+  { title: "Primary", image: "/images/school/primary-pupils-group.jpg", text: "Pupils follow the Rwanda national curriculum and work towards the Primary Leaving Examination.", meta: "P1 to P6", href: "/programs#primary-school" },
 ] as const;
 
 const posts = [

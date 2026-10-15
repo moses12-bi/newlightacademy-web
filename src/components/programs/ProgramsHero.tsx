@@ -23,13 +23,15 @@ const TREE_FX = '{"scale":{"direction":"in-out-in","speed":-3,"range":{"start":0
 export default function ProgramsHero() {
   return (
     <section className="programs-hero">
-      {/* Elementor's background slideshow: two slides, fade, 5s apart, looping. */}
+      {/* Elementor's background slideshow: two slides, fade, 5s apart, looping.
+          The school's own photographs as 16:9 crops (scripts/process-programs.cjs);
+          the title panel sits over the middle and right of them on desktop. */}
       <div className="programs-hero__slides" aria-hidden="true">
         <div className="programs-hero__slide">
-          <Image src="/images/home/h-15.jpg" alt="" fill priority sizes="100vw" />
+          <Image src="/images/programs/hero-1.webp" alt="" fill priority sizes="100vw" />
         </div>
         <div className="programs-hero__slide">
-          <Image src="/images/home/h-16.jpg" alt="" fill sizes="100vw" />
+          <Image src="/images/programs/hero-2.webp" alt="" fill sizes="100vw" />
         </div>
       </div>
       <div className="programs-hero__shade" aria-hidden="true" />

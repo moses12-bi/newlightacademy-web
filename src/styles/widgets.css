@@ -131,18 +131,6 @@
 .w-hero__art { width: 60%; text-align: right; }
 .w-hero__art-inner { margin-bottom: -18%; transform-origin: center bottom; }
 .w-hero__image { display: inline-block; width: 36%; height: auto; transform-origin: center bottom; }
-
-/* Media variant - post-1050 #6d2a6f98: a video/photo band with a tinted overlay
-   and centred white type. The backdrop is a local poster supplied by the page;
-   nothing external is fetched. */
-.w-hero--media { background: var(--color-accent-3); margin-top: -48px; padding: 80px 0; }
-.w-hero--media .w-hero__layout { flex-direction: column; align-items: stretch; justify-content: center; min-height: 50vh; }
-.w-hero--media .w-hero__copy { width: 100%; align-items: center; text-align: center; }
-.w-hero--media .w-hero__copy h1 { color: var(--color-accent-5); }
-.w-hero--media .w-hero__lead { max-width: 50%; font-size: 23px; font-weight: 500; color: var(--color-accent-5); }
-.w-hero__backdrop { position: absolute; inset: 0; z-index: 0; }
-.w-hero__backdrop img { width: 100%; height: 100%; object-fit: cover; }
-.w-hero__overlay { position: absolute; inset: 0; z-index: 1; background: var(--w-hero-overlay, var(--color-accent-2)); opacity: var(--w-hero-overlay-opacity, .46); }
 .w-hero__container { position: relative; z-index: 2; }
 
 @media (max-width: 1024px) {
@@ -152,9 +140,6 @@
   .w-hero__art { width: 40%; text-align: center; }
   .w-hero__art-inner { margin-bottom: 0; }
   .w-hero__image { width: 60%; }
-  .w-hero--media { margin-top: -48px; }
-  .w-hero--media .w-hero__copy { width: 100%; }
-  .w-hero--media .w-hero__lead { max-width: 80%; }
 }
 @media (max-width: 767px) {
   .w-hero { padding: 70px 0; }
@@ -164,9 +149,6 @@
   .w-hero__art { margin-top: 100px; }
   .w-hero__art-inner { margin-bottom: -30%; }
   .w-hero__image { width: 46%; }
-  .w-hero--media { margin-top: 20px; padding: 30px 0 20px; }
-  .w-hero--media .w-hero__copy { align-items: flex-start; text-align: start; }
-  .w-hero--media .w-hero__lead { max-width: none; font-size: 15px; line-height: 1.63; }
 }
 
 /* ---------------------------------------------------------------------------

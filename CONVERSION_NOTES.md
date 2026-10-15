@@ -12,7 +12,7 @@ and a small shared widget layer.
 | Group | Routes |
 | --- | --- |
 | Home / about | `/` (Home 1), `/home-2`, `/about` |
-| Programs | `/programs`, `/infants`, `/toddlers`, `/preschool`, `/kindergarten`, `/flex-care`, `/art-program` |
+| Programs | `/programs` (the six per-class routes were later replaced by it; they redirect there) |
 | Admissions | `/admissions`, `/how-to-apply`, `/tuition`, `/make-a-payment`, `/schedule-a-tour` |
 | Parents | `/parents`, `/daily-schedule`, `/school-calendar`, `/student-handbook`, `/attendance-policy` |
 | School | `/our-teachers`, `/careers`, `/faq`, `/location`, `/gallery` |
@@ -40,7 +40,7 @@ about your family?" in the visit form) and its curly apostrophes and en dashes.
 | --- | --- |
 | `Container` | the content well — `max-w-[1320px] px-[30px]` |
 | `Button` | `theme-button`, `solid` / `outline` |
-| `PageHero` | the `theme-page-title` band that opens 21 pages: h1, optional lead, optional illustration, wavy edges, cream or media variant. Carries the hero illustration's saved scroll `scale` effect by default (`HERO_ART_FX`); pass `image.fx = null` to switch it off |
+| `PageHero` | the `theme-page-title` band that opens most inner pages: h1, optional lead, optional illustration, wavy edges. Carries the hero illustration's saved scroll `scale` effect by default (`HERO_ART_FX`); pass `image.fx = null` to switch it off |
 | `ShapeDivider` | the wavy section edge, recolourable through `--w-wave-*` |
 | `Accordion` | disclosure group — rendered open on the server, collapsed on hydration, `hidden="until-found"` so Ctrl+F still finds closed panels |
 | `ContactForm` | every form on the site (field set, widths and labels come from each saved Elementor form) |
@@ -51,8 +51,8 @@ about your family?" in the visit form) and its curly apostrophes and en dashes.
 
 `src/components/layout` holds `Header`, `MobileNav` and `Footer`, rendered by the
 root layout together with `PageMotion`; pages render only their own content.
-`src/components/programs` holds the six-in-one program template
-(`ProgramPage` + `program-data.ts`) and the YouTube `VideoLightbox`.
+`src/components/programs` holds the `/programs` sections, including the class
+cards (`AgeCards`), and the YouTube `VideoLightbox`.
 `src/components/sections/<route>` holds the per-page sections.
 `src/lib` holds `navigation.ts`, `site.ts`, `blog-posts.ts` and `motion-fx.ts`.
 
@@ -129,7 +129,7 @@ shared runtime. Screenshots land in `artifacts/`.
   menu and submenu keyboard operation, image loading, mobile ordering, scroll
   motion, pointer tilt, reduced motion, breakpoint resizing, video activation
   and client-side navigation.
-- `scripts/verify-pages.cjs` — the 25 converted routes: h1 and heading order,
+- `scripts/verify-pages.cjs` — the converted routes: h1 and heading order,
   horizontal overflow at 320/390/768/1024/1025/1280/1440, broken images and
   console errors, then the interactive widgets (gallery lightbox, FAQ and
   location accordions, the FAQ table of contents, counters, flip boxes, blog
@@ -188,11 +188,11 @@ These are deliberate, and none of them is hidden from the visitor.
 - **Two motion features are not ported.** Section-level
   `background_motion_fx` (the background-layer parallax on ~12 bands) is not
   wired, because it needs an extra layer element that would distort the cut-out
-  illustrations. The six program heroes use an Elementor *video* background
-  (YouTube `3Y4lgKnmWSk`, and `t2JslAspaYY` on the `/programs` band); no poster
-  frame was captured and nothing external may load before a gesture, so they
-  render as the theme's deep-teal band with a local play facade. Element-level
-  `motion_fx` is ported throughout.
+  illustrations. The `/programs` video band had an Elementor *video* background
+  in the theme; no poster frame was captured and nothing external may load
+  before a gesture, so it renders as the theme's deep-teal band with a local play
+  facade (which now opens the school's own video). Element-level `motion_fx` is
+  ported throughout.
 - **Known accessibility gap.** Home 1 (`/`) has a heading-level skip: the four
   contact details in the "Come over and look around" band are `h4`s directly
   after an `h2`. Every other prerendered page has a clean heading outline.

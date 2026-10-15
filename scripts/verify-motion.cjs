@@ -21,8 +21,7 @@ const ARTIFACTS = 'artifacts';
 
 const ALL_ROUTES = [
   '/', '/about', '/gallery', '/our-teachers', '/careers', '/daily-schedule',
-  '/programs', '/infants', '/toddlers', '/preschool', '/kindergarten', '/flex-care',
-  '/art-program', '/admissions', '/tuition', '/how-to-apply', '/faq', '/schedule-a-tour',
+  '/programs', '/admissions', '/tuition', '/how-to-apply', '/faq', '/schedule-a-tour',
   '/coming-soon', '/parents', '/make-a-payment', '/student-handbook',
   '/school-calendar', '/blog', '/location',
 ];

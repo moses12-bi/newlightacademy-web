@@ -4,72 +4,84 @@ import Container from "@/components/ui/Container";
 import ImageBox from "@/components/ui/ImageBox";
 
 interface AgeCard {
+  /** Anchor target, so other pages can link straight to a class: /programs#baby-class. */
+  id: string;
   title: string;
-  href: string;
-  image: string;
+  image: { src: string; alt: string };
   description: string;
   /** Rendered with `white-space: pre-wrap`, so any padding spacing is preserved. */
   meta: string;
   background: string;
-  backgroundHover: string;
   titleColor: string;
   eyeColor: string;
   eyeAngle: string;
 }
 
 /**
- * The four cards are byte-identical on all seven pages in this group
- * (post-46 #202409e / #a812e9c / #be1e1a1 / #c6f8413 and the matching widgets
- * in post-1050..1062), including the colours and each eye's rotation.
+ * The four classes, youngest first, with the colours and eye rotations of the
+ * theme's cards (post-46 #202409e / #a812e9c / #be1e1a1 / #c6f8413). The
+ * photographs are the school's own (scripts/process-programs.cjs).
  *
- * The fourth card links to /kindergarten/, which is the route that carries the
- * Primary School copy; that is the source's own wiring and it is kept.
+ * The cards are not links. Each class used to have a page of its own; those
+ * pages were replaced by this one and only these one-line descriptions were
+ * kept (the rest was the theme's placeholder copy; see program-data.ts in git
+ * history). The old addresses redirect to these anchors (next.config.ts).
+ * Without a link to follow, the cards keep their colour on hover rather than
+ * inviting a click that goes nowhere.
  */
-const AGE_CARDS: AgeCard[] = [
+export const AGE_CARDS: AgeCard[] = [
   {
+    id: "baby-class",
     title: "Baby Class",
-    href: "/infants",
-    image: "/images/home/h-17.jpg",
+    image: {
+      src: "/images/programs/baby-class.webp",
+      alt: "Young children on small coloured chairs in a classroom with picture charts on the walls, with two teachers in white coats",
+    },
     description: "A gentle first year of school, where children learn to play, share and listen together.",
     meta: "Ages 3-4",
     background: "var(--color-tint-peach)",
-    backgroundHover: "var(--color-tint-peach-hover)",
     titleColor: "var(--color-brand-coral)",
     eyeColor: "var(--color-accent-1)",
     eyeAngle: "60deg",
   },
   {
+    id: "middle-class",
     title: "Middle Class",
-    href: "/toddlers",
-    image: "/images/home/h-19.jpg",
+    image: {
+      src: "/images/programs/middle-class.webp",
+      alt: "Young children riding a playground roundabout in front of a slide",
+    },
     description: "Children grow more independent, with early letters, numbers, song and story.",
     meta: "Ages 4-5",
     background: "var(--color-tint-ice)",
-    backgroundHover: "var(--color-tint-ice-hover)",
     titleColor: "var(--color-accent-2)",
     eyeColor: "var(--color-accent-2)",
     eyeAngle: "129deg",
   },
   {
+    id: "top-class",
     title: "Top Class",
-    href: "/preschool",
-    image: "/images/home/h-16.jpg",
+    image: {
+      src: "/images/programs/top-class.webp",
+      alt: "Children at wooden desks raising their hands while their teacher stands at the front of the class",
+    },
     description: "The last nursery year, preparing children for the step up into P1.",
     meta: "Ages 5-6",
     background: "var(--color-tint-cream)",
-    backgroundHover: "var(--color-tint-cream-hover)",
     titleColor: "var(--color-brand-orange)",
     eyeColor: "var(--color-brand-orange)",
     eyeAngle: "8deg",
   },
   {
+    id: "primary-school",
     title: "Primary School",
-    href: "/kindergarten",
-    image: "/images/home/h-20.jpg",
+    image: {
+      src: "/images/programs/primary-school.webp",
+      alt: "Pupils working at laptops on wooden desks while two teachers in white coats look on",
+    },
     description: "Six years following the Rwanda national curriculum, up to the Primary Leaving Examination.",
     meta: "P1 - P6",
     background: "var(--color-tint-mint)",
-    backgroundHover: "var(--color-tint-mint-hover)",
     titleColor: "var(--color-brand-green)",
     eyeColor: "var(--color-brand-green)",
     eyeAngle: "269deg",
@@ -79,21 +91,10 @@ const AGE_CARDS: AgeCard[] = [
 /** The scroll scale Elementor puts on the oversized "Ages" word, desktop only. */
 const SENSEI_FX = '{"scale":{"direction":"in-out","speed":2,"range":{"start":0,"end":40}}}';
 
-export interface AgeCardsProps {
-  /**
-   * /programs pads the band itself (130px top and bottom); the detail pages
-   * let the section above it carry the top spacing.
-   */
-  variant: "index" | "detail";
-}
-
-/**
- * "Ages — we meet children where they are.": the four age cards that close
- * /programs and all six program detail pages.
- */
-export default function AgeCards({ variant }: AgeCardsProps) {
+/** "Ages — we meet children where they are.": the four classes on /programs. */
+export default function AgeCards() {
   return (
-    <section className={`program-ages program-ages--${variant}`} aria-labelledby="program-ages-title">
+    <section className="program-ages" aria-labelledby="program-ages-title">
       <Container>
         <div className="program-ages__head">
           <p className="program-sensei" data-fx={SENSEI_FX} data-fx-devices="desktop">
@@ -106,9 +107,8 @@ export default function AgeCards({ variant }: AgeCardsProps) {
 
         <div className="program-ages__grid">
           {AGE_CARDS.map((card) => (
-            <div key={card.title}>
+            <div key={card.id} id={card.id} className="program-ages__card">
               <ImageBox
-                href={card.href}
                 title={card.title}
                 description={card.description}
                 meta={card.meta}
@@ -118,8 +118,8 @@ export default function AgeCards({ variant }: AgeCardsProps) {
                 metaTag="h4"
                 eye
                 image={{
-                  src: card.image,
-                  alt: "",
+                  src: card.image.src,
+                  alt: card.image.alt,
                   width: 1300,
                   height: 800,
                   sizes: "(min-width: 1025px) 25vw, (min-width: 768px) 50vw, 80vw",
@@ -127,7 +127,6 @@ export default function AgeCards({ variant }: AgeCardsProps) {
                 style={
                   {
                     "--w-imagebox-bg": card.background,
-                    "--w-imagebox-bg-hover": card.backgroundHover,
                     "--w-imagebox-title-color": card.titleColor,
                     "--w-imagebox-eye-color": card.eyeColor,
                     "--w-imagebox-eye-angle": card.eyeAngle,

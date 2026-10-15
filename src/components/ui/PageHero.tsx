@@ -87,12 +87,6 @@ export interface PageHeroProps {
   leadDelay?: RevealDelay;
   /** The saved art columns carry `elementor-hidden-phone`. */
   imageHiddenOnPhone?: boolean;
-  /** `media` is the video-background hero used by the six age/program pages. */
-  variant?: "cream" | "media";
-  /** Local poster for the media variant. Nothing external is requested. */
-  backdrop?: ReactNode;
-  overlayColor?: string;
-  overlayOpacity?: number;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -115,10 +109,6 @@ export default function PageHero({
   leadReveal = "fadeIn",
   leadDelay = "200",
   imageHiddenOnPhone = true,
-  variant = "cream",
-  backdrop,
-  overlayColor,
-  overlayOpacity,
   className,
   style,
   children,
@@ -129,13 +119,9 @@ export default function PageHero({
   const cssVars: Record<string, string> = {};
   if (dividerFill?.top) cssVars["--w-wave-top"] = dividerFill.top;
   if (dividerFill?.bottom) cssVars["--w-wave-bottom"] = dividerFill.bottom;
-  if (overlayColor) cssVars["--w-hero-overlay"] = overlayColor;
-  if (overlayOpacity !== undefined) cssVars["--w-hero-overlay-opacity"] = String(overlayOpacity);
   const sectionStyle = { ...style, ...cssVars } as CSSProperties;
 
-  const classes = ["w-hero", variant === "media" ? "w-hero--media" : null, className]
-    .filter(Boolean)
-    .join(" ");
+  const classes = ["w-hero", className].filter(Boolean).join(" ");
 
   const artClasses = ["w-hero__art", imageHiddenOnPhone ? "max-md:hidden" : null]
     .filter(Boolean)
@@ -143,9 +129,6 @@ export default function PageHero({
 
   return (
     <section className={classes} style={sectionStyle}>
-      {backdrop ? <div className="w-hero__backdrop">{backdrop}</div> : null}
-      {backdrop ? <div className="w-hero__overlay" /> : null}
-
       {showTop ? <ShapeDivider position="top" className="w-wave--top" /> : null}
       {showBottom ? <ShapeDivider position="bottom" className="w-wave--bottom" /> : null}
 

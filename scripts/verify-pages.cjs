@@ -1,5 +1,6 @@
 /**
- * Browser verification for the 25 converted routes.
+ * Browser verification for the converted routes, plus the redirects that keep
+ * the retired per-class pages' addresses working.
  *
  * Mirrors the style of scripts/verify-ui.cjs: Playwright drives the system Edge
  * (`channel: 'msedge'` — there is no bundled browser in this project), every
@@ -26,28 +27,35 @@ const CORE_WIDTHS = [390, 1024, 1440];
 /** The converted routes, tagged with the archetype they belong to. */
 const ROUTES = [
   { route: "/admissions", archetype: "content-hero" },
-  { route: "/art-program", archetype: "program" },
   { route: "/blog", archetype: "feed", sweep: true },
   { route: "/careers", archetype: "content-hero" },
   { route: "/coming-soon", archetype: "form-minimal", sweep: true },
   { route: "/daily-schedule", archetype: "schedule" },
   { route: "/faq", archetype: "accordion", sweep: true },
-  { route: "/flex-care", archetype: "program" },
   { route: "/gallery", archetype: "gallery", sweep: true },
   { route: "/how-to-apply", archetype: "form-long" },
-  { route: "/infants", archetype: "program", sweep: true },
-  { route: "/kindergarten", archetype: "program" },
   { route: "/location", archetype: "map-form", sweep: true },
   { route: "/make-a-payment", archetype: "form-long" },
   { route: "/our-teachers", archetype: "counters", sweep: true },
   { route: "/parents", archetype: "form-long" },
-  { route: "/preschool", archetype: "program" },
   { route: "/programs", archetype: "flipboxes", sweep: true },
   { route: "/schedule-a-tour", archetype: "form-long" },
   { route: "/school-calendar", archetype: "schedule" },
   { route: "/student-handbook", archetype: "policy" },
-  { route: "/toddlers", archetype: "program" },
   { route: "/tuition", archetype: "tables", sweep: true },
+];
+
+/**
+ * The theme's page-per-class routes, now one /programs page. Each must answer
+ * with a permanent redirect to its class's card (next.config.ts).
+ */
+const RETIRED = [
+  { route: "/infants", to: "/programs#baby-class" },
+  { route: "/toddlers", to: "/programs#middle-class" },
+  { route: "/preschool", to: "/programs#top-class" },
+  { route: "/kindergarten", to: "/programs#primary-school" },
+  { route: "/flex-care", to: "/programs" },
+  { route: "/art-program", to: "/programs" },
 ];
 
 const SHOT_WIDTHS = [390, 1440];
@@ -61,6 +69,7 @@ const wanted = (route) => ONLY.length === 0 || ONLY.includes(route);
 
 const failures = [];
 const internalLinks = new Map(); // href -> Set of routes that contain it
+const anchorLinks = new Map(); // "/path#id" -> Set of routes that contain it
 
 function record(label, error) {
   const message = error && error.message ? error.message : String(error);
@@ -145,9 +154,15 @@ async function collectLinks(page, route) {
       .filter((href) => href && href.startsWith("/") && !href.startsWith("//")),
   );
   for (const href of hrefs) {
-    const clean = href.split("#")[0] || "/";
+    const [pathPart, hash] = href.split("#");
+    const clean = pathPart || "/";
     if (!internalLinks.has(clean)) internalLinks.set(clean, new Set());
     internalLinks.get(clean).add(route);
+    if (hash) {
+      const target = `${clean}#${hash}`;
+      if (!anchorLinks.has(target)) anchorLinks.set(target, new Set());
+      anchorLinks.get(target).add(route);
+    }
   }
 }
 
@@ -680,6 +695,85 @@ async function verifyInternalLinks() {
   console.log(`PASS internal links: ${targets.length} distinct targets resolve`);
 }
 
+/** Every `/path#id` link must land on a page that renders an element with that id. */
+async function verifyAnchorLinks() {
+  const missing = [];
+  const pages = new Map();
+  for (const target of [...anchorLinks.keys()].sort()) {
+    const [pathPart, id] = target.split("#");
+    if (!pages.has(pathPart)) pages.set(pathPart, await (await fetch(`${base}${pathPart}`)).text());
+    if (!pages.get(pathPart).includes(`id="${id}"`)) {
+      missing.push(`${target} (linked from ${[...anchorLinks.get(target)].join(", ")})`);
+    }
+  }
+  assert.deepEqual(missing, [], "links to an #id the target page does not render");
+  console.log(`PASS anchor links: ${anchorLinks.size} distinct #targets exist`);
+}
+
+/**
+ * The retired class pages: a 308 straight to the class's card, the trailing
+ * slash form included (Next strips the slash with its own 308 first), and
+ * nothing left in the sitemap.
+ */
+async function verifyRetiredRedirects() {
+  const problems = [];
+  const hop = async (url) => {
+    const response = await fetch(url, { redirect: "manual" });
+    return { status: response.status, location: response.headers.get("location") };
+  };
+  for (const { route, to } of RETIRED) {
+    const first = await hop(`${base}${route}`);
+    if (first.status !== 308 || first.location !== to) {
+      problems.push(`${route} -> ${first.status} ${first.location} (expected 308 ${to})`);
+    }
+    let url = `${base}${route}/`;
+    let landed = null;
+    for (let i = 0; i < 4 && landed === null; i++) {
+      const step = await hop(url);
+      if (step.status !== 308) {
+        problems.push(`${route}/ hop ${i + 1} -> ${step.status} (expected 308)`);
+        break;
+      }
+      const next = new URL(step.location, url);
+      if (next.pathname === "/programs") landed = `${next.pathname}${next.hash}`;
+      else url = next.href;
+    }
+    if (landed !== null && landed !== to) problems.push(`${route}/ landed on ${landed} (expected ${to})`);
+    if (landed === null && !problems.some((p) => p.startsWith(`${route}/`))) {
+      problems.push(`${route}/ never reached /programs`);
+    }
+  }
+  const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
+  for (const { route } of RETIRED) {
+    if (sitemap.includes(`${route}<`)) problems.push(`sitemap still lists ${route}`);
+  }
+  assert.deepEqual(problems, [], "retired class pages");
+  console.log(`PASS retired class pages: ${RETIRED.length} redirect to /programs, none in the sitemap`);
+}
+
+/**
+ * Following an old class address in a real browser ends on /programs with the
+ * class's card in view, below the sticky header rather than under it.
+ */
+async function verifyClassAnchors(page) {
+  for (const { route, to } of RETIRED.filter((entry) => entry.to.includes("#"))) {
+    await page.goto(`${base}${route}`, { waitUntil: "load", timeout: 90000 });
+    await page.waitForTimeout(1200);
+    const url = new URL(page.url());
+    assert.equal(`${url.pathname}${url.hash}`, to, `${route} ended on ${url.pathname}${url.hash}`);
+    const id = to.split("#")[1];
+    const placement = await page.evaluate((cardId) => {
+      const card = document.getElementById(cardId).getBoundingClientRect();
+      const header = document.querySelector("header").getBoundingClientRect();
+      return { cardTop: card.top, headerBottom: header.bottom, viewport: window.innerHeight };
+    }, id);
+    assert.ok(
+      placement.cardTop >= placement.headerBottom - 1 && placement.cardTop < placement.viewport / 2,
+      `#${id} sits at ${Math.round(placement.cardTop)}px; the header ends at ${Math.round(placement.headerBottom)}px`,
+    );
+  }
+}
+
 /* --------------------------------------------------------------------- main */
 
 (async () => {
@@ -708,12 +802,20 @@ async function verifyInternalLinks() {
     const page = await context.newPage();
     const hooks = watch(page);
 
+    /* The home page has its own suite (verify-home), but its class cards link
+       to /programs#<class>, so its links join the internal-link and anchor
+       checks at the end. */
+    await check("/ links collected", async () => {
+      await page.goto(`${base}/`, { waitUntil: "load", timeout: 90000 });
+      await collectLinks(page, "/");
+    });
     await check("/gallery lightbox", () => verifyGallery(page));
     await check("/faq accordion", () => verifyAccordion(page, "/faq"));
     await check("/faq table of contents", () => verifyFaqToc(page));
     await check("/location accordion", () => verifyAccordion(page, "/location"));
     await check("/our-teachers counter", () => verifyCounters(page));
     await check("/programs flip boxes", () => verifyFlipBoxes(page));
+    await check("old class addresses land on their card", () => verifyClassAnchors(page));
     await check("/blog search", () => verifyBlogSearch(page));
 
     for (const route of [
@@ -733,6 +835,8 @@ async function verifyInternalLinks() {
     await verifyReducedMotion(browser, ["/programs", "/our-teachers", "/tuition"]);
     await verifyNoJs(browser, ["/faq", "/tuition", "/student-handbook", "/programs", "/gallery", "/admissions"]);
     await check("internal links", () => verifyInternalLinks());
+    await check("anchor links", () => verifyAnchorLinks());
+    await check("retired class pages", () => verifyRetiredRedirects());
   } finally {
     await browser.close();
   }

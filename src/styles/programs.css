@@ -1,17 +1,9 @@
 /* ===========================================================================
-   /programs + the six program detail pages
-   (/infants, /toddlers, /preschool, /kindergarten, /flex-care, /art-program)
+   /programs
 
-   Ported from the saved Elementor page stylesheets:
-     post-46.css    -> /programs (the index: slideshow hero, flip boxes)
-     post-1050.css  -> /infants        post-1058.css -> /kindergarten
-     post-1054.css  -> /toddlers       post-1060.css -> /flex-care
-     post-1056.css  -> /preschool      post-1062.css -> /art-program
-
-   The six detail stylesheets were diffed against each other: they are one
-   template (identical colours, identical age-card palette, identical widget
-   order) and differ only in copy, photos and a handful of section paddings
-   (60 vs 65 vs 70px) and photo offsets. The values below are post-1050's.
+   Ported from the saved Elementor page stylesheet post-46.css (slideshow hero,
+   flip boxes, age cards). The theme also had a page per class; those are now
+   this one page, and their addresses redirect here (next.config.ts).
 
    Every class is prefixed `program-` / `programs-`, so no other conversion
    group can collide with it. Ordinary layout lives in the components as
@@ -19,7 +11,7 @@
    =========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   Shared pieces (used by both the index and the detail template)
+   Shared pieces
 --------------------------------------------------------------------------- */
 
 /* The oversized handwritten word above a section heading: "About", "Ages",
@@ -72,7 +64,7 @@
   .program-split--reverse { flex-direction: column-reverse; }
 }
 
-/* `far fa-play-circle` on a transparent button - the hero / video band CTA.
+/* `far fa-play-circle` on a transparent button - the video band's CTA.
    Font Awesome is not part of the capture, so the glyph is hand-drawn. */
 .program-play {
   display: inline-flex;
@@ -122,17 +114,16 @@
 .program-lightbox__close svg { width: 28px; height: 28px; }
 
 /* ---------------------------------------------------------------------------
-   "Ages - we meet kids where they are." (post-46 #7a539ade, post-1050 #1bd9ae25)
-   The same four cards, the same palette, on all seven pages.
+   "Ages - we meet kids where they are." (post-46 #7a539ade)
+   One card per class; each card's id is the anchor the old class pages
+   redirect to.
 --------------------------------------------------------------------------- */
 .program-ages {
   position: relative;
   overflow: hidden;
   background: url("/images/home/illustration-right-cut.svg") bottom right / auto no-repeat;
+  padding: 130px 0;
 }
-/* /programs pads the band itself; the detail pages hang it off the section above. */
-.program-ages--index { padding: 130px 0; }
-.program-ages--detail { padding: 0 0 100px; }
 
 .program-ages__title {
   padding: 0 130px 50px 0;
@@ -143,6 +134,12 @@
 
 .program-ages__grid { display: flex; flex-wrap: wrap; }
 .program-ages__grid > * { width: 25%; padding: 0 25px; }
+/* Old class addresses land on these cards (#baby-class ...). scroll-padding-top
+   in globals.css is 90px, but the sticky header is 92px tall at tablet widths
+   (768-1024px); this margin keeps the card's top edge clear of it there (the
+   card lands at ~110px) and leaves some air at other widths. Keep it unless
+   scroll-padding-top is raised to at least 92px. */
+.program-ages__card { scroll-margin-top: 20px; }
 /* The card's time line is an h6 in the save; it is an h4 here so the heading
    levels stay in order, so the kit's h6 scale is restored for it. */
 .program-ages .w-imagebox__meta { font-size: 14px; font-weight: 600; line-height: 1.5; }
@@ -151,9 +148,7 @@
 }
 
 @media (max-width: 1024px) {
-  .program-ages { background-position: top right; }
-  .program-ages--index { margin-top: 70px; padding: 0; }
-  .program-ages--detail { margin: 70px 0 100px; padding: 0; }
+  .program-ages { background-position: top right; margin-top: 70px; padding: 0; }
   .program-ages__head { padding-bottom: 30px; }
   .program-ages__title { padding: 0; text-align: start; }
   .program-ages__grid > * { width: 50%; padding: 0; }
@@ -162,9 +157,7 @@
   .program-ages__grid > *:nth-child(n + 3) { padding-top: 20px; }
 }
 @media (max-width: 767px) {
-  .program-ages { background-size: 140px auto; }
-  .program-ages--index { margin-top: 50px; padding-bottom: 60px; }
-  .program-ages--detail { margin: 50px 0; }
+  .program-ages { background-size: 140px auto; margin-top: 50px; padding-bottom: 60px; }
   .program-ages__head { padding-bottom: 20px; }
   .program-ages__title { font-size: 30px; }
   .program-ages__grid { padding: 0 10%; }
@@ -175,103 +168,6 @@
     width: 100%;
     padding: 0 0 30px;
   }
-}
-
-/* ===========================================================================
-   The six detail pages (post-1050 and its five twins)
-   =========================================================================== */
-
-/* --- "About" band (#6ac299d): white, with a 900px-wide inner row ---------- */
-/* `overflow: hidden` is the saved section's own rule; it is what keeps the
-   oversized, scroll-scaled "About" from widening the page. */
-.program-about { overflow: hidden; margin: 100px 0; }
-.program-about__inner {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 900px;
-  margin: 0 auto;
-}
-/* Elementor's default column padding inside the 900px inner container. */
-.program-about__art { width: 39.222%; padding: 10px; text-align: center; }
-/* The saved image widget has no width rule, so the illustration keeps its
-   natural 227px and is centred in its column. */
-.program-about__art img { display: inline-block; width: auto; max-width: 100%; height: auto; }
-.program-about__copy { width: 60.778%; padding: 10px; }
-.program-about__copy > * + * { margin-top: 10px; }
-.program-about__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 15px 40px; }
-
-@media (max-width: 1024px) {
-  .program-about { margin: 70px 0; }
-  .program-about__art { margin-top: 60px; padding: 0; }
-  .program-about__copy { padding: 0; }
-}
-@media (max-width: 767px) {
-  .program-about { margin: 50px 0 0; }
-  /* `elementor-reverse-mobile`: the copy comes first, the illustration under it. */
-  .program-about__inner { flex-direction: column-reverse; }
-  .program-about__art,
-  .program-about__copy { width: 100%; }
-  .program-about__art { margin-top: 0; padding-top: 30px; }
-  .program-about__art img { width: 50%; }
-}
-
-/* --- "Individualized care" band (#7b4588f): cream, wave on top ------------ */
-.program-care {
-  position: relative;
-  overflow: hidden;
-  background: var(--color-accent-8);
-  padding: 130px 0 70px;
-}
-.program-care__photo { margin-inline-start: -40px; text-align: end; }
-
-@media (max-width: 1024px) {
-  .program-care { padding: 100px 0 50px; }
-  .program-care__photo { margin-top: 100px; }
-  /* post-1050 switches these two columns to vertical centring at tablet. */
-  .program-care .program-split { align-items: center; }
-}
-@media (max-width: 767px) {
-  .program-care { margin-top: 20px; padding: 0; }
-  .program-care__photo { margin: 0; }
-  .program-care .program-card { margin-top: 20px; }
-}
-
-/* --- "<Program> program" band (#a7c1487): cream + the snail illustration -- */
-.program-detail {
-  overflow: hidden;
-  background: var(--color-accent-8) url("/images/snail.svg") bottom center / auto no-repeat;
-  padding: 60px 0 70px;
-}
-.program-detail__photo { margin: 85px -40px 0 0; }
-
-@media (max-width: 1024px) {
-  .program-detail { background-size: 531px auto; }
-}
-@media (max-width: 767px) {
-  .program-detail { background-size: 270px auto; padding: 70px 0 60px; }
-  .program-detail__photo { margin: 0; }
-  .program-detail .program-card { margin-top: 20px; }
-}
-
-/* --- "Signature practices" band (#edfe970): cream, wave at the bottom ----- */
-.program-signature {
-  position: relative;
-  overflow: hidden;
-  background: var(--color-accent-8);
-  margin-bottom: 100px;
-  padding: 60px 0 130px;
-}
-.program-signature__photo { margin: 120px 0 0 -40px; }
-
-@media (max-width: 1024px) {
-  .program-signature { padding: 50px 0; }
-  .program-signature__photo { margin-top: 100px; }
-  .program-signature .program-split { align-items: center; }
-}
-@media (max-width: 767px) {
-  .program-signature { margin-bottom: 0; padding: 20px 0 70px; }
-  .program-signature__photo { margin: 0; }
-  .program-signature .program-card { margin-top: 20px; }
 }
 
 /* ===========================================================================
@@ -294,7 +190,13 @@
   opacity: 0;
   animation: programs-hero-slides 10s linear infinite;
 }
-.programs-hero__slide img { width: 100%; height: 100%; object-fit: cover; }
+/* The slides are 16:9 crops with children across the frame; on desktop the
+   title panel sits over the middle and right of them, and the hero is wider
+   than the photo, so it is cropped top and bottom only. On a phone the frame is
+   cut down to a narrow upright window, centred a little left of middle (30%)
+   to keep the left-hand children (the girl shooting, the girl with the beaded
+   hair) in it. */
+.programs-hero__slide img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 50%; }
 .programs-hero__slide:nth-child(2) { animation-delay: 5s; }
 .programs-hero__shade {
   position: absolute;
@@ -544,7 +446,8 @@
 }
 .programs-safety__photo { margin: 198px 0 -167px -40px; }
 
-/* Both bands stack one breakpoint earlier than the detail template does. */
+/* Both bands stack from tablet width down, a breakpoint earlier than
+   .program-split's own phone rule. */
 @media (max-width: 1024px) {
   .programs-tuition { padding: 100px 0 0; }
   .programs-tuition__photo { margin: 0; }

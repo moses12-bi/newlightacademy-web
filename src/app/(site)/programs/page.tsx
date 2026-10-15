@@ -21,7 +21,7 @@ export default function ProgramsPage() {
       <ProgramsPromise />
       <ProgramsVideoBand />
       <ProgramsDifference />
-      <AgeCards variant="index" />
+      <AgeCards />
       <ProgramsTuition />
       <ProgramsSafety />
     </>

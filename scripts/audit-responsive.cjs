@@ -19,8 +19,7 @@ const base = process.env.BASE_URL || 'http://localhost:3000';
 const WIDTHS = (process.env.WIDTHS || '320,390,768,1024,1025,1280,1440').split(',').map(Number);
 const ALL = [
   '/', '/about', '/gallery', '/our-teachers', '/careers', '/daily-schedule',
-  '/programs', '/infants', '/toddlers', '/preschool', '/kindergarten', '/flex-care',
-  '/art-program', '/admissions', '/tuition', '/how-to-apply', '/faq', '/schedule-a-tour',
+  '/programs', '/admissions', '/tuition', '/how-to-apply', '/faq', '/schedule-a-tour',
   '/coming-soon', '/parents', '/make-a-payment', '/student-handbook',
   '/school-calendar', '/blog', '/location',
 ];

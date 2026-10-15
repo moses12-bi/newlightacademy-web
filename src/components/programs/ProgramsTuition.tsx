@@ -23,10 +23,10 @@ export default function ProgramsTuition() {
             data-fx-devices="desktop"
           >
             <Image
-              src="/images/programs/h-05-pj0d6d2j57p4by7xz55fzmlzmnuuve8bzdr8pnro58.jpg"
-              alt=""
-              width={500}
-              height={230}
+              src="/images/programs/tuition.webp"
+              alt="Pupils gathered round an outdoor court as a player reaches up for the ball"
+              width={1400}
+              height={644}
               sizes="(min-width: 1025px) 50vw, 100vw"
               className="program-photo"
             />

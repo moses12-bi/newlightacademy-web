@@ -33,19 +33,9 @@ export const mainNav: NavItem[] = [
       { label: "A Day at School", href: "/daily-schedule" },
     ],
   },
-  {
-    label: "Programs",
-    href: "/programs",
-    accent: "var(--color-nav-3)",
-    children: [
-      { label: "Baby Class", href: "/infants" },
-      { label: "Middle Class", href: "/toddlers" },
-      { label: "Top Class", href: "/preschool" },
-      { label: "Primary School", href: "/kindergarten" },
-      { label: "Character & Values", href: "/flex-care" },
-      { label: "Creativity & Sport", href: "/art-program" },
-    ],
-  },
+  /* A plain link too: every class is described on the one Programs page, and
+     the old per-class addresses redirect there (next.config.ts). */
+  { label: "Programs", href: "/programs", accent: "var(--color-nav-3)" },
   {
     label: "Admissions",
     href: "/admissions",

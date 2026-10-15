@@ -46,10 +46,10 @@ export default function ProgramsSafety() {
             data-fx-devices="desktop"
           >
             <Image
-              src="/images/programs/pic-30-pj0d1skrx7gwoec60zswvd1cbrqrmdgbfoxl69n0rk.jpg"
-              alt=""
-              width={500}
-              height={400}
+              src="/images/programs/safety.webp"
+              alt="Children in school T-shirts sitting together in the seats of a bus"
+              width={1400}
+              height={1120}
               sizes="(min-width: 1025px) 50vw, 100vw"
               className="program-photo"
             />

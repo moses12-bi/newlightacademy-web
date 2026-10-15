@@ -11,7 +11,7 @@ this repository carries New Light Academy's identity, colours and content on top
 ```bash
 npm install
 npm run dev          # http://localhost:3000
-npm run build        # production build, 31 static routes
+npm run build        # production build
 npm run start        # serve the build
 ```
 
@@ -20,7 +20,7 @@ npm run start        # serve the build
 ```bash
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
-npm run verify       # browser checks across all 25 routes (needs the site running)
+npm run verify       # browser checks across the public pages (needs the site running)
 ```
 
 `npm run verify` drives Playwright against the system Edge (`channel: "msedge"` — no browser is bundled) and
@@ -121,10 +121,15 @@ bell times or testimonials until the school provides them.
 Still assumed and awaiting confirmation:
 
 - The class names **Baby Class / Middle Class / Top Class** and the age bands 3–4, 4–5, 5–6, which follow the
-  Rwandan convention rather than anything the school has stated. They appear in seven page titles and six meta
-  descriptions.
-- Route slugs still read `/infants`, `/toddlers`, `/preschool`, `/kindergarten` while the pages are labelled
-  Baby Class … Primary School, so the address bar contradicts the page.
+  Rwandan convention rather than anything the school has stated. They appear right across the site (class cards,
+  FAQs, admissions, tuition, the admissions form's class options in `src/lib/server/admissions.ts`, page
+  descriptions). Find every one with `grep -rnE "Baby Class|Middle Class|Top Class|3–4|4–5|5–6" src`.
+
+The classes are summarised by the four class cards on the one `/programs` page. The theme's page-per-class
+addresses (`/infants`, `/toddlers`, `/preschool`, `/kindergarten`, `/flex-care`, `/art-program`) permanently
+redirect there, to the matching class card where there is one (`next.config.ts`). Their longer copy — a lead per
+class, the "Care for every child" and "How we teach" lists, and the Character & Values and Creativity & Sport
+pages — was placeholder text written for the theme, not supplied by the school, and was not carried over.
 
 Still to come from the school:
 
@@ -134,5 +139,5 @@ Still to come from the school:
 - **The Founder's name.** Her photograph and title are published; her name is not.
 - **The Head Teacher.** Confirmed to be a separate person from the Founder; `HEAD_TEACHER` is `null` until a
   name and photograph arrive, at which point the card renders first in the grid.
-- Both YouTube videos embedded on the site are still the theme's demo footage. No copy claims they show the
-  school, but the school has its own channel and should supply its own. 
+- **Programme detail.** Whether `/programs` should say more about each class, or about character and values,
+  creativity and sport, than the one-line class cards do. Only with copy the school confirms.

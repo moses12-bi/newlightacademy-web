@@ -7,8 +7,8 @@ import { schoolVideo } from "@/lib/site";
  * post-46 #f948bec: a full-width band whose Elementor background is a YouTube
  * clip, with a single play button in the middle that opens a second clip in a
  * lightbox. Nothing may reach youtube.com before a gesture, so the band keeps
- * the theme's deep teal and only the button loads a player. The clip id is
- * still the template's own and is waiting on the school's own footage.
+ * the theme's deep teal and only the button loads a player: the school's own
+ * video (`schoolVideo` in site.ts).
  */
 export default function ProgramsVideoBand() {
   return (
