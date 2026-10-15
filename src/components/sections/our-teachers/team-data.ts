@@ -9,7 +9,7 @@ export interface TeamMember {
 
 /**
  * The teaching staff as supplied by the school: five matching studio portraits
- * (white wall, NLA lanyards) followed by two further staff photographs. They
+ * (white wall, NLA lanyards) followed by a further studio portrait. They
  * arrived without saying who is in them, so no names are set.
  *
  * Built by scripts/process-staff.cjs from the school's own photographs.
@@ -25,8 +25,7 @@ export const DEFAULT_TEAM: TeamMember[] = [
   { photo: "/images/staff/staff-03.webp" },
   { photo: "/images/staff/staff-04.webp" },
   { photo: "/images/staff/staff-05.webp" },
-  { photo: "/images/staff/staff-06.webp" },
-  { photo: "/images/staff/staff-07.webp" },
+  { photo: "/images/staff/staff-07b.webp" },
 ];
 
 /**
@@ -42,6 +41,22 @@ export const RETIRED_DEFAULT_PHOTOS: readonly string[] = [
   "/images/staff/teacher-5.webp",
   "/images/staff/teacher-6.webp",
 ];
+
+/**
+ * Default portraits swapped for a better photograph of the SAME person. The seed
+ * migration moves every row still showing `from` onto `to`, named or not.
+ *   staff-07: a 640px phone photo, replaced by the school's studio portrait of
+ *   him (teach3.png, at the owner's request).
+ */
+export const REPLACED_DEFAULT_PHOTOS: readonly { from: string; to: string }[] = [
+  { from: "/images/staff/staff-07.webp", to: "/images/staff/staff-07b.webp" },
+];
+
+/**
+ * Default portraits taken off the page at the school's request. The seed
+ * migration deletes every row still showing one.
+ */
+export const REMOVED_DEFAULT_PHOTOS: readonly string[] = ["/images/staff/staff-06.webp"];
 
 /** The whole teaching team together, shown above the individual portraits. */
 export const TEAM_GROUP_PHOTO = {

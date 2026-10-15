@@ -3,13 +3,16 @@
  *
  *   node scripts/process-staff.cjs
  *
- * Source: the "new light" folder of staff photographs supplied by the school.
+ * Source: the "new light" folder of staff photographs supplied by the school,
+ * except staff-07b, whose studio portrait (public/images/teach3.png, supplied
+ * earlier) replaced a low-resolution phone photo of the same person.
  * Portraits are cropped to 4:5 (the card shape) around the person, who stands
  * centred in every frame; the group photograph is cropped to a wide 16:7 band
  * around the team, trimming sky and lawn. Nothing is upscaled: a source smaller
  * than the target keeps its own resolution.
  *
- * Output goes to public/images/staff/ as WebP.
+ * Output goes to public/images/staff/ as WebP. ONLY=staff-07b limits a run to
+ * the named outputs.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -28,11 +31,8 @@ const JOBS = [
   { from: "KARISIMBI im(18).jpg.jpeg", to: "staff-03", crop: null, maxW: 800 },
   { from: "KARISIMBI im(19).jpg.jpeg", to: "staff-04", crop: null, maxW: 800 },
   { from: "KARISIMBI im(20).jpg.jpeg", to: "staff-05", crop: null, maxW: 800 },
-  /* 720x1080 phone portrait: keep the full width, take a 4:5 window from the
-     top so the head keeps a little air above it. */
-  { from: "IMG-20250721-WA0040.jpg.jpeg", to: "staff-06", crop: { x: 0, y: 0.04, w: 1, h: 0.833 }, maxW: 800 },
-  /* 640x640 square: a centred 4:5 window, full height. */
-  { from: "+250 788 317 824 20260912_171741.jpg.jpeg", to: "staff-07", crop: { x: 0.1, y: 0, w: 0.8, h: 1 }, maxW: 800 },
+  /* Already 4:5 (1122x1402), so the whole frame. */
+  { from: path.join(__dirname, "..", "public", "images", "teach3.png"), to: "staff-07b", crop: null, maxW: 800 },
   /* The whole teaching team, 16:7, centred on the group. */
   { from: "KARISIMBI im(22).jpg.jpeg", to: "team-group", crop: { x: 0, y: 0.281, w: 1, h: 0.657 }, maxW: 1800 },
 ];
@@ -42,15 +42,17 @@ const JOBS = [
   const browser = await chromium.launch({ headless: true, channel: "msedge" });
   const page = await browser.newPage();
 
+  const only = process.env.ONLY ? process.env.ONLY.split(",") : null;
   for (const job of JOBS) {
-    const file = path.join(SRC, job.from);
+    if (only && !only.includes(job.to)) continue;
+    const file = path.resolve(SRC, job.from);
     if (!fs.existsSync(file)) {
       console.error(`  ! missing ${job.from}`);
       continue;
     }
     const b64 = fs.readFileSync(file).toString("base64");
     const result = await page.evaluate(
-      ([data, crop, maxW]) =>
+      ([data, crop, maxW, mime]) =>
         new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => {
@@ -79,9 +81,9 @@ const JOBS = [
             resolve({ data: c.toDataURL("image/webp", 0.86).split(",")[1], w: c.width, h: c.height });
           };
           img.onerror = () => reject(new Error("decode failed"));
-          img.src = "data:image/jpeg;base64," + data;
+          img.src = "data:" + mime + ";base64," + data;
         }),
-      [b64, job.crop, job.maxW]
+      [b64, job.crop, job.maxW, file.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg"]
     );
     const dest = path.join(OUT, `${job.to}.webp`);
     fs.writeFileSync(dest, Buffer.from(result.data, "base64"));

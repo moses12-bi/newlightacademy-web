@@ -3,7 +3,13 @@
  * code; after that staff manage names, roles, portraits, order and the Head
  * Teacher (always shown first) in the portal.
  */
-import { DEFAULT_TEAM, RETIRED_DEFAULT_PHOTOS, type TeamMember } from "@/components/sections/our-teachers/team-data";
+import {
+  DEFAULT_TEAM,
+  REMOVED_DEFAULT_PHOTOS,
+  REPLACED_DEFAULT_PHOTOS,
+  RETIRED_DEFAULT_PHOTOS,
+  type TeamMember,
+} from "@/components/sections/our-teachers/team-data";
 
 import { db, getContent, isBuildPhase, now, setContent } from "./db";
 
@@ -11,8 +17,10 @@ import { db, getContent, isBuildPhase, now, setContent } from "./db";
  * Bump when DEFAULT_TEAM changes in a way a live site should pick up.
  *   1 — the first six portraits (teacher-1 … teacher-6)
  *   2 — the school's studio portraits (staff-01 … staff-07)
+ *   3 — staff-07's phone photo replaced by a studio portrait of him (staff-07b),
+ *       and staff-06 taken off the page at the school's request
  */
-const STAFF_SEED_VERSION = 2;
+const STAFF_SEED_VERSION = 3;
 
 export interface StaffRow {
   id: number;
@@ -35,6 +43,11 @@ export interface StaffRow {
  * role, not the Head Teacher, still on one of the retired photos. Anything a
  * member of staff named, re-photographed, promoted or added in the portal is
  * theirs and is kept, and the new portraits are appended after it.
+ *
+ * A default portrait later swapped for a better photograph of the same person
+ * (REPLACED_DEFAULT_PHOTOS) is moved over in place on every row still showing
+ * it, so the card keeps its name, role and position. A default portrait the
+ * school asked to take down (REMOVED_DEFAULT_PHOTOS) loses its row.
  */
 function seed(): void {
   const recorded = getContent<number>("staff_seed_version");
@@ -42,24 +55,34 @@ function seed(): void {
   if (version >= STAFF_SEED_VERSION) return;
 
   const handle = db();
-  if (version >= 1 && RETIRED_DEFAULT_PHOTOS.length > 0) {
-    const placeholders = RETIRED_DEFAULT_PHOTOS.map(() => "?").join(", ");
-    handle
-      .prepare(
-        `DELETE FROM staff WHERE name = '' AND role = '' AND is_head = 0 AND photo IN (${placeholders})`,
-      )
-      .run(...RETIRED_DEFAULT_PHOTOS);
+  /* A fresh database (0), or one seeded with the first placeholder portraits (1),
+     gets the current DEFAULT_TEAM; 1 also retires its untouched placeholders. */
+  if (version < 2) {
+    if (version >= 1 && RETIRED_DEFAULT_PHOTOS.length > 0) {
+      const placeholders = RETIRED_DEFAULT_PHOTOS.map(() => "?").join(", ");
+      handle
+        .prepare(
+          `DELETE FROM staff WHERE name = '' AND role = '' AND is_head = 0 AND photo IN (${placeholders})`,
+        )
+        .run(...RETIRED_DEFAULT_PHOTOS);
+    }
+
+    const max = handle.prepare("SELECT MAX(position) AS hi FROM staff").get() as { hi: number | null };
+    let position = (max.hi ?? -1) + 1;
+    const insert = handle.prepare(
+      "INSERT INTO staff (name, role, photo, width, height, position, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    );
+    for (const member of DEFAULT_TEAM) {
+      insert.run(member.name ?? "", member.role ?? "", member.photo, 800, 1000, position, now());
+      position += 1;
+    }
   }
 
-  const max = handle.prepare("SELECT MAX(position) AS hi FROM staff").get() as { hi: number | null };
-  let position = (max.hi ?? -1) + 1;
-  const insert = handle.prepare(
-    "INSERT INTO staff (name, role, photo, width, height, position, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-  );
-  for (const member of DEFAULT_TEAM) {
-    insert.run(member.name ?? "", member.role ?? "", member.photo, 800, 1000, position, now());
-    position += 1;
-  }
+  const replace = handle.prepare("UPDATE staff SET photo = ?, width = 800, height = 1000 WHERE photo = ?");
+  for (const { from, to } of REPLACED_DEFAULT_PHOTOS) replace.run(to, from);
+  const remove = handle.prepare("DELETE FROM staff WHERE photo = ?");
+  for (const photo of REMOVED_DEFAULT_PHOTOS) remove.run(photo);
+
   setContent("staff_seeded", true);
   setContent("staff_seed_version", STAFF_SEED_VERSION);
 }
