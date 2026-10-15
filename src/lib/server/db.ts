@@ -188,6 +188,9 @@ const MIGRATIONS: string[] = [
   `
   ALTER TABLE messages ADD COLUMN stage TEXT NOT NULL DEFAULT '';
   `,
+  `
+  ALTER TABLE posts ADD COLUMN image_focus TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrate(db: DatabaseSync): void {

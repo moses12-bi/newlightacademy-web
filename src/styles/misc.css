@@ -227,6 +227,9 @@
 }
 .blog-card__thumb { position: relative; width: 100%; padding-bottom: 60%; }
 .blog-card__image { object-fit: cover; transition: filter 0.3s; }
+/* No cover photo: the school crest on the cream band instead of an empty box. */
+.blog-card__thumb--empty { background: var(--color-accent-8); }
+.blog-card__crest { position: absolute; top: 50%; left: 50%; width: 30%; max-width: 160px; height: auto; transform: translate(-50%, -50%); opacity: .9; }
 .blog-card:hover .blog-card__image { filter: brightness(115%); }
 .blog-card__badge {
   position: absolute;
@@ -328,8 +331,8 @@
   background: var(--color-accent-2);
 }
 .blog-post__title { margin-bottom: 30px; font-size: 48px; font-weight: 800; line-height: 1.1; }
-.blog-post__photo { overflow: hidden; border-radius: 10px; }
-.blog-post__photo img { display: block; width: 100%; height: auto; }
+.blog-post__photo { position: relative; overflow: hidden; border-radius: 10px; aspect-ratio: 16 / 9; background: var(--color-accent-8); }
+.blog-post__photo img { object-fit: cover; }
 .blog-post__excerpt { margin-top: 30px; font-size: 18px; }
 .blog-post__note {
   margin-top: 25px;
@@ -359,6 +362,7 @@
   .blog-feed__main { width: 100%; margin-right: 0; }
   .blog-feed__side { width: 100%; margin-top: 40px; }
   .blog-card__thumb { padding-bottom: 50%; }
+  .blog-post__photo { aspect-ratio: 4 / 3; }
   .blog-card__text { padding: 20px; }
   .blog-post { padding: 40px 0 60px; }
   .blog-post__title { font-size: 26px; }

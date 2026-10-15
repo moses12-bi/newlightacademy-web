@@ -14,6 +14,8 @@ export interface PostRow {
   image_url: string;
   image_width: number;
   image_height: number;
+  /** Focal point as CSS `object-position`, e.g. "50% 20%"; empty = automatic. */
+  image_focus: string;
   status: "draft" | "published";
   published_at: string | null;
   created_at: string;
@@ -29,6 +31,7 @@ export interface PostInput {
   image_url: string;
   image_width: number;
   image_height: number;
+  image_focus: string;
   status: "draft" | "published";
   /** ISO date (YYYY-MM-DD) shown on the post; defaults to today on first publish. */
   published_at: string;
@@ -90,8 +93,8 @@ export function createPost(input: PostInput, authorId: number): PostRow {
   const stamp = now();
   const result = db()
     .prepare(
-      `INSERT INTO posts (slug, title, category, excerpt, body, image_url, image_width, image_height, status, published_at, created_at, updated_at, author_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO posts (slug, title, category, excerpt, body, image_url, image_width, image_height, image_focus, status, published_at, created_at, updated_at, author_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       slug,
@@ -102,6 +105,7 @@ export function createPost(input: PostInput, authorId: number): PostRow {
       input.image_url,
       input.image_width,
       input.image_height,
+      input.image_focus,
       input.status,
       publishedAt(input),
       stamp,
@@ -118,7 +122,7 @@ export function updatePost(id: number, input: PostInput): PostRow {
   db()
     .prepare(
       `UPDATE posts SET slug = ?, title = ?, category = ?, excerpt = ?, body = ?, image_url = ?, image_width = ?, image_height = ?,
-              status = ?, published_at = ?, updated_at = ? WHERE id = ?`,
+              image_focus = ?, status = ?, published_at = ?, updated_at = ? WHERE id = ?`,
     )
     .run(
       slug,
@@ -129,6 +133,7 @@ export function updatePost(id: number, input: PostInput): PostRow {
       input.image_url,
       input.image_width,
       input.image_height,
+      input.image_focus,
       input.status,
       publishedAt(input, existing),
       now(),
