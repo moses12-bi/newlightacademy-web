@@ -390,8 +390,12 @@ async function verifyGallery(page) {
   const total = await thumbs.count();
   assert.ok(total > 1, "the gallery needs more than one photo to test navigation");
 
+  /* The masonry lists tiles column by column, so tiles are found by photo number. */
+  const tile = (n) => page.locator(`.gallery-item[data-photo="${n}"]`);
+  const focusedPhoto = () => page.evaluate(() => Number(document.activeElement.closest(".gallery-item")?.dataset.photo ?? -1));
+
   // Click opens.
-  await thumbs.nth(1).click();
+  await tile(1).click();
   const dialog = page.locator(".gallery-lightbox");
   await dialog.waitFor({ state: "visible" });
   assert.equal(await dialog.getAttribute("aria-modal"), "true", "the lightbox is not a modal dialog");
@@ -412,24 +416,16 @@ async function verifyGallery(page) {
   // Escape closes and focus returns to the thumbnail that opened it.
   await page.keyboard.press("Escape");
   await dialog.waitFor({ state: "hidden" });
-  const returned = await page.evaluate(() => {
-    const items = [...document.querySelectorAll(".gallery-item")];
-    return items.indexOf(document.activeElement.closest(".gallery-item"));
-  });
-  assert.equal(returned, 1, "focus did not return to the thumbnail that opened the lightbox");
+  assert.equal(await focusedPhoto(), 1, "focus did not return to the thumbnail of the photo on show");
 
   // Keyboard opening: focus the thumbnail and press Enter.
-  await page.locator(".gallery-item").nth(3).focus();
+  await tile(3).focus();
   await page.keyboard.press("Enter");
   await dialog.waitFor({ state: "visible" });
   assert.match(await page.locator(".gallery-lightbox__count").innerText(), /4 of/, "Enter opened the wrong photo");
   await page.keyboard.press("Escape");
   await dialog.waitFor({ state: "hidden" });
-  const returnedTwo = await page.evaluate(() => {
-    const items = [...document.querySelectorAll(".gallery-item")];
-    return items.indexOf(document.activeElement.closest(".gallery-item"));
-  });
-  assert.equal(returnedTwo, 3, "focus did not return after a keyboard open");
+  assert.equal(await focusedPhoto(), 3, "focus did not return after a keyboard open");
 }
 
 /** The gallery shows forty tiles at a time; "Show more photos" adds the next forty. */

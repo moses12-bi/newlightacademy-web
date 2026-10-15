@@ -30,7 +30,7 @@ import { deleteMessage, getMessage, setMessageStage, setMessageStatus, type Mess
 import { createPost, deletePost, updatePost, type PostInput } from "@/lib/server/posts";
 import { createReview, deleteReview, setReviewStatus, type ReviewStatus } from "@/lib/server/reviews";
 import { LIBRARY_CACHE_TAG, setDescription, setTag } from "@/lib/server/cloudinary-library";
-import { copiesOf, galleryLibrary, HIDE_TAG, libraryKey } from "@/lib/server/gallery";
+import { copiesOf, galleryLibrary, HIDE_TAG, markHidden, photoKey } from "@/lib/server/gallery";
 import { cloudinaryCloud, withTransform } from "@/lib/server/media";
 import { SETTINGS, setSetting, siteUrl } from "@/lib/server/settings";
 import { saveSiteDetails, SOCIAL_NETWORKS } from "@/lib/server/site-details";
@@ -55,7 +55,8 @@ function str(form: FormData, key: string): string {
 function withFlash(path: string, kind: "ok" | "error", message: string): string {
   const url = new URL(path, "http://portal.local");
   url.searchParams.set(kind, message);
-  return `${url.pathname}${url.search}`;
+  /* Keep the #anchor, so the page opens on the item that was just changed. */
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 function safeNext(next: string): string {
@@ -223,10 +224,11 @@ export async function galleryPhotoAction(form: FormData): Promise<void> {
   if (!library.some((photo) => photo.publicId === publicId)) {
     redirect(withFlash("/admin/gallery", "error", "That photo is no longer in the library."));
   }
-  const back = `/admin/gallery#photo-${libraryKey(publicId)}`;
+  const back = `/admin/gallery#photo-${photoKey(publicId)}`;
   try {
     if (op === "hide" || op === "show") {
       await setTag(await copiesOf(publicId), HIDE_TAG, op === "hide");
+      markHidden(photoKey(publicId), op === "hide");
       logActivity(user.id, op === "hide" ? "hid gallery photo" : "showed gallery photo", publicId);
     } else if (op === "describe") {
       await setDescription(publicId, str(form, "alt").slice(0, 300), str(form, "label").slice(0, 40));

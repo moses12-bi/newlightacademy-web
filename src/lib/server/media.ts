@@ -7,7 +7,11 @@ import crypto from "node:crypto";
 
 import { getSetting } from "./settings";
 
-/** Portraits, blog covers and social media posts. The gallery never shows this folder. */
+/**
+ * Portraits, blog covers and social media posts. The gallery skips this folder,
+ * except photos staff added from the portal's old Gallery page and those listed
+ * in library-meta.ts.
+ */
 export const UPLOAD_FOLDER = "new-light-academy/portal";
 /** Photos added on the portal's Gallery page; they appear in the gallery like any other library photo. */
 export const GALLERY_FOLDER = "new-light-academy/gallery";

@@ -55,15 +55,25 @@
    the image that overruns a row when doing so lands nearer the ideal height).
    Counts verified at 320/390/768/1024/1025/1280/1440 = 1/2/3/4/2/2/2; once the
    count matches, the row geometry matches the original exactly. */
-/* A precise masonry: CSS columns let each photograph keep its own aspect ratio
-   and stack into balanced columns, like a photo album laid out by hand. Each
-   tile carries a dark gradient foot with a short label, rounded corners and a
-   lift-and-zoom on hover. `--gallery-ar` (set per item in the markup) drives the
-   tile's height from its own ratio. The `margin-bottom` matches `column-gap`,
-   so the vertical and horizontal gutters are identical. */
+/* A precise masonry: each photograph keeps its own aspect ratio and stacks into
+   columns, like a photo album laid out by hand. GalleryJustified places every
+   photo in the shortest column (4 on desktop, 3 on a tablet, 2 on a phone), so
+   the gallery reads left to right and "Show more photos" only adds to the
+   bottom. Each tile carries a dark gradient foot with a short label, rounded
+   corners and a lift-and-zoom on hover. `--gallery-ar` (set per item in the
+   markup) drives the tile's height from its own ratio; one gap serves both
+   gutters. */
 .gallery-grid {
-  columns: 4;
-  column-gap: var(--gallery-gap, 18px);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gallery-gap, 18px);
+}
+.gallery-column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--gallery-gap, 18px);
+  min-width: 0;
 }
 /* "Show more photos": the library is shown forty tiles at a time. */
 .gallery-more {
@@ -81,8 +91,6 @@
   position: relative;
   display: block;
   width: 100%;
-  margin: 0 0 var(--gallery-gap, 18px);
-  break-inside: avoid;
   aspect-ratio: var(--gallery-ar);
   overflow: hidden;
   border-radius: 16px;
@@ -274,7 +282,6 @@
     padding: 50px 0;
   }
   .gallery-grid {
-    columns: 3;
     --gallery-gap: 16px;
   }
 }
@@ -285,9 +292,14 @@
   .gallery-intro__copy {
     width: 100%;
   }
+  /* Two to a row: also catches the server guessing more columns for a phone
+     before the page's script has corrected it. */
   .gallery-grid {
-    columns: 2;
     --gallery-gap: 12px;
+    flex-wrap: wrap;
+  }
+  .gallery-column {
+    flex-basis: calc(50% - var(--gallery-gap) / 2);
   }
   .gallery-item {
     border-radius: 12px;

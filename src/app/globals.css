@@ -107,7 +107,7 @@
 
   --font-handwritten: "Sensei", ui-sans-serif, sans-serif;
 
-  /* next/font/google exposes Catamaran on --font-catamaran (set in layout.tsx). */
+  /* next/font/local exposes Catamaran on --font-catamaran (set in layout.tsx). */
   --font-display: var(--font-catamaran), "Catamaran", ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", sans-serif;
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Catamaran } from "next/font/google";
+import localFont from "next/font/local";
 
 import "./globals.css";
 
@@ -9,10 +9,14 @@ import { site } from "@/lib/site";
 /**
  * The whole theme is set in Catamaran. `variable` publishes the family as
  * `--font-catamaran`, which `globals.css` reads through `--font-display`.
+ *
+ * The font file is kept in the repository (Google Fonts' variable Catamaran,
+ * latin subset; SIL Open Font License, see fonts/OFL.txt) rather than fetched
+ * from Google during the build: a failed download there once failed a deploy.
  */
-const catamaran = Catamaran({
-  subsets: ["latin"],
-  weight: ["400", "600", "800", "900"],
+const catamaran = localFont({
+  src: "./fonts/catamaran-latin.woff2",
+  weight: "100 900",
   display: "swap",
   variable: "--font-catamaran",
 });

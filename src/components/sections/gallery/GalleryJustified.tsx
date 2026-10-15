@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 
 import { CloseIcon } from "@/components/ui/icons";
@@ -20,6 +20,47 @@ function fullSizeHref(src: string): string {
 
 export interface GalleryJustifiedProps {
   photos: GalleryPhoto[];
+  /** Tiles to show before any "Show more photos" (the page passes all of them for ?all=1). */
+  initialCount?: number;
+  /** Columns to render on the server, guessed from the device; the browser corrects it. */
+  initialColumns?: number;
+}
+
+/* The masonry's column counts: 4 on desktop, 3 on a tablet, 2 on a phone. */
+const WIDE = "(min-width: 1025px)";
+const MEDIUM = "(min-width: 768px)";
+
+function viewportColumns(): number {
+  if (window.matchMedia(WIDE).matches) return 4;
+  return window.matchMedia(MEDIUM).matches ? 3 : 2;
+}
+
+function onViewportChange(callback: () => void): () => void {
+  const queries = [window.matchMedia(WIDE), window.matchMedia(MEDIUM)];
+  for (const query of queries) query.addEventListener("change", callback);
+  return () => {
+    for (const query of queries) query.removeEventListener("change", callback);
+  };
+}
+
+/**
+ * Shortest column first, in order: photo i goes to whichever column is shortest
+ * once photos 0…i-1 are placed. The page therefore reads left to right, the
+ * columns grow evenly, and adding photos never moves one already placed.
+ * Heights are in column widths (1 / aspect ratio), plus a little for the gap.
+ */
+function distribute(photos: GalleryPhoto[], count: number, columns: number): number[][] {
+  const heights = new Array<number>(columns).fill(0);
+  const placed = Array.from({ length: columns }, () => [] as number[]);
+  for (let index = 0; index < count; index++) {
+    let target = 0;
+    for (let column = 1; column < columns; column++) {
+      if (heights[column] < heights[target] - 1e-6) target = column;
+    }
+    placed[target].push(index);
+    heights[target] += 1 / photos[index].ratio + 0.06;
+  }
+  return placed;
 }
 
 function ArrowIcon({ direction }: { direction: "left" | "right" }) {
@@ -46,16 +87,20 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
  * only takes over once this component has hydrated.
  *
  * The library runs to a couple of hundred photographs, so the grid shows them
- * forty at a time behind a "Show more photos" button. The lightbox steps
- * through all of them, revealing the tiles it reaches so that focus can always
- * return to the photo it came from.
+ * forty at a time behind a "Show more photos" button, in a shortest-column-first
+ * masonry (see distribute), so the photos already on screen never move when
+ * more arrive; focus goes to the first new one. Without JavaScript the button is a plain
+ * link to the whole gallery (?all=1). The lightbox steps through every photo,
+ * revealing the tiles it reaches, and on closing returns focus to the tile of
+ * the photo last shown.
  */
 /** Tiles shown at first, and added by each "Show more photos". */
 const BATCH = 40;
 
-export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
+export default function GalleryJustified({ photos, initialCount = BATCH, initialColumns = 4 }: GalleryJustifiedProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [shown, setShown] = useState(BATCH);
+  const [shown, setShown] = useState(initialCount);
+  const revealFromRef = useRef<number | null>(null);
   const triggersRef = useRef<Array<HTMLAnchorElement | null>>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -64,7 +109,9 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
 
   const total = photos.length;
   const isOpen = openIndex !== null;
-  const visible = photos.slice(0, shown);
+  const visibleCount = Math.min(shown, total);
+  const columns = useSyncExternalStore(onViewportChange, viewportColumns, () => initialColumns);
+  const placed = distribute(photos, visibleCount, columns);
 
   const open = useCallback((index: number) => {
     returnIndexRef.current = index;
@@ -81,14 +128,28 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
     (delta: number) => {
       if (openIndex === null) return;
       const next = (openIndex + delta + total) % total;
+      returnIndexRef.current = next;
       setOpenIndex(next);
       setShown((current) => (next < current ? current : Math.ceil((next + 1) / BATCH) * BATCH));
     },
     [openIndex, total],
   );
 
-  /* Move focus into the dialog when it opens and back to the thumbnail that
-     opened it when it closes. */
+  const showMore = () => {
+    revealFromRef.current = visibleCount;
+    setShown(Math.min(total, visibleCount + BATCH));
+  };
+
+  /* After "Show more photos", focus (and scroll to) the first new tile. */
+  useEffect(() => {
+    const from = revealFromRef.current;
+    if (from === null) return;
+    revealFromRef.current = null;
+    triggersRef.current[from]?.focus();
+  }, [shown]);
+
+  /* Move focus into the dialog when it opens and back to the thumbnail of the
+     photo last shown when it closes. */
   useEffect(() => {
     if (isOpen) {
       closeRef.current?.focus();
@@ -169,47 +230,71 @@ export default function GalleryJustified({ photos }: GalleryJustifiedProps) {
 
   return (
     <>
-      <div className="gallery-grid">
-        {visible.map((photo, index) => (
-          <a
-            key={`${photo.src}-${index}`}
-            ref={(node) => {
-              triggersRef.current[index] = node;
-            }}
-            href={fullSizeHref(photo.src)}
-            className="gallery-item"
-            style={{ "--gallery-ar": photo.ratio } as CSSProperties}
-            onClick={(event) => handleThumbClick(event, index)}
-            onKeyDown={(event) => handleThumbKeyDown(event, index)}
-          >
-            <Image
-              src={photo.src}
-              loader={loaderFor(photo.src)}
-              alt={photo.alt ?? `Gallery photo ${index + 1} of ${total}`}
-              width={photo.width}
-              height={photo.height}
-              sizes="(max-width: 420px) 100vw, (max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
-            />
-            {/* A dark gradient foot carries the short label and keeps it legible
-                over any photograph. The whole tile is the link, so the overlay
-                is decorative and hidden from assistive tech. */}
-            <span className="gallery-item__overlay" aria-hidden="true">
-              {photo.label ? <span className="gallery-item__label">{photo.label}</span> : null}
-            </span>
-          </a>
+      <div className="gallery-grid" style={{ "--gallery-columns": columns } as CSSProperties}>
+        {placed.map((indices, column) => (
+          <div key={column} className="gallery-column">
+            {indices.map((index) => {
+              const photo = photos[index];
+              return (
+                <a
+                  key={`${photo.src}-${index}`}
+                  ref={(node) => {
+                    triggersRef.current[index] = node;
+                  }}
+                  href={fullSizeHref(photo.src)}
+                  className="gallery-item"
+                  /* Tiles sit in their columns, so the page order is not the photo order. */
+                  data-photo={index}
+                  style={{ "--gallery-ar": photo.ratio } as CSSProperties}
+                  onClick={(event) => handleThumbClick(event, index)}
+                  onKeyDown={(event) => handleThumbKeyDown(event, index)}
+                >
+                  <Image
+                    src={photo.src}
+                    loader={loaderFor(photo.src)}
+                    alt={photo.alt ?? `Gallery photo ${index + 1} of ${total}`}
+                    width={photo.width}
+                    height={photo.height}
+                    sizes="(max-width: 420px) 100vw, (max-width: 767px) 50vw, (max-width: 1024px) 33vw, 320px"
+                  />
+                  {/* A dark gradient foot carries the short label and keeps it legible
+                      over any photograph. The whole tile is the link, so the overlay
+                      is decorative and hidden from assistive tech. */}
+                  <span className="gallery-item__overlay" aria-hidden="true">
+                    {photo.label ? <span className="gallery-item__label">{photo.label}</span> : null}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
         ))}
       </div>
 
-      {shown < total ? (
+      {/* Mounted for the whole visit when the gallery is long, so the last count
+          is announced too. Without JavaScript the form asks for every photo. */}
+      {total > BATCH ? (
         <div className="gallery-more">
-          <button
-            type="button"
-            className="theme-button inline-flex items-center justify-center gap-2 rounded-[4px] border border-accent-1 bg-transparent px-6 py-3 text-[15px] leading-tight text-accent-1 transition-[color,background-color,border-color,transform] duration-300 hover:scale-110 hover:border-accent-3 hover:bg-accent-3 hover:text-accent-5 focus-visible:scale-110"
-            onClick={() => setShown((current) => Math.min(total, current + BATCH))}
-          >
-            Show more photos
-          </button>
-          <p className="gallery-more__count" aria-live="polite">{`Showing ${shown} of ${total} photos`}</p>
+          {visibleCount < total ? (
+            <form
+              method="get"
+              action="/gallery"
+              onSubmit={(event) => {
+                event.preventDefault();
+                showMore();
+              }}
+            >
+              <input type="hidden" name="all" value="1" />
+              <button
+                type="submit"
+                className="theme-button inline-flex items-center justify-center gap-2 rounded-[4px] border border-accent-1 bg-transparent px-6 py-3 text-[15px] leading-tight text-accent-1 transition-[color,background-color,border-color,transform] duration-300 hover:scale-110 hover:border-accent-3 hover:bg-accent-3 hover:text-accent-5 focus-visible:scale-110"
+              >
+                Show more photos
+              </button>
+            </form>
+          ) : null}
+          <p className="gallery-more__count" aria-live="polite">
+            {visibleCount < total ? `Showing ${visibleCount} of ${total} photos` : `Showing all ${total} photos`}
+          </p>
         </div>
       ) : null}
 

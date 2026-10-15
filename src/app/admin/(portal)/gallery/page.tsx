@@ -3,7 +3,7 @@ import Link from "next/link";
 import Flash from "@/components/admin/Flash";
 import GalleryUploader from "@/components/admin/GalleryUploader";
 import { requireUser } from "@/lib/server/auth";
-import { galleryLibrary, HIDE_TAG, libraryKey } from "@/lib/server/gallery";
+import { galleryLibrary, HIDE_TAG } from "@/lib/server/gallery";
 import { mediaConfigured, withTransform } from "@/lib/server/media";
 
 import { galleryPhotoAction, galleryUploadedAction } from "../../actions";
@@ -73,7 +73,7 @@ export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/g
             {library.map((photo) => (
               <article
                 key={photo.publicId}
-                id={`photo-${libraryKey(photo.publicId)}`}
+                id={`photo-${photo.key}`}
                 className="adm-card adm-gallery__item"
                 style={photo.hidden ? { opacity: 0.6 } : undefined}
               >
@@ -103,7 +103,7 @@ export default async function GalleryAdmin({ searchParams }: PageProps<"/admin/g
                   </label>
                   <label className="adm-field">
                     <span className="adm-small">Description</span>
-                    <textarea name="alt" rows={2} defaultValue={photo.alt} maxLength={300} style={{ minHeight: 0 }} />
+                    <textarea name="alt" rows={2} defaultValue={photo.alt ?? ""} maxLength={300} style={{ minHeight: 0 }} />
                   </label>
                   <button type="submit" className="adm-btn adm-btn--ghost adm-btn--sm">
                     Save
