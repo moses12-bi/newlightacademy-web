@@ -13,7 +13,7 @@ import { connectGoogleFromCode } from "@/lib/server/social/youtube";
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/admin/oauth/[provider]/callback">) {
   const back = new URL("/admin/social/accounts", siteUrl(request.nextUrl.origin));
   const user = await currentUser();
-  if (!user) return Response.redirect(new URL("/admin/login", siteUrl(request.nextUrl.origin)));
+  if (!user || user.role !== "admin") return Response.redirect(new URL("/admin/login", siteUrl(request.nextUrl.origin)));
 
   const { provider } = await ctx.params;
   const params = request.nextUrl.searchParams;

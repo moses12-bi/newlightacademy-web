@@ -29,10 +29,10 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <small>Staff portal</small>
           </span>
         </Link>
-        <AdminNav counts={{ inbox: countNewMessages(), reviews: pendingReviews, applications: newApplications }} />
+        <AdminNav isAdmin={user.role === "admin"} counts={{ inbox: countNewMessages(), reviews: pendingReviews, applications: newApplications }} />
         <div className="adm-side-foot">
           <span>
-            Signed in as <b>{user.name}</b>
+            Signed in as <Link href="/admin/account">{user.name}</Link>
           </span>
           <a href="/" target="_blank" rel="noreferrer">
             View website ↗

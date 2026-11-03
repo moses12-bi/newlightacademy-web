@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import CalendarContact from "@/components/sections/school-calendar/CalendarContact";
+import CalendarEvents from "@/components/sections/school-calendar/CalendarEvents";
 import CalendarMonths, {
   formatCalendarDate,
   selectAcademicYear,
@@ -9,6 +10,7 @@ import CalendarMonths, {
 import CalendarScene from "@/components/sections/school-calendar/CalendarScene";
 import CalendarVisit from "@/components/sections/school-calendar/CalendarVisit";
 import PageHero from "@/components/ui/PageHero";
+import { upcomingEvents } from "@/lib/server/events";
 
 /**
  * Regenerate once a day. The page picks which academic year to show from the
@@ -16,6 +18,8 @@ import PageHero from "@/components/ui/PageHero";
  * built and the calendar would quietly go stale a year later.
  */
 export const revalidate = 86400;
+/* (School events added in the portal refresh this page straight away; the
+   site layout also re-renders every page at least every five minutes.) */
 
 /**
  * One sentence describing where we are in the published calendar. `awaiting` is
@@ -69,6 +73,8 @@ export default function SchoolCalendarPage() {
           reveal: "bounceInUp",
         }}
       />
+
+      <CalendarEvents events={upcomingEvents()} />
 
       {panels.map((months, index) => (
         <CalendarMonths

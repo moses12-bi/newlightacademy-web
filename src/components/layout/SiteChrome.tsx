@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import AnnouncementBanner from "@/components/sections/announcements/AnnouncementBanner";
 import PageMotion from "@/components/ui/PageMotion";
+import { urgentAnnouncement } from "@/lib/server/announcements";
 import { siteDetails } from "@/lib/server/site-details";
 
 /**
@@ -11,6 +13,7 @@ import { siteDetails } from "@/lib/server/site-details";
  */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const details = siteDetails();
+  const urgent = urgentAnnouncement();
   return (
     <>
       {/* First focusable element on every page: the header's nav and dropdowns are
@@ -21,6 +24,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
+      {urgent ? <AnnouncementBanner id={urgent.id} title={urgent.title} /> : null}
       <Header phone={details.phone} phoneHref={details.phoneHref} />
       <main id="main" className="flex-1">
         {children}

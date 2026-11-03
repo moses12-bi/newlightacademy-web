@@ -10,6 +10,7 @@ export default function LoginForm({ next }: { next: string }) {
     /* onSubmit rather than `action`, so a failed attempt does not clear the email. */
     <form
       className="adm-form"
+      action={action}
       onSubmit={(event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);

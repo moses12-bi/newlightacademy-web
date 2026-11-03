@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import ConfirmSubmit from "@/components/admin/ConfirmSubmit";
 import Flash from "@/components/admin/Flash";
+import { requireAdmin } from "@/lib/server/auth";
 import { callbackPath, PROVIDER_FOR } from "@/lib/server/oauth";
 import { siteUrl } from "@/lib/server/settings";
 import { describeAccounts, PLATFORM_LABELS, PLATFORMS, platformStatus } from "@/lib/server/social";
@@ -20,6 +21,7 @@ const PROVIDER_TEXT = {
 
 export default async function AccountsPage({ searchParams }: PageProps<"/admin/social/accounts">) {
   await requireUser();
+  await requireAdmin();
   const params = await searchParams;
   const host = (await headers()).get("host");
   const origin = siteUrl(host ? `${host.startsWith("localhost") ? "http" : "https"}://${host}` : undefined);

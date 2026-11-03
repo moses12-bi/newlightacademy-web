@@ -59,6 +59,8 @@ An internal portal for the school office, served by the same app at `newlight-ac
 | **Blog** | Write, schedule (future date) and publish posts with a cover photo and full article. `/blog` reads them live. "Save & share" hands the post to the social composer. |
 | **Applications** | Student applications from `/how-to-apply` (child, class, parent, documents) and job applications from `/careers`, each moved through stages (e.g. New → Visit or assessment → Offered a place → Enrolled). Open/close online admissions and set the intake. |
 | **Careers** | Publish vacancies with type of work, category, class, closing date, responsibilities and requirements. Each gets a page at `/careers/<slug>` with an application form that takes a CV. "Save & share" posts it to social media. |
+| **Announcements** | Notices for parents on `/announcements` and the Parents page, with audience, optional publish time and expiry, and pinning. *Urgent* ones also show as a banner on every page, which visitors can close. |
+| **Calendar** | The school's own events (meetings, sports day, graduation…) on `/school-calendar` above the national term dates, and on the Parents page. Parents subscribe once at `/school-calendar.ics` and their phone calendar stays up to date. |
 | **Gallery** | `/gallery` follows the school's Cloudinary library: every photo there shows, newest uploads first, except photos tagged `nla-hide`, the site's own files (samples, crests, placeholders, and the portal's upload folder, apart from photos added on the old Gallery page) and second copies of the same file. Visitors see forty at a time, with "Show more photos"; if Cloudinary cannot be read, the page keeps the last listing it had and never brings back a hidden photo. Here staff upload photos (into `new-light-academy/gallery`), hide or show any photo, and write its description and label (stored on the photo in Cloudinary). Photos added in the Cloudinary console appear within five minutes. |
 | **Staff** | Teacher cards on `/our-teachers`: portrait (cropped to 4:5 around the face), name, role, order, and the Head Teacher shown first. |
 | **School details** | Phone, email, address, directions and the Facebook / Instagram / YouTube / TikTok links used in the header, footer and contact sections. |
@@ -67,6 +69,25 @@ An internal portal for the school office, served by the same app at `newlight-ac
 | **Inbox** | Every website form (tour, application, payment question, visit, newsletter, review) is stored here and emailed to the office. Reply by email from the message. |
 | **Email** | Send email from the school address; log of everything sent, with failures. |
 | **Settings** | SMTP, Cloudinary and social app credentials (secrets encrypted at rest), test email, staff accounts, password change. |
+
+### Staff accounts
+
+- **Roles.** *Administrators* can do everything, including Staff accounts and Settings (email, Cloudinary, social
+  app keys). *Staff* can use every content screen — blog, social media, applications, careers, gallery, staff cards,
+  school details, reviews, inbox and email. There is always at least one active administrator; the portal refuses
+  to remove, deactivate or demote the last one.
+- **Inviting.** Staff accounts → *Invite someone*. The person gets an email with a link to choose their own
+  password (one use, 7 days). Without email set up, the administrator is shown the link to pass on.
+- **Forgotten passwords.** *Forgot your password?* on the sign-in page emails a reset link (one use, 1 hour). The
+  answer is the same whether or not the address has an account. An administrator can also send someone a reset
+  link from Staff accounts. Setting a new password signs that person out everywhere.
+- **Leaving staff.** *Deactivate* signs the person out at once and blocks sign-in, keeping their name on past
+  work; *Remove* deletes the account.
+- **My account** (click your name in the sidebar): change name, email (needs the password), password, and sign out
+  of other devices.
+
+The first administrator still comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` on first start; everyone else is
+invited. Invitations and reset emails need email set up (Settings → Integrations → Email).
 
 ### First deploy
 

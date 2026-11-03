@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import Flash from "@/components/admin/Flash";
+
 import { formatDateTime } from "@/lib/admin/format";
 import { db } from "@/lib/server/db";
 import { mailConfigured } from "@/lib/server/mail";
@@ -13,7 +15,8 @@ function count(sql: string): number {
   return (db().prepare(sql).get() as { n: number }).n;
 }
 
-export default async function Dashboard() {
+export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
+  const params = await searchParams;
   await requireUser();
   const stats = [
     { label: "New enquiries", value: count("SELECT COUNT(*) AS n FROM messages WHERE status = 'new'"), href: "/admin/inbox" },
@@ -63,6 +66,7 @@ export default async function Dashboard() {
         </div>
       </div>
 
+      <Flash ok={params.ok} error={params.error} />
       <div className="adm-grid">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href} className="adm-card adm-stat">

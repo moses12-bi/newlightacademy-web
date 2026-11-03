@@ -7,6 +7,8 @@ const ITEMS = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/social", label: "Social media" },
+  { href: "/admin/announcements", label: "Announcements" },
+  { href: "/admin/calendar", label: "Calendar" },
   { href: "/admin/applications", label: "Applications", countKey: "applications" },
   { href: "/admin/careers", label: "Careers" },
   { href: "/admin/gallery", label: "Gallery" },
@@ -15,14 +17,21 @@ const ITEMS = [
   { href: "/admin/reviews", label: "Reviews", countKey: "reviews" },
   { href: "/admin/inbox", label: "Inbox", countKey: "inbox" },
   { href: "/admin/email", label: "Email" },
-  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/settings/users", label: "Staff accounts", adminOnly: true },
+  { href: "/admin/settings", label: "Settings", adminOnly: true, exact: true },
 ] as const;
 
-export default function AdminNav({ counts }: { counts: { inbox: number; reviews: number; applications: number } }) {
+export default function AdminNav({
+  counts,
+  isAdmin,
+}: {
+  counts: { inbox: number; reviews: number; applications: number };
+  isAdmin: boolean;
+}) {
   const pathname = usePathname();
   return (
     <nav className="adm-nav" aria-label="Portal">
-      {ITEMS.map((item) => {
+      {ITEMS.filter((item) => isAdmin || !("adminOnly" in item)).map((item) => {
         const active = "exact" in item ? pathname === item.href : pathname.startsWith(item.href);
         const count = "countKey" in item ? counts[item.countKey] : 0;
         return (

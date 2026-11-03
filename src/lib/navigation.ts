@@ -53,6 +53,7 @@ export const mainNav: NavItem[] = [
     href: "/parents",
     accent: "var(--color-nav-5)",
     children: [
+      { label: "Announcements", href: "/announcements" },
       { label: "Paying School Fees", href: "/make-a-payment" },
       { label: "Pupil Handbook", href: "/student-handbook" },
       { label: "School Calendar", href: "/school-calendar" },

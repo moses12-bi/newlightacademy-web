@@ -4,6 +4,8 @@ import ConfirmSubmit from "@/components/admin/ConfirmSubmit";
 import Flash from "@/components/admin/Flash";
 import SocialComposer, { type ComposerDraft } from "@/components/admin/SocialComposer";
 import { formatDateTime } from "@/lib/admin/format";
+import { getAnnouncement } from "@/lib/server/announcements";
+import { eventDateText, eventTimeText, getEvent } from "@/lib/server/events";
 import { getJob } from "@/lib/server/jobs";
 import { getPostById } from "@/lib/server/posts";
 import { siteUrl } from "@/lib/server/settings";
@@ -60,6 +62,29 @@ export default async function SocialPage({ searchParams }: PageProps<"/admin/soc
     };
   }
 
+  const fromEvent = typeof params.from_event === "string" ? getEvent(Number(params.from_event)) : undefined;
+  if (fromEvent) {
+    draft = {
+      caption: [
+        fromEvent.title,
+        [eventDateText(fromEvent), eventTimeText(fromEvent), fromEvent.location].filter(Boolean).join(" · "),
+        fromEvent.description,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+      title: fromEvent.title,
+      link: `${siteUrl()}/school-calendar`,
+    };
+  }
+  const fromAnnouncement = typeof params.from_announcement === "string" ? getAnnouncement(Number(params.from_announcement)) : undefined;
+  if (fromAnnouncement) {
+    draft = {
+      caption: [fromAnnouncement.title, fromAnnouncement.body].join("\n\n"),
+      title: fromAnnouncement.title,
+      link: `${siteUrl()}/announcements`,
+    };
+  }
+
   const history = listSocialPosts();
   const anyConnected = platforms.some((platform) => platform.connected);
 
@@ -76,6 +101,9 @@ export default async function SocialPage({ searchParams }: PageProps<"/admin/soc
       </div>
       <Flash ok={params.ok} error={params.error} />
       {fromPost ? <p className="adm-flash adm-flash--ok">Blog post saved. Choose where to share it.</p> : null}
+      {fromEvent || fromAnnouncement ? (
+        <p className="adm-flash adm-flash--ok">Saved. Choose where to share it — Instagram and TikTok need a picture.</p>
+      ) : null}
       {fromJob ? (
         <p className="adm-flash adm-flash--ok">
           Vacancy saved. Instagram and TikTok need a picture — add one, or post to Facebook with the link alone.

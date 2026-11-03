@@ -11,15 +11,33 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 
 import { kigaliLocalToIso } from "@/lib/admin/format";
+import { deleteAnnouncement, saveAnnouncement, type AnnouncementInput } from "@/lib/server/announcements";
+import { deleteEvent, EVENT_CATEGORIES, saveEvent, type EventInput } from "@/lib/server/events";
 import {
-  createUser,
+  acceptInvite,
+  completeReset,
+  countActiveAdmins,
+  currentSessionToken,
   deleteUser,
+  endSessions,
+  getInvite,
+  getUser,
+  getUserByEmail,
+  issueToken,
   loginThrottled,
+  passwordProblem,
+  requireAdmin,
   requireUser,
+  resetThrottled,
+  revokeInvite,
+  ROLES,
   setPassword,
   signIn,
   signOut,
+  updateUser,
+  type Role,
 } from "@/lib/server/auth";
+import { inviteLink, resetLink, sendInvitation, sendResetEmail } from "@/lib/server/account-mail";
 import { verifyPassword } from "@/lib/server/crypto";
 import { db, logActivity } from "@/lib/server/db";
 import { sendMail, verifyMail } from "@/lib/server/mail";
@@ -115,6 +133,118 @@ export async function saveSiteDetailsAction(_prev: string | null, form: FormData
   logActivity(user.id, "updated school details");
   refreshSite();
   redirect(withFlash("/admin/site", "ok", "Saved. The website shows the new details within a moment."));
+}
+
+/* ------------------------------------------------- calendar & announcements -- */
+
+/** Pages that show events or announcements; the urgent banner is on every page. */
+function refreshParentPages() {
+  revalidatePath("/school-calendar");
+  revalidatePath("/announcements");
+  revalidatePath("/parents");
+}
+
+function eventInput(form: FormData): EventInput | string {
+  const title = str(form, "title");
+  if (!title) return "Give the event a title.";
+  const date = /^\d{4}-\d{2}-\d{2}$/;
+  const time = /^\d{2}:\d{2}$/;
+  const start = str(form, "start_date");
+  const end = str(form, "end_date");
+  if (!date.test(start)) return "Choose the date of the event.";
+  if (end && (!date.test(end) || end < start)) return "The end date must be on or after the start date.";
+  const allDay = form.get("all_day") === "on";
+  const startTime = allDay ? "" : str(form, "start_time");
+  const endTime = allDay ? "" : str(form, "end_time");
+  if (startTime && !time.test(startTime)) return "The start time is not valid.";
+  if (endTime && (!time.test(endTime) || !startTime)) return "Add a start time before an end time.";
+  const category = str(form, "category");
+  return {
+    title: title.slice(0, 160),
+    category: (EVENT_CATEGORIES as readonly string[]).includes(category) ? category : "Event",
+    start_date: start,
+    end_date: end === start ? "" : end,
+    start_time: startTime,
+    end_time: endTime,
+    location: str(form, "location").slice(0, 160),
+    audience: str(form, "audience").slice(0, 120),
+    description: str(form, "description").slice(0, 4000),
+    status: str(form, "status") === "draft" ? "draft" : "published",
+  };
+}
+
+export async function saveEventAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = eventInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id")) || undefined;
+  const event = saveEvent(input, user.id, id);
+  logActivity(user.id, id ? "updated calendar event" : "added calendar event", event.title);
+  refreshParentPages();
+  if (str(form, "share") === "1" && event.status === "published") redirect(`/admin/social?from_event=${event.id}`);
+  if (str(form, "another") === "1") redirect(withFlash("/admin/calendar/new", "ok", `Added “${event.title}”. Add the next one.`));
+  redirect(withFlash("/admin/calendar", "ok", `Saved “${event.title}”.`));
+}
+
+export async function deleteEventAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  deleteEvent(Number(str(form, "id")));
+  logActivity(user.id, "deleted calendar event");
+  refreshParentPages();
+  redirect(withFlash("/admin/calendar", "ok", "Event deleted."));
+}
+
+function announcementInput(form: FormData): AnnouncementInput | string {
+  const title = str(form, "title");
+  if (!title) return "Give the announcement a title.";
+  const body = str(form, "body");
+  if (!body) return "Write the announcement.";
+  let publishAt = new Date().toISOString();
+  if (str(form, "publish_at")) {
+    const iso = kigaliLocalToIso(str(form, "publish_at"));
+    if (!iso) return "The publish time is not valid.";
+    publishAt = iso;
+  }
+  let expiresAt = "";
+  if (str(form, "expires_at")) {
+    const iso = kigaliLocalToIso(str(form, "expires_at"));
+    if (!iso) return "The expiry time is not valid.";
+    if (iso <= publishAt) return "The announcement must expire after it is published.";
+    expiresAt = iso;
+  }
+  return {
+    title: title.slice(0, 160),
+    body: body.slice(0, 8000),
+    audience: str(form, "audience").slice(0, 120),
+    priority: str(form, "priority") === "urgent" ? "urgent" : "normal",
+    pinned: form.get("pinned") === "on" ? 1 : 0,
+    publish_at: publishAt,
+    expires_at: expiresAt,
+    status: str(form, "status") === "draft" ? "draft" : "published",
+  };
+}
+
+export async function saveAnnouncementAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = announcementInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id")) || undefined;
+  const announcement = saveAnnouncement(input, user.id, id);
+  logActivity(user.id, id ? "updated announcement" : "posted announcement", announcement.title);
+  refreshParentPages();
+  /* An urgent announcement is a banner on every page. */
+  revalidatePath("/", "layout");
+  if (str(form, "share") === "1" && announcement.status === "published") redirect(`/admin/social?from_announcement=${announcement.id}`);
+  redirect(withFlash("/admin/announcements", "ok", `Saved “${announcement.title}”.`));
+}
+
+export async function deleteAnnouncementAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  deleteAnnouncement(Number(str(form, "id")));
+  logActivity(user.id, "deleted announcement");
+  refreshParentPages();
+  revalidatePath("/", "layout");
+  redirect(withFlash("/admin/announcements", "ok", "Announcement deleted."));
 }
 
 /* --------------------------------------------------------- applications -- */
@@ -395,7 +525,7 @@ export async function retrySocialPostAction(form: FormData): Promise<void> {
 }
 
 export async function disconnectAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireAdmin();
   const which = str(form, "provider");
   const keys: Record<string, string[]> = {
     meta: ["FACEBOOK_PAGE_TOKEN", "INSTAGRAM_USER_ID"],
@@ -503,7 +633,7 @@ export async function composeEmailAction(_prev: string | null, form: FormData): 
 /* ------------------------------------------------------------ settings -- */
 
 export async function saveSettingsAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireAdmin();
   const group = str(form, "group");
   for (const def of SETTINGS.filter((entry) => entry.group === group)) {
     if (def.secret) {
@@ -519,7 +649,7 @@ export async function saveSettingsAction(form: FormData): Promise<void> {
 }
 
 export async function testEmailAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireAdmin();
   const problem = await verifyMail();
   if (problem) redirect(withFlash("/admin/settings#email", "error", `SMTP check failed: ${problem}`));
   const to = str(form, "to") || user.email;
@@ -534,27 +664,133 @@ export async function testEmailAction(form: FormData): Promise<void> {
   );
 }
 
-export async function addUserAction(_prev: string | null, form: FormData): Promise<string | null> {
-  const user = await requireUser();
-  const email = str(form, "email");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email address.";
-  try {
-    createUser(email, str(form, "name"), String(form.get("password") ?? ""));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return message.includes("UNIQUE") ? "There is already an account with that email." : message;
-  }
-  logActivity(user.id, "added staff account", email);
-  redirect(withFlash("/admin/settings/users", "ok", `Account created for ${email}.`));
+/* --------------------------------------------------------- staff accounts -- */
+
+export interface InviteResult {
+  error?: string;
+  /** Shown to the administrator when the email could not be sent, to pass on by hand. */
+  link?: string;
+  ok?: string;
 }
 
-export async function removeUserAction(form: FormData): Promise<void> {
-  const user = await requireUser();
+function isRole(value: string): value is Role {
+  return ROLES.some((role) => role.id === value);
+}
+
+async function requestOrigin(): Promise<string | undefined> {
+  const host = (await headers()).get("host");
+  return host ? `${host.startsWith("localhost") ? "http" : "https"}://${host}` : undefined;
+}
+
+export async function inviteUserAction(_prev: InviteResult | null, form: FormData): Promise<InviteResult> {
+  const admin = await requireAdmin();
+  const email = str(form, "email").toLowerCase();
+  const name = str(form, "name").slice(0, 120);
+  const role = str(form, "role");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Enter a valid email address." };
+  if (!isRole(role)) return { error: "Choose a role." };
+  const existing = getUserByEmail(email);
+  if (existing) return { error: existing.disabled ? "That person has a deactivated account — reactivate it instead." : "That person already has an account." };
+
+  const link = inviteLink(issueToken({ kind: "invite", email, name, role, createdBy: admin.id }), await requestOrigin());
+  logActivity(admin.id, "invited staff member", `${email} (${role})`);
+  const sent = await sendInvitation({ email, name, role, invitedBy: admin.name, link, sentBy: admin.id });
+  revalidatePath("/admin/settings/users");
+  if (sent.ok) return { ok: `Invitation emailed to ${email}. The link works for 7 days.` };
+  return {
+    ok: `Invitation created, but the email could not be sent (${sent.error}). Send this link to ${email} yourself — it works once, for 7 days:`,
+    link,
+  };
+}
+
+export async function resendInviteAction(_prev: InviteResult | null, form: FormData): Promise<InviteResult> {
+  const admin = await requireAdmin();
+  const invite = getInvite(Number(str(form, "id")));
+  if (!invite || invite.used_at) return { error: "That invitation is no longer pending." };
+  const link = inviteLink(
+    issueToken({ kind: "invite", email: invite.email, name: invite.name, role: invite.role, createdBy: admin.id }),
+    await requestOrigin(),
+  );
+  const sent = await sendInvitation({ email: invite.email, name: invite.name, role: invite.role, invitedBy: admin.name, link, sentBy: admin.id });
+  revalidatePath("/admin/settings/users");
+  if (sent.ok) return { ok: `New invitation emailed to ${invite.email}. The old link no longer works.` };
+  return { ok: `New link created (the email could not be sent: ${sent.error}). Send it to ${invite.email} yourself:`, link };
+}
+
+export async function revokeInviteAction(form: FormData): Promise<void> {
+  const admin = await requireAdmin();
+  revokeInvite(Number(str(form, "id")));
+  logActivity(admin.id, "cancelled invitation");
+  redirect(withFlash("/admin/settings/users", "ok", "Invitation cancelled — the link no longer works."));
+}
+
+/** Role, deactivate/reactivate and remove — with the last active administrator protected. */
+export async function manageUserAction(form: FormData): Promise<void> {
+  const admin = await requireAdmin();
   const id = Number(str(form, "id"));
-  if (id === user.id) redirect(withFlash("/admin/settings/users", "error", "You cannot remove your own account."));
-  deleteUser(id);
-  logActivity(user.id, "removed staff account", String(id));
-  redirect(withFlash("/admin/settings/users", "ok", "Account removed."));
+  const op = str(form, "op");
+  const target = getUser(id);
+  const back = "/admin/settings/users";
+  if (!target) redirect(withFlash(back, "error", "That account no longer exists."));
+  const losesAdmin =
+    target.role === "admin" && !target.disabled && (op === "disable" || op === "remove" || (op === "role" && str(form, "role") !== "admin"));
+  if (losesAdmin && countActiveAdmins() <= 1) {
+    redirect(withFlash(back, "error", "There must always be at least one active administrator. Make someone else an administrator first."));
+  }
+  if (id === admin.id && (op === "disable" || op === "remove")) {
+    redirect(withFlash(back, "error", "You cannot deactivate or remove your own account."));
+  }
+
+  let message = "Saved.";
+  if (op === "role") {
+    const role = str(form, "role");
+    if (isRole(role)) {
+      updateUser(id, { role });
+      message = `${target.name} is now ${ROLES.find((entry) => entry.id === role)!.label}.`;
+    }
+  } else if (op === "disable") {
+    updateUser(id, { disabled: true });
+    message = `${target.name} can no longer sign in. Their work stays in the portal.`;
+  } else if (op === "enable") {
+    updateUser(id, { disabled: false });
+    message = `${target.name} can sign in again.`;
+  } else if (op === "remove") {
+    deleteUser(id);
+    message = `${target.name}'s account was removed.`;
+  }
+  logActivity(admin.id, `staff account: ${op}`, target.email);
+  redirect(withFlash(back, "ok", message));
+}
+
+/** An administrator sends someone a password reset link (e.g. they are locked out). */
+export async function adminResetLinkAction(_prev: InviteResult | null, form: FormData): Promise<InviteResult> {
+  const admin = await requireAdmin();
+  const target = getUser(Number(str(form, "id")));
+  if (!target || target.disabled) return { error: "That account is not active." };
+  const link = resetLink(issueToken({ kind: "reset", email: target.email, userId: target.id, createdBy: admin.id }), await requestOrigin());
+  logActivity(admin.id, "sent password reset link", target.email);
+  const sent = await sendResetEmail({ email: target.email, name: target.name, link });
+  if (sent.ok) return { ok: `Reset link emailed to ${target.email}. It works for 1 hour.` };
+  return { ok: `Email could not be sent (${sent.error}). Give ${target.name} this link — it works once, for 1 hour:`, link };
+}
+
+/* ------------------------------------------------------------ my account -- */
+
+export async function updateProfileAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const name = str(form, "name");
+  const email = str(form, "email").toLowerCase();
+  if (!name) return "Your name cannot be empty.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter a valid email address.";
+  if (email !== user.email) {
+    /* Changing the sign-in address needs the password, like changing the password. */
+    const row = db().prepare("SELECT password_hash FROM users WHERE id = ?").get(user.id) as { password_hash: string };
+    if (!verifyPassword(String(form.get("current") ?? ""), row.password_hash)) return "Enter your current password to change your email.";
+    if (getUserByEmail(email)) return "Another account already uses that email.";
+  }
+  updateUser(user.id, { name: name.slice(0, 120), email });
+  logActivity(user.id, "updated profile");
+  redirect(withFlash("/admin/account", "ok", "Profile saved."));
 }
 
 export async function changePasswordAction(_prev: string | null, form: FormData): Promise<string | null> {
@@ -562,12 +798,50 @@ export async function changePasswordAction(_prev: string | null, form: FormData)
   const row = db().prepare("SELECT password_hash FROM users WHERE id = ?").get(user.id) as { password_hash: string };
   if (!verifyPassword(String(form.get("current") ?? ""), row.password_hash)) return "Your current password is not right.";
   const next = String(form.get("password") ?? "");
-  if (next !== String(form.get("confirm") ?? "")) return "The new passwords do not match.";
-  try {
-    setPassword(user.id, next);
-  } catch (error) {
-    return error instanceof Error ? error.message : String(error);
-  }
+  const problem = passwordProblem(next, String(form.get("confirm") ?? ""));
+  if (problem) return problem;
+  setPassword(user.id, next);
   logActivity(user.id, "changed password");
   redirect("/admin/login?changed=1");
+}
+
+export async function signOutEverywhereAction(): Promise<void> {
+  const user = await requireUser();
+  endSessions(user.id, await currentSessionToken());
+  logActivity(user.id, "signed out other devices");
+  redirect(withFlash("/admin/account", "ok", "Signed out on every other device."));
+}
+
+/* ------------------------------------------- invitation, forgot & reset -- */
+
+export async function acceptInviteAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const problem = passwordProblem(String(form.get("password") ?? ""), String(form.get("confirm") ?? ""));
+  if (problem) return problem;
+  const result = await acceptInvite(str(form, "token"), str(form, "name").slice(0, 120), String(form.get("password")));
+  if (typeof result === "string") return result;
+  redirect("/admin?ok=" + encodeURIComponent(`Welcome, ${result.name}. Your account is ready.`));
+}
+
+/** Always answers the same way, so the form cannot be used to find out who has an account. */
+export async function forgotPasswordAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const email = str(form, "email").toLowerCase();
+  const ip = ((await headers()).get("x-forwarded-for") ?? "").split(",")[0].trim();
+  const done = "sent";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Enter the email address you sign in with.";
+  if (resetThrottled(`ip:${ip}`) || resetThrottled(`email:${email}`)) return done;
+  const user = getUserByEmail(email);
+  if (user && !user.disabled) {
+    const link = resetLink(issueToken({ kind: "reset", email, userId: user.id }), await requestOrigin());
+    const sent = await sendResetEmail({ email, name: user.name, link });
+    logActivity(user.id, sent.ok ? "requested password reset" : "password reset email failed", sent.error ?? "");
+  }
+  return done;
+}
+
+export async function resetPasswordAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const problem = passwordProblem(String(form.get("password") ?? ""), String(form.get("confirm") ?? ""));
+  if (problem) return problem;
+  const result = completeReset(str(form, "token"), String(form.get("password")));
+  if (typeof result === "string") return result;
+  redirect("/admin/login?reset=1");
 }
