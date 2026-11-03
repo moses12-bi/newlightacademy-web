@@ -11,6 +11,8 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 
 import { kigaliLocalToIso } from "@/lib/admin/format";
+import { deleteAnnouncement, saveAnnouncement, type AnnouncementInput } from "@/lib/server/announcements";
+import { deleteEvent, EVENT_CATEGORIES, saveEvent, type EventInput } from "@/lib/server/events";
 import {
   acceptInvite,
   completeReset,
@@ -131,6 +133,118 @@ export async function saveSiteDetailsAction(_prev: string | null, form: FormData
   logActivity(user.id, "updated school details");
   refreshSite();
   redirect(withFlash("/admin/site", "ok", "Saved. The website shows the new details within a moment."));
+}
+
+/* ------------------------------------------------- calendar & announcements -- */
+
+/** Pages that show events or announcements; the urgent banner is on every page. */
+function refreshParentPages() {
+  revalidatePath("/school-calendar");
+  revalidatePath("/announcements");
+  revalidatePath("/parents");
+}
+
+function eventInput(form: FormData): EventInput | string {
+  const title = str(form, "title");
+  if (!title) return "Give the event a title.";
+  const date = /^\d{4}-\d{2}-\d{2}$/;
+  const time = /^\d{2}:\d{2}$/;
+  const start = str(form, "start_date");
+  const end = str(form, "end_date");
+  if (!date.test(start)) return "Choose the date of the event.";
+  if (end && (!date.test(end) || end < start)) return "The end date must be on or after the start date.";
+  const allDay = form.get("all_day") === "on";
+  const startTime = allDay ? "" : str(form, "start_time");
+  const endTime = allDay ? "" : str(form, "end_time");
+  if (startTime && !time.test(startTime)) return "The start time is not valid.";
+  if (endTime && (!time.test(endTime) || !startTime)) return "Add a start time before an end time.";
+  const category = str(form, "category");
+  return {
+    title: title.slice(0, 160),
+    category: (EVENT_CATEGORIES as readonly string[]).includes(category) ? category : "Event",
+    start_date: start,
+    end_date: end === start ? "" : end,
+    start_time: startTime,
+    end_time: endTime,
+    location: str(form, "location").slice(0, 160),
+    audience: str(form, "audience").slice(0, 120),
+    description: str(form, "description").slice(0, 4000),
+    status: str(form, "status") === "draft" ? "draft" : "published",
+  };
+}
+
+export async function saveEventAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = eventInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id")) || undefined;
+  const event = saveEvent(input, user.id, id);
+  logActivity(user.id, id ? "updated calendar event" : "added calendar event", event.title);
+  refreshParentPages();
+  if (str(form, "share") === "1" && event.status === "published") redirect(`/admin/social?from_event=${event.id}`);
+  if (str(form, "another") === "1") redirect(withFlash("/admin/calendar/new", "ok", `Added “${event.title}”. Add the next one.`));
+  redirect(withFlash("/admin/calendar", "ok", `Saved “${event.title}”.`));
+}
+
+export async function deleteEventAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  deleteEvent(Number(str(form, "id")));
+  logActivity(user.id, "deleted calendar event");
+  refreshParentPages();
+  redirect(withFlash("/admin/calendar", "ok", "Event deleted."));
+}
+
+function announcementInput(form: FormData): AnnouncementInput | string {
+  const title = str(form, "title");
+  if (!title) return "Give the announcement a title.";
+  const body = str(form, "body");
+  if (!body) return "Write the announcement.";
+  let publishAt = new Date().toISOString();
+  if (str(form, "publish_at")) {
+    const iso = kigaliLocalToIso(str(form, "publish_at"));
+    if (!iso) return "The publish time is not valid.";
+    publishAt = iso;
+  }
+  let expiresAt = "";
+  if (str(form, "expires_at")) {
+    const iso = kigaliLocalToIso(str(form, "expires_at"));
+    if (!iso) return "The expiry time is not valid.";
+    if (iso <= publishAt) return "The announcement must expire after it is published.";
+    expiresAt = iso;
+  }
+  return {
+    title: title.slice(0, 160),
+    body: body.slice(0, 8000),
+    audience: str(form, "audience").slice(0, 120),
+    priority: str(form, "priority") === "urgent" ? "urgent" : "normal",
+    pinned: form.get("pinned") === "on" ? 1 : 0,
+    publish_at: publishAt,
+    expires_at: expiresAt,
+    status: str(form, "status") === "draft" ? "draft" : "published",
+  };
+}
+
+export async function saveAnnouncementAction(_prev: string | null, form: FormData): Promise<string | null> {
+  const user = await requireUser();
+  const input = announcementInput(form);
+  if (typeof input === "string") return input;
+  const id = Number(str(form, "id")) || undefined;
+  const announcement = saveAnnouncement(input, user.id, id);
+  logActivity(user.id, id ? "updated announcement" : "posted announcement", announcement.title);
+  refreshParentPages();
+  /* An urgent announcement is a banner on every page. */
+  revalidatePath("/", "layout");
+  if (str(form, "share") === "1" && announcement.status === "published") redirect(`/admin/social?from_announcement=${announcement.id}`);
+  redirect(withFlash("/admin/announcements", "ok", `Saved “${announcement.title}”.`));
+}
+
+export async function deleteAnnouncementAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  deleteAnnouncement(Number(str(form, "id")));
+  logActivity(user.id, "deleted announcement");
+  refreshParentPages();
+  revalidatePath("/", "layout");
+  redirect(withFlash("/admin/announcements", "ok", "Announcement deleted."));
 }
 
 /* --------------------------------------------------------- applications -- */

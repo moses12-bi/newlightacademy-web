@@ -7,6 +7,8 @@ const ITEMS = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/social", label: "Social media" },
+  { href: "/admin/announcements", label: "Announcements" },
+  { href: "/admin/calendar", label: "Calendar" },
   { href: "/admin/applications", label: "Applications", countKey: "applications" },
   { href: "/admin/careers", label: "Careers" },
   { href: "/admin/gallery", label: "Gallery" },

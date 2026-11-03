@@ -209,6 +209,40 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX auth_tokens_email ON auth_tokens(kind, email);
   `,
+  `
+  CREATE TABLE events (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT 'Event',
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL DEFAULT '',
+    start_time TEXT NOT NULL DEFAULT '',
+    end_time TEXT NOT NULL DEFAULT '',
+    location TEXT NOT NULL DEFAULT '',
+    audience TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'published',
+    created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX events_dates ON events(status, start_date);
+  CREATE TABLE announcements (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL DEFAULT '',
+    audience TEXT NOT NULL DEFAULT '',
+    priority TEXT NOT NULL DEFAULT 'normal',
+    pinned INTEGER NOT NULL DEFAULT 0,
+    publish_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'published',
+    created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX announcements_live ON announcements(status, publish_at);
+  `,
 ];
 
 function migrate(db: DatabaseSync): void {

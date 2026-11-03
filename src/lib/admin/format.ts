@@ -33,3 +33,19 @@ export function isoToKigaliDate(iso: string | null | undefined): string {
   if (!iso) return "";
   return new Intl.DateTimeFormat("en-CA", { timeZone: SCHOOL_TZ }).format(new Date(iso));
 }
+
+/** ISO instant → `YYYY-MM-DDTHH:MM` in Kigali, for `<input type="datetime-local">`. */
+export function isoToKigaliLocal(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: SCHOOL_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(iso));
+  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+}

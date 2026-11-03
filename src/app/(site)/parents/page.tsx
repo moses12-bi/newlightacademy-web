@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 
 import ParentsCards from "@/components/sections/parents/ParentsCards";
 import ParentsHero from "@/components/sections/parents/ParentsHero";
+import ParentsNotices from "@/components/sections/parents/ParentsNotices";
 import ParentsVisit from "@/components/sections/parents/ParentsVisit";
+import { liveAnnouncements } from "@/lib/server/announcements";
+import { upcomingEvents } from "@/lib/server/events";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -15,6 +18,7 @@ export default function ParentsPage() {
   return (
     <>
       <ParentsHero />
+      <ParentsNotices announcements={liveAnnouncements(3)} events={upcomingEvents(5)} />
       <ParentsCards />
       <ParentsVisit />
     </>
