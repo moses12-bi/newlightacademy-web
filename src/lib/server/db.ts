@@ -191,6 +191,24 @@ const MIGRATIONS: string[] = [
   `
   ALTER TABLE posts ADD COLUMN image_focus TEXT NOT NULL DEFAULT '';
   `,
+  `
+  ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin';
+  ALTER TABLE users ADD COLUMN disabled INTEGER NOT NULL DEFAULT 0;
+  CREATE TABLE auth_tokens (
+    id INTEGER PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE,
+    kind TEXT NOT NULL,
+    email TEXT NOT NULL COLLATE NOCASE,
+    name TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL DEFAULT 'staff',
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used_at TEXT
+  );
+  CREATE INDEX auth_tokens_email ON auth_tokens(kind, email);
+  `,
 ];
 
 function migrate(db: DatabaseSync): void {

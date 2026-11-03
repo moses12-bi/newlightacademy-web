@@ -18,7 +18,8 @@ const REQUIRED: Record<OAuthProvider, string[]> = {
 /** Sends the signed-in user to the network's consent screen. */
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/admin/oauth/[provider]/start">) {
   const back = new URL("/admin/social/accounts", siteUrl(request.nextUrl.origin));
-  if (!(await currentUser())) return Response.redirect(new URL("/admin/login", siteUrl(request.nextUrl.origin)));
+  const user = await currentUser();
+  if (!user || user.role !== "admin") return Response.redirect(new URL("/admin/login", siteUrl(request.nextUrl.origin)));
 
   const { provider } = await ctx.params;
   if (!(provider in REQUIRED)) return new Response("Unknown provider", { status: 404 });

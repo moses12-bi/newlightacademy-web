@@ -68,6 +68,25 @@ An internal portal for the school office, served by the same app at `newlight-ac
 | **Email** | Send email from the school address; log of everything sent, with failures. |
 | **Settings** | SMTP, Cloudinary and social app credentials (secrets encrypted at rest), test email, staff accounts, password change. |
 
+### Staff accounts
+
+- **Roles.** *Administrators* can do everything, including Staff accounts and Settings (email, Cloudinary, social
+  app keys). *Staff* can use every content screen — blog, social media, applications, careers, gallery, staff cards,
+  school details, reviews, inbox and email. There is always at least one active administrator; the portal refuses
+  to remove, deactivate or demote the last one.
+- **Inviting.** Staff accounts → *Invite someone*. The person gets an email with a link to choose their own
+  password (one use, 7 days). Without email set up, the administrator is shown the link to pass on.
+- **Forgotten passwords.** *Forgot your password?* on the sign-in page emails a reset link (one use, 1 hour). The
+  answer is the same whether or not the address has an account. An administrator can also send someone a reset
+  link from Staff accounts. Setting a new password signs that person out everywhere.
+- **Leaving staff.** *Deactivate* signs the person out at once and blocks sign-in, keeping their name on past
+  work; *Remove* deletes the account.
+- **My account** (click your name in the sidebar): change name, email (needs the password), password, and sign out
+  of other devices.
+
+The first administrator still comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` on first start; everyone else is
+invited. Invitations and reset emails need email set up (Settings → Integrations → Email).
+
 ### First deploy
 
 1. Add to the server's `.env`: `SESSION_SECRET` (`openssl rand -hex 32`), `ADMIN_EMAIL`, `ADMIN_PASSWORD` (10+ chars), `SITE_URL`.

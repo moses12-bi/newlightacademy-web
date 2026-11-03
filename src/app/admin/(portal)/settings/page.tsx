@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import Flash from "@/components/admin/Flash";
+import { requireAdmin } from "@/lib/server/auth";
 import { SETTING_GROUPS, SETTINGS, getSetting, settingSource } from "@/lib/server/settings";
 
 import { saveSettingsAction, testEmailAction } from "../../actions";
@@ -12,6 +13,7 @@ const SOURCE_TEXT = { portal: "set here", env: "from server environment", unset:
 
 export default async function SettingsPage({ searchParams }: PageProps<"/admin/settings">) {
   await requireUser();
+  await requireAdmin();
   const params = await searchParams;
 
   return (
